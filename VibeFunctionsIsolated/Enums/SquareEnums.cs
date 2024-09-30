@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VibeCollectiveFunctions.Enums
+﻿namespace VibeCollectiveFunctions.Enums
 {
     internal static class SquareEnums
     {
