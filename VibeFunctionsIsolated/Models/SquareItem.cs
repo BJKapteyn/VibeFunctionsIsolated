@@ -1,9 +1,4 @@
 ﻿using Square.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VibeCollectiveFunctions.Models
 {
@@ -23,7 +18,7 @@ namespace VibeCollectiveFunctions.Models
 
         private static List<SquareItem>? setVariations(CatalogObject item)
         {
-            if (item.ItemData.Variations == null || 
+            if (item.ItemData?.Variations == null || 
                 item.ItemData.Variations.Count == 0) 
                 return null;
 

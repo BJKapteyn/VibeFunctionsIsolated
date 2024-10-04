@@ -14,5 +14,10 @@
             Email,
             Sign
         }
+
+        public enum Categories
+        {
+            Employee,
+        }
     }
 }

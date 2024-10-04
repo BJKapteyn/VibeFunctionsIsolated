@@ -1,63 +1,93 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square;
-using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
-using VibeCollectiveFunctions.Enums;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
+using VibeCollectiveFunctions.Enums;
+using static VibeCollectiveFunctions.Enums.SquareEnums;
+using VibeFunctionsIsolated.Enums;
 
-namespace VibeCollectiveFunctions.Items
+namespace VibeCollectiveFunctions.Items;
+
+internal class GetItems
 {
-    internal class GetItems
+    private readonly ILogger<GetItems> logger;
+    private readonly ISquareUtility SquareUtility;
+
+    public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility)
     {
-        private readonly ILogger<GetItems> logger;
-        private readonly ISquareUtility SquareUtility;
-
-        public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility)
-        {
-            SquareUtility = squareUtility;
-            logger = _logger;
-        }
-
-        [Function("GetItems")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
-        {
-            BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
-            ListCatalogResponse response;
-            List<SquareItem> squareItems = new List<SquareItem>();
-
-            SquareClient client = SquareUtility.InitializeClient();
-            
-            try
-            {
-                response = await client.CatalogApi.ListCatalogAsync();
-            }
-            catch (ApiException e)
-            {
-                logger.LogError(e.Message);
-                Console.WriteLine($"Response Code: {e.ResponseCode}");
-                Console.WriteLine($"Exception: {e.Message}");
-
-                return new NotFoundResult();
-            }
-
-            if (response.Objects.Count > 0)
-            {
-                squareItems = response.Objects.Where(responseItem => responseItem.Type == SquareEnums.CatalogObjectType.ITEM.ToString())
-                    .Select(responseItem =>
-                    {
-                        return new SquareItem(responseItem);
-
-                    })
-                    .ToList();
-            }
-
-            return new OkObjectResult(squareItems);
-        }
+        SquareUtility = squareUtility;
+        logger = _logger;
     }
-}
+
+    [Function("GetItems")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    {
+        SquareClient client = SquareUtility.InitializeClient();
+        SearchCatalogObjectsResponse response;
+
+        List<string> objectTypes = new ()
+        {
+            CatalogObjectType.ITEM.ToString(),
+            CatalogObjectType.CATEGORY.ToString()
+        };
+
+        SearchCatalogObjectsRequest? requestBody = new SearchCatalogObjectsRequest.Builder()
+            .ObjectTypes(objectTypes)
+            .Build();
+
+        try
+        {
+            response = await client.CatalogApi.SearchCatalogObjectsAsync(requestBody);
+        }
+        catch (ApiException e)
+        {
+            logger.LogError(e.Message);
+            Console.WriteLine($"Response Code: {e.ResponseCode}");
+            Console.WriteLine($"Exception: {e.Message}");
+
+            return new NotFoundResult();
+        }
+
+        List<SquareItem> squareItems = MapSquareItems(response, CatalogObjectType.ITEM.ToString()); 
+
+        return new OkObjectResult(squareItems); 
+    }
+
+    private List<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, string type)
+    {
+        List<SquareItem> squareItems = new List<SquareItem>();
+
+        string employeeCategoryId = response.Objects.Where(responseItem =>
+        {
+            return responseItem.CategoryData?.Name.Equals(Categories.Employee.ToString()) ?? false;
+        })
+        .First().Id;
+                                   
+
+        if (response.Objects.Count > 0)
+        {
+            squareItems = response.Objects
+                .Where(responseItem =>
+                {
+                    bool isCorrectType = responseItem.Type == type;
+                    bool isEmployee = responseItem.ItemData?.ReportingCategory.Id == employeeCategoryId;
+                    bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
+
+                    return isCorrectType && !isEmployee && isAppointment;
+
+                })
+                .Select(responseItem =>
+                {
+                    return new SquareItem(responseItem);
+                })
+                .ToList();
+        }
+
+        return squareItems;
+    }
+} 
