@@ -7,9 +7,8 @@ using Square.Exceptions;
 using Square.Models;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
-using VibeCollectiveFunctions.Enums;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
 using VibeFunctionsIsolated.Enums;
+using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Items;
 
