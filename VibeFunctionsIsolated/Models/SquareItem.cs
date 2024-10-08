@@ -1,4 +1,5 @@
 ﻿using Square.Models;
+using System.Security.Permissions;
 
 namespace VibeCollectiveFunctions.Models
 {
@@ -9,11 +10,15 @@ namespace VibeCollectiveFunctions.Models
         {
             Name = item.ItemData.Name;
             Description = item.ItemData.Description;
+            Id = item.Id;
+            ImageId = item.ImageData?.Url ?? string.Empty;
             Variations = setVariations(item);
         }
 
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string ImageId {  get; set; } = string.Empty;    
         public List<SquareItem>? Variations { get; set; }
 
         private static List<SquareItem>? setVariations(CatalogObject item)
@@ -27,7 +32,8 @@ namespace VibeCollectiveFunctions.Models
                 {
                     SquareItem item = new SquareItem()
                     {
-                        Name = variation.ItemVariationData.Name
+                        Name = variation.ItemVariationData.Name,
+                        Id = variation.ItemVariationData.ItemId
                     };
 
                     return item;
