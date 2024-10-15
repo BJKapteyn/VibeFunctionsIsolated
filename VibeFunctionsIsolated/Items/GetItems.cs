@@ -74,10 +74,10 @@ internal class GetItems
                 .Where(responseItem =>
                 {
                     bool isCorrectType = responseItem.Type == type;
-                    bool isEmployee = responseItem.ItemData?.ReportingCategory.Id == employeeCategoryId;
+                    bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
                     bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
 
-                    return isCorrectType && !isEmployee && isAppointment;
+                    return isCorrectType && !isNOTEmployee && isAppointment;
 
                 })
                 .Select(responseItem =>
