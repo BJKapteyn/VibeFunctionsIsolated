@@ -77,7 +77,7 @@ internal class GetItems
                     bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
                     bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
 
-                    return isCorrectType && !isNOTEmployee && isAppointment;
+                    return isCorrectType && isNOTEmployee && isAppointment;
 
                 })
                 .Select(responseItem =>
