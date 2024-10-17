@@ -1,5 +1,4 @@
 ﻿using Square.Models;
-using System.Text.Json.Serialization;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Models

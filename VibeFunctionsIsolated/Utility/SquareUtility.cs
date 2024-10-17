@@ -1,5 +1,7 @@
-﻿using Square;
+﻿using Microsoft.Extensions.Logging;
+using Square;
 using Square.Authentication;
+using Square.Models;
 using System.Text.Json;
 
 namespace VibeCollectiveFunctions.Utility
@@ -27,6 +29,28 @@ namespace VibeCollectiveFunctions.Utility
                 .Build();
 
             return client;
+        }
+
+        public string GetImageURL(string? imageId, SquareClient client, ILogger logger)
+        {
+            if (imageId == null)
+                return "";
+
+            string? result;
+            CatalogObject? item;
+
+            try
+            {
+                item = client.CatalogApi.RetrieveCatalogObject(imageId)?.MObject;
+                result = item?.ImageData?.Url ?? "";
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                result = "";
+            }
+
+            return result;
         }
     }
 }

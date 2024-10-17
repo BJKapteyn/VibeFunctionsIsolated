@@ -8,7 +8,7 @@ using Square.Models;
 using System.Text.Json;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using VibeFunctionsIsolated.Enums;
 
 
 namespace VibeCollectiveFunctions.Items
@@ -57,6 +57,7 @@ namespace VibeCollectiveFunctions.Items
         }
 
         // Pair down response data to limit data exposure
+        // response - response from the square API
         private List<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse response)
         {
             if(response.Items == null || response.Items.Count <= 0)
@@ -78,7 +79,7 @@ namespace VibeCollectiveFunctions.Items
                     {
                         imageId = "";
                     }
-                    string imageURL = GetImageURL(imageId);
+                    string imageURL = squareUtility.GetImageURL(imageId, client, logger);
                     
                     return new SquareEmployee(responseItem, customAttributeValues, imageURL);
                 })
@@ -87,7 +88,7 @@ namespace VibeCollectiveFunctions.Items
             return squareEmployees;
         }
 
-        // Add ids and product type to narrow down returned results
+        // Add ids and product type to narrow down results
         private SearchCatalogItemsRequest buildRequestBody()
         {
             var categoryIds = new List<string>()
@@ -98,7 +99,7 @@ namespace VibeCollectiveFunctions.Items
 
             var productTypes = new List<string>()
             {
-                "APPOINTMENTS_SERVICE"
+                SquareProductType.AppointmentsService
             };
 
             SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
@@ -107,28 +108,6 @@ namespace VibeCollectiveFunctions.Items
               .Build();
 
             return body;
-        }
-
-        private string GetImageURL(string? imageId)
-        {
-            if (imageId == null)
-                return "";
-
-            string? result;
-            CatalogObject? item;
-
-            try
-            {
-                item = client.CatalogApi.RetrieveCatalogObject(imageId)?.MObject;
-                result = item?.ImageData?.Url ?? "";
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.Message);
-                result = "";
-            }
-
-            return result;
         }
     }
 }

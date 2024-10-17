@@ -29,10 +29,10 @@ internal class GetItems
         SquareClient client = SquareUtility.InitializeClient();
         SearchCatalogObjectsResponse response;
 
-        List<string> objectTypes = new ()
+        List<string> objectTypes = new()
         {
             CatalogObjectType.ITEM.ToString(),
-            CatalogObjectType.CATEGORY.ToString()
+            CatalogObjectType.CATEGORY.ToString(),
         };
 
         SearchCatalogObjectsRequest? requestBody = new SearchCatalogObjectsRequest.Builder()
@@ -52,12 +52,12 @@ internal class GetItems
             return new NotFoundResult();
         }
 
-        List<SquareItem> squareItems = MapSquareItems(response, CatalogObjectType.ITEM.ToString()); 
+        List<SquareItem> squareItems = MapSquareItems(response, client, CatalogObjectType.ITEM.ToString()); 
 
         return new OkObjectResult(squareItems); 
     }
 
-    private List<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, string type)
+    private List<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, SquareClient client, string type)
     {
         List<SquareItem> squareItems = new List<SquareItem>();
 
@@ -66,8 +66,7 @@ internal class GetItems
             return responseItem.CategoryData?.Name.Equals(Categories.Employee.ToString()) ?? false;
         })
         .First().Id;
-                                   
-
+        
         if (response.Objects.Count > 0)
         {
             squareItems = response.Objects
@@ -82,7 +81,17 @@ internal class GetItems
                 })
                 .Select(responseItem =>
                 {
-                    return new SquareItem(responseItem);
+                    string imageId = responseItem.ItemData.ImageIds != null ? 
+                                     responseItem.ItemData.ImageIds.First() : 
+                                     "";
+                    string imageURL = "";
+
+                    if(imageId != string.Empty)
+                    {
+                        imageURL = SquareUtility.GetImageURL(imageId, client, logger);
+                    }
+
+                    return new SquareItem(responseItem, imageURL);
                 })
                 .ToList();
         }
