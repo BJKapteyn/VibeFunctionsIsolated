@@ -12,12 +12,21 @@ namespace VibeCollectiveFunctions.Models
             Id = item.Id;
             ImageURL = imageURL;
             Variations = setVariations(item);
+            ReportingCategoryId = item.ItemData.ReportingCategory?.Id;
+
+            if(item.ItemData.Variations != null)
+            {
+               
+            }
         }
 
+        public string? ReportingCategoryId { get; set; }
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string ImageURL {  get; set; } = string.Empty;    
+        public string ImageURL {  get; set; } = string.Empty;
+        public string? Price { get; set; }
+        public string? DurationInMinutes { get; set; }
         public List<SquareItem>? Variations { get; set; }
 
         private static List<SquareItem>? setVariations(CatalogObject item)
@@ -29,10 +38,13 @@ namespace VibeCollectiveFunctions.Models
             List<SquareItem> variations = item.ItemData.Variations
                 .Select(variation => 
                 {
+                    long? durationInMinutes = ((variation.ItemVariationData.ServiceDuration / 1000) / 60);
                     SquareItem item = new SquareItem()
                     {
                         Name = variation.ItemVariationData.Name,
-                        Id = variation.ItemVariationData.ItemId
+                        Id = variation.ItemVariationData.ItemId,
+                        Price = variation.ItemVariationData.PriceMoney?.Amount.ToString(),
+                        DurationInMinutes = durationInMinutes?.ToString()
                     };
 
                     return item;
