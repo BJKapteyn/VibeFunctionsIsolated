@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using Square;
 using Square.Exceptions;
 using Square.Models;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
@@ -63,8 +61,12 @@ internal class GetServiceItems
         IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Select(categoryId =>
         {
             IEnumerable<SquareItem> itemsByCategory = squareItems.Where(item => item.ReportingCategoryId == categoryId);
-            string category = response.Objects.Where(category => category.Id == categoryId).First().CategoryData.Name;
-            return new SquareServiceBundle(category, itemsByCategory);
+            CatalogCategory category = response.Objects.Where(category => category.Id == categoryId).First().CategoryData;
+            string categoryImageId = category.ImageIds?.First() ?? string.Empty;
+            string categoryImageURL = SquareUtility.GetImageURL(categoryImageId, client, logger);
+            SquareItem squareCategory = new SquareItem(category, categoryImageURL);
+
+            return new SquareServiceBundle(squareCategory, itemsByCategory);
         });
 
         string servicesJson = JsonSerializer.Serialize(servicesByCategory);

@@ -20,6 +20,13 @@ namespace VibeCollectiveFunctions.Models
             }
         }
 
+        public SquareItem(CatalogCategory category, string imageUrl)
+        {
+            Name = category.Name;
+            ImageURL = imageUrl;
+            Id = Guid.NewGuid().ToString();
+        }
+
         public string? ReportingCategoryId { get; set; }
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
