@@ -69,9 +69,8 @@ internal class GetServiceItems
             return new SquareServiceBundle(squareCategory, itemsByCategory);
         });
 
-        string servicesJson = JsonSerializer.Serialize(servicesByCategory);
 
-        return new OkObjectResult(servicesJson);
+        return new OkObjectResult(servicesByCategory);
     }
 
 
