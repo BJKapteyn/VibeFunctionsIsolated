@@ -41,22 +41,47 @@ namespace VibeCollectiveFunctions.Models
             if (item.ItemData?.Variations == null || 
                 item.ItemData.Variations.Count == 0) 
                 return null;
+            const int millisecondsPerSecond = 1000;
+            const int secondsPerMinute = 60;
+            HashSet<string> hashVariationNames = new();
+            List<SquareItem> variations = new ();
 
-            List<SquareItem> variations = item.ItemData.Variations
-                .Select(variation => 
+            foreach (CatalogObject variation in item.ItemData.Variations)
+            {
+                string variationName = variation.ItemVariationData.Name;
+                bool isDuplicate =  hashVariationNames.TryGetValue(variationName, out string? noOut);
+
+                if(!isDuplicate)
                 {
-                    long? durationInMinutes = ((variation.ItemVariationData.ServiceDuration / 1000) / 60);
-                    SquareItem item = new SquareItem()
+                    hashVariationNames.Add(variationName);
+                    long? durationInMinutes = ((variation.ItemVariationData.ServiceDuration / millisecondsPerSecond) / secondsPerMinute);
+
+                    SquareItem itemVaration = new SquareItem()
                     {
                         Name = variation.ItemVariationData.Name,
                         Id = variation.ItemVariationData.ItemId,
                         Price = variation.ItemVariationData.PriceMoney?.Amount.ToString(),
                         DurationInMinutes = durationInMinutes?.ToString()
                     };
+                    variations.Add(itemVaration);
+                }
+            }
 
-                    return item;
+
+            //List<SquareItem> variations = item.ItemData.Variations
+            //    .Select(variation => 
+            //    {
+            //        SquareItem item = new SquareItem()
+            //        {
+            //            Name = variation.ItemVariationData.Name,
+            //            Id = variation.ItemVariationData.ItemId,
+            //            Price = variation.ItemVariationData.PriceMoney?.Amount.ToString(),
+            //            DurationInMinutes = durationInMinutes?.ToString()
+            //        };
+
+            //        return item;
                     
-                }).ToList();
+            //    }).ToList();
 
             return variations;
         }

@@ -9,7 +9,7 @@ using Square.Exceptions;
 using VibeCollectiveFunctions.Models;
 using System.Text.Json;
 
-namespace VibeCollectiveFunctions.Email
+namespace VibeCollectiveFunctions.Functions.Email
 {
     public class InsertCustomerEmail
     {

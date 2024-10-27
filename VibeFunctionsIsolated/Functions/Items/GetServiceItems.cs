@@ -5,25 +5,28 @@ using Microsoft.Extensions.Logging;
 using Square;
 using Square.Exceptions;
 using Square.Models;
+using System.Reflection.Metadata.Ecma335;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.Models;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
 
-namespace VibeCollectiveFunctions.Items;
+namespace VibeCollectiveFunctions.Functions.Items;
 
-internal class GetItems
+// Get all service offerings bundled by category
+internal class GetServiceItems
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility SquareUtility;
 
-    public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility)
+    public GetServiceItems(ILogger<GetItems> _logger, ISquareUtility squareUtility)
     {
         SquareUtility = squareUtility;
         logger = _logger;
     }
 
-    [Function("GetItems")]
+    [Function("GetServiceItems")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
         SquareClient client = SquareUtility.InitializeClient();
@@ -52,12 +55,26 @@ internal class GetItems
             return new NotFoundResult();
         }
 
-        List<SquareItem> squareItems = MapSquareItems(response, client, CatalogObjectType.ITEM.ToString()); 
+        IEnumerable<SquareItem> squareItems = MapSquareItems(response, client, CatalogObjectType.ITEM.ToString());
+        List<string?> distinctItemCategoryIds = squareItems.Select(item => item.ReportingCategoryId).Distinct().ToList();
 
-        return new OkObjectResult(squareItems); 
+        IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Where(categoryId => categoryId != null).Select(categoryId =>
+        {
+            IEnumerable<SquareItem> itemsByCategory = squareItems.Where(item => item.ReportingCategoryId == categoryId);
+            CatalogCategory category = response.Objects.First(categoryObject => categoryObject.Id == categoryId).CategoryData;
+            string categoryImageId = category.ImageIds?.First() ?? string.Empty;
+            string categoryImageURL = SquareUtility.GetImageURL(categoryImageId, client, logger);
+            SquareItem squareCategory = new SquareItem(category, categoryImageURL);
+
+            return new SquareServiceBundle(squareCategory, itemsByCategory);
+
+        });
+
+        return new OkObjectResult(servicesByCategory);
     }
 
-    private List<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, SquareClient client, string type)
+
+    private IEnumerable<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, SquareClient client, string type)
     {
         List<SquareItem> squareItems = new List<SquareItem>();
 
@@ -66,7 +83,7 @@ internal class GetItems
             return responseItem.CategoryData?.Name.Equals(Categories.Employee.ToString()) ?? false;
         })
         .First().Id;
-        
+
         if (response.Objects.Count > 0)
         {
             squareItems = response.Objects
@@ -81,12 +98,12 @@ internal class GetItems
                 })
                 .Select(responseItem =>
                 {
-                    string imageId = responseItem.ItemData.ImageIds != null ? 
-                                     responseItem.ItemData.ImageIds.First() : 
-                                     "";
-                    string imageURL = "";
+                    string imageId = responseItem.ItemData.ImageIds != null ?
+                                     responseItem.ItemData.ImageIds.First() :
+                                     string.Empty;
+                    string imageURL = string.Empty;
 
-                    if(imageId != string.Empty)
+                    if (imageId != string.Empty)
                     {
                         imageURL = SquareUtility.GetImageURL(imageId, client, logger);
                     }
@@ -98,4 +115,5 @@ internal class GetItems
 
         return squareItems;
     }
-} 
+
+}

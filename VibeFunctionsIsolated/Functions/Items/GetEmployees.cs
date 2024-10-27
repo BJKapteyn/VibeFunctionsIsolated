@@ -11,7 +11,7 @@ using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.Enums;
 
 
-namespace VibeCollectiveFunctions.Items
+namespace VibeCollectiveFunctions.Functions.Items
 {
     internal class GetEmployees
     {
@@ -44,7 +44,7 @@ namespace VibeCollectiveFunctions.Items
                 return new BadRequestResult();
             }
 
-            List<SquareEmployee>? employees = modelEmployees(response);
+            IEnumerable<SquareEmployee>? employees = modelEmployees(response);
 
             if (employees == null) 
             {
@@ -58,18 +58,18 @@ namespace VibeCollectiveFunctions.Items
 
         // Pair down response data to limit data exposure
         // response - response from the square API
-        private List<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse response)
+        private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse response)
         {
             if(response.Items == null || response.Items.Count <= 0)
             {
                 return null;
             }
 
-            List<SquareEmployee> squareEmployees = response.Items
+            IEnumerable<SquareEmployee> squareEmployees = response.Items
                 .Select(responseItem =>
                 {
                     // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
-                    List<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values.ToList();
+                    IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
                     string? imageId;
                     if(responseItem.ItemData?.ImageIds != null)
                     {

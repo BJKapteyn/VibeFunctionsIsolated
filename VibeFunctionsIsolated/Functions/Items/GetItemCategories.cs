@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace VibeCollectiveFunctions.Items
+namespace VibeCollectiveFunctions.Functions.Items
 {
     public class GetItemCategories
     {
