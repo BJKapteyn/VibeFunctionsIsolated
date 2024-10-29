@@ -1,18 +1,26 @@
 ﻿using Square.Models;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.Models;
 
 namespace VibeCollectiveFunctions.Models
 {
-    internal class SquareEmployee(CatalogObject item, IEnumerable<CatalogCustomAttributeValue> customAttributes, string imageURL)
+    internal class SquareEmployee : SquareCatalogItem
     {
-        public string Id { get; set; } =  item.Id;
-        public string Name { get; set; } = item.ItemData.Name;
-        public string Description { get; set; } = item.ItemData.Description;
-        public string? ImageURL { get; set; } = imageURL;
-        public string? Sign { get; set; } = getCustomAttribute(CustomAttributes.Sign, customAttributes);
-        public string? Email { get; set; } = getCustomAttribute(CustomAttributes.Email, customAttributes);
-        public string? ThreeWordsToDescribe { get; set; } = getCustomAttribute(CustomAttributes.Describe, customAttributes);
-        public string? Expertise { get; set; } = getCustomAttribute(CustomAttributes.Expertise, customAttributes);
+        public SquareEmployee(CatalogObject item, IEnumerable<CatalogCustomAttributeValue> customAttributes, string imageURL) : 
+            base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
+        {
+            CategoryId = item.ItemData.CategoryId;
+            Sign = getCustomAttribute(CustomAttributes.Sign, customAttributes);
+            Email = getCustomAttribute(CustomAttributes.Email, customAttributes);
+            ThreeWordsToDescribe = getCustomAttribute(CustomAttributes.Describe, customAttributes);
+            Expertise = getCustomAttribute(CustomAttributes.Expertise, customAttributes);
+        }
+
+        public string CategoryId { get; set; }
+        public string? Sign { get; set; }
+        public string? Email { get; set; }
+        public string? ThreeWordsToDescribe { get; set; }
+        public string? Expertise { get; set; } 
 
         private static string? getCustomAttribute(string attributeName, IEnumerable<CatalogCustomAttributeValue> values)
         {

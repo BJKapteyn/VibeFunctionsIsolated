@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Square;
 using Square.Exceptions;
 using Square.Models;
-using System.Reflection.Metadata.Ecma335;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.Enums;
@@ -61,10 +60,11 @@ internal class GetServiceItems
         IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Where(categoryId => categoryId != null).Select(categoryId =>
         {
             IEnumerable<SquareItem> itemsByCategory = squareItems.Where(item => item.ReportingCategoryId == categoryId);
-            CatalogCategory category = response.Objects.First(categoryObject => categoryObject.Id == categoryId).CategoryData;
-            string categoryImageId = category.ImageIds?.First() ?? string.Empty;
+            CatalogObject category = response.Objects.First(categoryObject => categoryObject.Id == categoryId);
+            string categoryImageId = category.CategoryData.ImageIds?.First() ?? string.Empty;
             string categoryImageURL = SquareUtility.GetImageURL(categoryImageId, client, logger);
-            SquareItem squareCategory = new SquareItem(category, categoryImageURL);
+            SquareCategory squareCategory = new SquareCategory(category, categoryImageURL);
+
 
             return new SquareServiceBundle(squareCategory, itemsByCategory);
 

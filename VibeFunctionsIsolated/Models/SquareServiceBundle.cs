@@ -2,9 +2,9 @@
 
 namespace VibeFunctionsIsolated.Models
 {
-    internal class SquareServiceBundle(SquareItem category, IEnumerable<SquareItem> squareItems)
+    internal class SquareServiceBundle(SquareCategory category, IEnumerable<SquareItem> squareItems)
     {
-        public SquareItem Category { get; set; } = category;
+        public SquareCategory Category { get; set; } = category;
         public IEnumerable<SquareItem> Items { get; set; } = squareItems;
     }
 }

@@ -7,6 +7,5 @@ namespace VibeCollectiveFunctions.Utility
     {
         public SquareClient InitializeClient();
         public string GetImageURL(string? imageId, SquareClient client, ILogger logger);
-        public T? Deserialize<T>(string json);
     }
 }
