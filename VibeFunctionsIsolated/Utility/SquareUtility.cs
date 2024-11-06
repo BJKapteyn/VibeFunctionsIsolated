@@ -8,6 +8,18 @@ namespace VibeCollectiveFunctions.Utility
 {
     internal class SquareUtility : ISquareUtility
     {
+        public async Task<T?> DeserializeStream<T>(Stream body)
+        {
+            T? deserializedJson;
+            using (StreamReader reader = new(body))
+            {
+                string streamText = await reader.ReadToEndAsync();
+                deserializedJson = JsonSerializer.Deserialize<T>(streamText);
+            };
+
+            return deserializedJson;
+        }
+
         public SquareClient InitializeClient()
         {
             BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
