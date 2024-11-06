@@ -45,9 +45,7 @@ namespace VibeCollectiveFunctions.Functions.Items
                 Console.WriteLine(ex.StackTrace);
             }
 
-
-
-            return new OkObjectResult("yay");
+            return new OkObjectResult(response);
         }
     }
 }
