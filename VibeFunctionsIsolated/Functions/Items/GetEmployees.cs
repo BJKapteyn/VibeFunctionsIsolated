@@ -8,6 +8,7 @@ using Square.Models;
 using System.Text.Json;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 
 
@@ -15,34 +16,20 @@ namespace VibeCollectiveFunctions.Functions.Items
 {
     internal class GetEmployees
     {
-        private readonly ILogger<GetEmployees> logger;
         private ISquareUtility squareUtility;
-        private SquareClient client;
+        private ISquareDAL squareDAL;
 
-        public GetEmployees(ILogger<GetEmployees> l, ISquareUtility squareUtility)
+        public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
         {
-            logger = l;
             this.squareUtility = squareUtility;
-            this.client = squareUtility.InitializeClient();
+            this.squareDAL = squareDAL;
         }
 
         [Function("GetEmployees")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
         {
-            SearchCatalogItemsResponse? response;
             SearchCatalogItemsRequest requestBody = buildRequestBody();
-
-            try
-            {
-                response = await client.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
-            }
-            catch (ApiException e)
-            {
-                Console.WriteLine($"Response Code: {e.ResponseCode}");
-                Console.WriteLine($"Exception: {e.Message}");
-
-                return new BadRequestResult();
-            }
+            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItem(requestBody);
 
             IEnumerable<SquareEmployee>? employees = modelEmployees(response);
 
@@ -58,9 +45,9 @@ namespace VibeCollectiveFunctions.Functions.Items
 
         // Pair down response data to limit data exposure
         // response - response from the square API
-        private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse response)
+        private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse? response)
         {
-            if(response.Items == null || response.Items.Count <= 0)
+            if(response?.Items == null || response.Items.Count <= 0)
             {
                 return null;
             }
@@ -79,7 +66,7 @@ namespace VibeCollectiveFunctions.Functions.Items
                     {
                         imageId = "";
                     }
-                    string imageURL = squareUtility.GetImageURL(imageId, client, logger);
+                    string? imageURL = squareDAL.GetImageURL(imageId).Result;
                     
                     return new SquareEmployee(responseItem, customAttributeValues, imageURL);
                 })

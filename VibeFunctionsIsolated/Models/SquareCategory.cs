@@ -4,7 +4,7 @@ namespace VibeFunctionsIsolated.Models
 {
     internal class SquareCategory : SquareCatalogItem
     {
-        public SquareCategory (CatalogObject category, string imageUrl) : base(category.Id, category.CategoryData.Name, string.Empty, imageUrl)
+        public SquareCategory(CatalogObject category, string? imageURL) : base(category.Id, category.CategoryData.Name, string.Empty, imageURL)
         {
         }
     }

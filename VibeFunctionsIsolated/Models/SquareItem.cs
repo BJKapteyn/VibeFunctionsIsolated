@@ -12,7 +12,7 @@ namespace VibeCollectiveFunctions.Models
             DurationInMinutes = duration;
         }
 
-        public SquareItem(CatalogObject item, string imageURL) : 
+        public SquareItem(CatalogObject item, string? imageURL) : 
             base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
         {
             ImageURL = imageURL;
@@ -23,6 +23,7 @@ namespace VibeCollectiveFunctions.Models
                 Variations = setVariations(item);
             }
         }
+
         public string? Price { get; set; }
         public string? ReportingCategoryId { get; set; }
         public string? DurationInMinutes { get; set; }
@@ -34,8 +35,7 @@ namespace VibeCollectiveFunctions.Models
                 item.ItemData.Variations.Count == 0) 
                 return null;
 
-            const int millisecondsPerSecond = 1000;
-            const int secondsPerMinute = 60;
+            const int millisecondsPerMinute = 60000;
             HashSet<string> hashVariationNames = new();
             List<SquareItem> variations = new ();
 
@@ -51,7 +51,7 @@ namespace VibeCollectiveFunctions.Models
                     long durationInMinutes = 0;
                     if(serviceDurationInMilliseconds != 0)
                     {
-                        durationInMinutes = ((serviceDurationInMilliseconds / millisecondsPerSecond) / secondsPerMinute);
+                        durationInMinutes = (serviceDurationInMilliseconds / millisecondsPerMinute);
                     }
 
                     SquareItem itemVaration = new SquareItem(variation.ItemVariationData.ItemId,

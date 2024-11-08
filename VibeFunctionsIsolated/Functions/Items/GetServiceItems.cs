@@ -2,11 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Square;
-using Square.Exceptions;
 using Square.Models;
 using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.Models;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
@@ -17,20 +16,19 @@ namespace VibeCollectiveFunctions.Functions.Items;
 internal class GetServiceItems
 {
     private readonly ILogger<GetItems> logger;
-    private readonly ISquareUtility SquareUtility;
+    private readonly ISquareUtility squareUtility;
+    private readonly ISquareDAL squareDAL;
 
-    public GetServiceItems(ILogger<GetItems> _logger, ISquareUtility squareUtility)
+    public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
     {
-        SquareUtility = squareUtility;
-        logger = _logger;
+        this.logger = logger;
+        this.squareUtility = squareUtility;
+        this.squareDAL = squareDAL;
     }
 
     [Function("GetServiceItems")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
-        SquareClient client = SquareUtility.InitializeClient();
-        SearchCatalogObjectsResponse response;
-
         List<string> objectTypes = new()
         {
             CatalogObjectType.ITEM.ToString(),
@@ -41,20 +39,14 @@ internal class GetServiceItems
             .ObjectTypes(objectTypes)
             .Build();
 
-        try
-        {
-            response = await client.CatalogApi.SearchCatalogObjectsAsync(requestBody);
-        }
-        catch (ApiException e)
-        {
-            logger.LogError(e.Message);
-            Console.WriteLine($"Response Code: {e.ResponseCode}");
-            Console.WriteLine($"Exception: {e.Message}");
+        SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjects(requestBody);
 
+        if(response == null)
+        {
             return new NotFoundResult();
         }
 
-        IEnumerable<SquareItem> squareItems = MapSquareItems(response, client, CatalogObjectType.ITEM.ToString());
+        IEnumerable<SquareItem> squareItems = MapSquareItems(response, CatalogObjectType.ITEM.ToString());
         List<string?> distinctItemCategoryIds = squareItems.Select(item => item.ReportingCategoryId).Distinct().ToList();
 
         IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Where(categoryId => categoryId != null).Select(categoryId =>
@@ -62,9 +54,8 @@ internal class GetServiceItems
             IEnumerable<SquareItem> itemsByCategory = squareItems.Where(item => item.ReportingCategoryId == categoryId);
             CatalogObject category = response.Objects.First(categoryObject => categoryObject.Id == categoryId);
             string categoryImageId = category.CategoryData.ImageIds?.First() ?? string.Empty;
-            string categoryImageURL = SquareUtility.GetImageURL(categoryImageId, client, logger);
+            string? categoryImageURL = squareDAL.GetImageURL(categoryImageId).Result;
             SquareCategory squareCategory = new SquareCategory(category, categoryImageURL);
-
 
             return new SquareServiceBundle(squareCategory, itemsByCategory);
 
@@ -74,7 +65,7 @@ internal class GetServiceItems
     }
 
 
-    private IEnumerable<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, SquareClient client, string type)
+    private IEnumerable<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, string type)
     {
         List<SquareItem> squareItems = new List<SquareItem>();
 
@@ -101,11 +92,12 @@ internal class GetServiceItems
                     string imageId = responseItem.ItemData.ImageIds != null ?
                                      responseItem.ItemData.ImageIds.First() :
                                      string.Empty;
-                    string imageURL = string.Empty;
+
+                    string? imageURL = null;
 
                     if (imageId != string.Empty)
                     {
-                        imageURL = SquareUtility.GetImageURL(imageId, client, logger);
+                        imageURL = squareDAL.GetImageURL(imageId).Result;
                     }
 
                     return new SquareItem(responseItem, imageURL);

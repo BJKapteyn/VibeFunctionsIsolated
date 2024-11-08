@@ -6,26 +6,28 @@ using Square.Models;
 using Square;
 using VibeCollectiveFunctions.Utility;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
+using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.Models;
+using System.Runtime.CompilerServices;
 
 namespace VibeCollectiveFunctions.Functions.Items
 {
     internal class GetItemCategories
     {
         private readonly ILogger<GetItemCategories> _logger;
-        private readonly ISquareUtility SquareUtility;
+        private readonly ISquareUtility squareUtility;
+        private readonly ISquareDAL squareDAL;
 
-        public GetItemCategories(ILogger<GetItemCategories> logger, ISquareUtility squareUtility)
+        public GetItemCategories(ILogger<GetItemCategories> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
         {
-            SquareUtility = squareUtility;
             _logger = logger;
+            this.squareUtility = squareUtility;
+            this.squareDAL = squareDAL;
         }
 
         [Function("GetItemCategories")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
         {
-            SquareClient client = SquareUtility.InitializeClient();
-            SearchCatalogObjectsResponse response;
-
             List<string> objectTypes = new()
             {
                 CatalogObjectType.CATEGORY.ToString(),
@@ -35,17 +37,22 @@ namespace VibeCollectiveFunctions.Functions.Items
                 .ObjectTypes(objectTypes)
                 .Build();
 
-            try
+            SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjects(requestBody);
+            
+            if (response == null)
             {
-                response = await client.CatalogApi.SearchCatalogObjectsAsync(requestBody);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                return new BadRequestResult();
             }
 
-            return new OkObjectResult(response);
+            IEnumerable<SquareCategory> catalogItems = response.Objects.Select(catalogItem =>
+            {
+                string? imageId = catalogItem.CategoryData.ImageIds == null ? null : catalogItem.CategoryData.ImageIds[0];
+                string? imageURL = squareDAL.GetImageURL(imageId).Result;
+
+                return new SquareCategory(catalogItem, imageURL);
+            });
+
+            return new OkObjectResult(catalogItems);
         }
     }
 }

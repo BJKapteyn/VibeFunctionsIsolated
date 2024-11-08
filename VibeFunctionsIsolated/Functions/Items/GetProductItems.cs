@@ -5,7 +5,9 @@ using Microsoft.Extensions.Logging;
 using Square;
 using Square.Exceptions;
 using Square.Models;
+using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 
 namespace VibeFunctionsIsolated.Functions.Items
@@ -14,39 +16,45 @@ namespace VibeFunctionsIsolated.Functions.Items
     internal class GetProductItems
     {
         private readonly ILogger<GetProductItems> _logger;
-        private readonly ISquareUtility SquareUtility;
+        private readonly ISquareUtility squareUtility;
+        private readonly ISquareDAL squareDAL;
 
-        public GetProductItems(ILogger<GetProductItems> logger, ISquareUtility squareUtility)
+        public GetProductItems(ILogger<GetProductItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
         {
-            SquareUtility = squareUtility;
             _logger = logger;
+            this.squareUtility = squareUtility;
+            this.squareDAL = squareDAL;
         }
 
         [Function("GetProductItems")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            SquareClient client = SquareUtility.InitializeClient();
-            SearchCatalogItemsResponse response;
             var productTypes = new List<string>()
             {
                 SquareProductType.Regular
             };
 
-            var body = new SearchCatalogItemsRequest.Builder()
+            SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
               .ProductTypes(productTypes)
               .Build();
 
-            try
+            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItem(body);
+
+            if (response == null)
             {
-                response = await client.CatalogApi.SearchCatalogItemsAsync(body: body);
-            }
-            catch (ApiException e)
-            {
-                Console.WriteLine($"{nameof(GetProductItems)} Response Code: {e.ResponseCode}");
-                Console.WriteLine($"Exception: {e.Message}");
+                return new BadRequestResult();
             }
 
-            return new OkObjectResult(response);
+            IEnumerable<SquareItem> productItems = response.Items.Select(productItem =>
+            {
+                string? imageId = null;
+                if (productItem.ItemData.ImageIds != null)
+                    imageId = squareDAL.GetImageURL(productItem.ItemData.ImageIds[0]).Result;
+
+                return new SquareItem(productItem, imageId);
+            });
+
+            return new OkObjectResult(productItems);
         }
     }
 }

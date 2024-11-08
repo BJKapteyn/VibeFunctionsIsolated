@@ -35,12 +35,6 @@ internal class InsertCustomerEmail
 
         CosmosEmail? cosmosEmail = await SquareUtility.DeserializeStream<CosmosEmail?>(req.Body);
 
-        //using (StreamReader bodyReader = new(req.Body))
-        //{
-        //    string streamJson = await bodyReader.ReadToEndAsync();
-        //    cosmosEmail = JsonSerializer.Deserialize<CosmosEmail>(streamJson);
-        //};
-
         bool isEmail = VerifyEmail(cosmosEmail?.email);
 
         if (cosmosEmail == null || cosmosEmail.email == null || !isEmail)

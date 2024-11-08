@@ -6,11 +6,18 @@ using System.Text.Json;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
 using VibeCollectiveFunctions.Models;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.DAL;
 
 namespace VibeCollectiveFunctions.Utility
 {
     internal class SquareUtility : ISquareUtility
     {
+        private readonly ISquareDAL squareDAL;
+        public SquareUtility(ISquareDAL squareDAL) 
+        {
+            this.squareDAL = squareDAL;
+        }
+
         public async Task<T?> DeserializeStream<T>(Stream body)
         {
             T? deserializedJson;
@@ -23,40 +30,7 @@ namespace VibeCollectiveFunctions.Utility
             return deserializedJson;
         }
 
-        public SquareClient InitializeClient()
-        {
-            BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
-            SquareClient client = new SquareClient.Builder()
-                .Environment(Square.Environment.Production)
-                .BearerAuthCredentials(bearerAuth)
-                .Build();
-
-            return client;
-        }
-
-        public string GetImageURL(string? imageId, SquareClient client, ILogger logger)
-        {
-            if (imageId == null)
-                return "";
-
-            string? result;
-            CatalogObject? item;
-
-            try
-            {
-                item = client.CatalogApi.RetrieveCatalogObject(imageId)?.MObject;
-                result = item?.ImageData?.Url ?? "";
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.Message);
-                result = "";
-            }
-
-            return result;
-        }
-
-        public IEnumerable<SquareItem>? MapSquareItems(SearchCatalogObjectsResponse response, SquareClient client, string type)
+        public IEnumerable<SquareItem>? MapSquareItems(SearchCatalogObjectsResponse response, string type)
         {
             IEnumerable<SquareItem>? squareItems = null;
 
@@ -83,11 +57,11 @@ namespace VibeCollectiveFunctions.Utility
                         string imageId = responseItem.ItemData.ImageIds != null ?
                                          responseItem.ItemData.ImageIds.First() :
                                          "";
-                        string imageURL = "";
+                        string? imageURL = null;
 
                         if (imageId != string.Empty)
                         {
-                            imageURL = SquareUtility.GetImageURL(imageId, client, logger);
+                            imageURL = squareDAL.GetImageURL(imageId).Result;
                         }
 
                         return new SquareItem(responseItem, imageURL);
