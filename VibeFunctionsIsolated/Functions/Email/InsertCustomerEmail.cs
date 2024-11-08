@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Square.Authentication;
-using Square.Models;
 using Square;
+using Square.Authentication;
 using Square.Exceptions;
+using Square.Models;
 using VibeCollectiveFunctions.Models;
-using System.Text.Json;
 using VibeCollectiveFunctions.Utility;
 
 namespace VibeCollectiveFunctions.Functions.Email;

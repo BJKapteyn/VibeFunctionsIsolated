@@ -3,7 +3,6 @@ using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
-using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.Functions.Items;
 
 namespace VibeFunctionsIsolated.DAL;

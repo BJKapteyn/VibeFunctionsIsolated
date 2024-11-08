@@ -1,7 +1,6 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.DAL;
 

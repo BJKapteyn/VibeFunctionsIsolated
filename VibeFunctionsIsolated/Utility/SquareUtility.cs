@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Square;
-using Square.Authentication;
-using Square.Models;
+﻿using Square.Models;
 using System.Text.Json;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
 using VibeCollectiveFunctions.Models;
-using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.Enums;
+using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Utility
 {
