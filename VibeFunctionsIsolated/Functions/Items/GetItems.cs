@@ -36,11 +36,11 @@ internal class GetItems
             .Build();
 
         SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjects(requestBody);
-
         if (response == null) 
         {
             return new NotFoundResult();
         }
+
         IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareItems(response, CatalogObjectType.ITEM.ToString()); 
         if(squareItems == null || squareItems.Count() == 0)
         {

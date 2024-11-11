@@ -4,18 +4,20 @@ using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
 using VibeFunctionsIsolated.Functions.Items;
+using VibeFunctionsIsolated.Models;
+using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;
 
 internal class SquareDAL : ISquareDAL
 {
     private readonly ILogger<SquareDAL> logger;
+    private SquareClient squareClient { get; }
     public SquareDAL(ILogger<SquareDAL> logger)
     {
         this.logger = logger;    
         squareClient = InitializeClient();
     }
-    SquareClient squareClient { get; set; }
 
     public SquareClient InitializeClient()
     {
@@ -26,6 +28,31 @@ internal class SquareDAL : ISquareDAL
             .Build();
 
         return client;
+    }
+
+    public async Task<SearchCatalogObjectsResponse?> SearchCatalogObjectByCategoryName(CategoryId categoryId)
+    {
+        List<string> objectTypes = new()
+        {
+            CatalogObjectType.CATEGORY.ToString(),
+        };
+
+        CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryId.Id)
+        .Build();
+
+        var searchQuery = new CatalogQuery.Builder()
+          .ExactQuery(exactQuery)
+          .Build();
+
+
+        SearchCatalogObjectsRequest requestBody = new SearchCatalogObjectsRequest.Builder()
+            .ObjectTypes(objectTypes)
+            .Query(searchQuery)
+            .Build();
+
+        SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
+
+        return response;
     }
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItem(SearchCatalogItemsRequest requestBody)

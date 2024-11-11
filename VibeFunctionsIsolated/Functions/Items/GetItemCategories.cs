@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using Square;
 using VibeCollectiveFunctions.Utility;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
-using System.Runtime.CompilerServices;
+using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Functions.Items
 {
@@ -41,7 +39,7 @@ namespace VibeCollectiveFunctions.Functions.Items
             
             if (response == null)
             {
-                return new BadRequestResult();
+                return new NotFoundResult();
             }
 
             IEnumerable<SquareCategory> catalogItems = response.Objects.Select(catalogItem =>
