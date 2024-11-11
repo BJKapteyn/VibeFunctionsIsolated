@@ -36,7 +36,7 @@ namespace VibeFunctionsIsolated.Functions.Items
               .ProductTypes(productTypes)
               .Build();
 
-            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItem(body);
+            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(body);
 
             if (response == null)
             {

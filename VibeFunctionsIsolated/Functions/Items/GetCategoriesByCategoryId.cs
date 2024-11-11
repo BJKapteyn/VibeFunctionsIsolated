@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using System.Runtime.CompilerServices;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
@@ -34,7 +32,7 @@ namespace VibeFunctionsIsolated.Functions.Items
                 return new BadRequestResult();
             }
 
-            SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjectByCategoryName(categoryName);
+            SearchCatalogObjectsResponse? response = await squareDAL.SearchCategoryObjectsByParentId(categoryName);
             if (response == null) 
             {
                 _logger.LogError($"{nameof(GetCategoriesByCategoryId)}: request failed");

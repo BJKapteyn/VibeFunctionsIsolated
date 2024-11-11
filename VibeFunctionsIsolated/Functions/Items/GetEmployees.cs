@@ -26,7 +26,7 @@ namespace VibeCollectiveFunctions.Functions.Items
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
         {
             SearchCatalogItemsRequest requestBody = buildRequestBody();
-            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItem(requestBody);
+            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(requestBody);
 
             IEnumerable<SquareEmployee>? employees = modelEmployees(response);
 
