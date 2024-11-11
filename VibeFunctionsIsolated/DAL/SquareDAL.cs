@@ -46,7 +46,7 @@ internal class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(SearchCatalogItemsRequest requestBody, CategoryId categoryId)
+    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryId categoryId)
     {
         var categoryIds = new List<string>()
         {
@@ -57,8 +57,7 @@ internal class SquareDAL : ISquareDAL
           .CategoryIds(categoryIds)
           .Build();
 
-
-        SearchCatalogItemsResponse? response = await SearchCatalogItems(requestBody);
+        SearchCatalogItemsResponse? response = await SearchCatalogItems(body);
 
         if (response != null) 
         {
