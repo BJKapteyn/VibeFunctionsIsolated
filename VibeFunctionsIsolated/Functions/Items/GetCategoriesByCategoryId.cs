@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
+using System.Runtime.CompilerServices;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
@@ -27,16 +28,16 @@ namespace VibeFunctionsIsolated.Functions.Items
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             CategoryId? categoryName = await squareUtility.DeserializeStream<CategoryId>(req.Body);
-
             if (categoryName == null)
             {
+                _logger.LogError($"{nameof(GetCategoriesByCategoryId)} could not map the category id");
                 return new BadRequestResult();
             }
 
             SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjectByCategoryName(categoryName);
-
             if (response == null) 
             {
+                _logger.LogError($"{nameof(GetCategoriesByCategoryId)}: request failed");
                 return new NotFoundResult();
             }
 
