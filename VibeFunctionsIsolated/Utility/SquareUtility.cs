@@ -3,7 +3,6 @@ using System.Text.Json;
 using VibeCollectiveFunctions.Models;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Utility
@@ -28,7 +27,7 @@ namespace VibeCollectiveFunctions.Utility
             return deserializedJson;
         }
 
-        public IEnumerable<SquareItem>? MapSquareItems(SearchCatalogObjectsResponse response, string type)
+        public IEnumerable<SquareItem>? MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
         {
             IEnumerable<SquareItem>? squareItems = null;
 

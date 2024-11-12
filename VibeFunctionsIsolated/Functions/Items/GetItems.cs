@@ -41,7 +41,7 @@ internal class GetItems
             return new NotFoundResult();
         }
 
-        IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareItems(response, CatalogObjectType.ITEM.ToString()); 
+        IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareProductItems(response, CatalogObjectType.ITEM.ToString()); 
         if(squareItems == null || squareItems.Count() == 0)
         {
             return new BadRequestObjectResult(squareItems);

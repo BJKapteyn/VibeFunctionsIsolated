@@ -59,7 +59,7 @@ internal class SquareDAL : ISquareDAL
 
         SearchCatalogItemsResponse? response = await SearchCatalogItems(body);
 
-        if (response != null) 
+        if (response == null) 
         {
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }

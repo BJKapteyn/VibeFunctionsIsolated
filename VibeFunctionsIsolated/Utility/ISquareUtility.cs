@@ -6,7 +6,7 @@ namespace VibeCollectiveFunctions.Utility
     internal interface ISquareUtility
     {
         public Task<T?> DeserializeStream<T>(Stream body);
-        public IEnumerable<SquareItem>? MapSquareItems(SearchCatalogObjectsResponse response, string type);
+        public IEnumerable<SquareItem>? MapSquareProductItems(SearchCatalogObjectsResponse response, string type);
 
     }
 }
