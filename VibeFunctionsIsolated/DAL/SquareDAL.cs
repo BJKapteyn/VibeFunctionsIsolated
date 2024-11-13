@@ -77,8 +77,8 @@ internal class SquareDAL : ISquareDAL
         }
         catch (ApiException e)
         {
-            Console.WriteLine($"{nameof(SearchCatalogObjects)} Response Code: {e.ResponseCode}");
-            Console.WriteLine($"Exception: {e.Message}");
+            logger.LogError($"{nameof(SearchCatalogObjects)} Response Code: {e.ResponseCode}");
+            logger.LogError($"Exception: {e.Message}");
 
             return null;
         }

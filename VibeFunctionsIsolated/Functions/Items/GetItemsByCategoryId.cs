@@ -35,7 +35,7 @@ internal class GetItemsByCategoryId
         }
 
         SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItemsByCategoryId(categoryId);
-        if (response == null)
+        if (response == null || response.Items == null || response.Errors != null)
         {
             _logger.LogError($"{nameof(GetItemsByCategoryId)}: request failed");
             return new NotFoundResult();

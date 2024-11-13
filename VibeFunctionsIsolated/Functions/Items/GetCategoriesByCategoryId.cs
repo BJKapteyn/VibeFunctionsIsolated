@@ -23,7 +23,7 @@ namespace VibeFunctionsIsolated.Functions.Items
         }
 
         [Function("GetCategoriesByCategoryId")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
             CategoryId? categoryName = await squareUtility.DeserializeStream<CategoryId>(req.Body);
             if (categoryName == null)
