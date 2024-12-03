@@ -35,10 +35,17 @@ internal class GetItemsByCategoryId
         }
 
         SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItemsByCategoryId(categoryId);
-        if (response == null || response.Items == null || response.Errors != null)
+
+        if (response == null || response.Items == null)
         {
-            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request failed");
+            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request returned no items");
             return new NotFoundResult();
+        }
+
+        if(response.Errors != null)
+        {
+            _logger.LogError($"{nameof(GetItemsByCategoryId)} errors: /n{response?.Errors.ToString()}");
+            return new BadRequestResult();
         }
 
         IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
