@@ -3,7 +3,7 @@
 namespace VibeFunctionsIsolated.Models
 {
     [JsonSerializable(typeof(CategoryId))]
-    internal class CategoryId
+    public class CategoryId
     {
         public CategoryId(string id) 
         {

@@ -1,6 +1,6 @@
 ﻿namespace VibeCollectiveFunctions.Enums
 {
-    internal static class SquareEnums
+    public static class SquareEnums
     {
         public enum CatalogObjectType
         {

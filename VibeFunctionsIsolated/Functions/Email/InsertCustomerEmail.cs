@@ -11,7 +11,7 @@ using VibeCollectiveFunctions.Utility;
 
 namespace VibeCollectiveFunctions.Functions.Email;
 
-internal class InsertCustomerEmail
+public class InsertCustomerEmail
 {
     private readonly ILogger<InsertCustomerEmail> _logger;
     private readonly ISquareUtility SquareUtility;

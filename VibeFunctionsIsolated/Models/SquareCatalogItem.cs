@@ -2,7 +2,7 @@
 
 namespace VibeFunctionsIsolated.Models
 {
-    internal class SquareCatalogItem : ISquareCatalogItem
+    public class SquareCatalogItem : ISquareCatalogItem
     {
         public SquareCatalogItem(string id, string name, string description, string? imageURL)
         {

@@ -11,7 +11,7 @@ using VibeFunctionsIsolated.Enums;
 namespace VibeFunctionsIsolated.Functions.Items
 {
     // Gets all shop items
-    internal class GetProductItems
+    public class GetProductItems
     {
         private readonly ILogger<GetProductItems> _logger;
         private readonly ISquareUtility squareUtility;

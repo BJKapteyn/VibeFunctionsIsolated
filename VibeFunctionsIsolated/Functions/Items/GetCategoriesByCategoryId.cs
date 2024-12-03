@@ -9,7 +9,7 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
-    internal class GetCategoriesByCategoryId
+    public class GetCategoriesByCategoryId
     {
         private readonly ILogger<GetCategoriesByCategoryId> _logger;
         private readonly ISquareDAL squareDAL;

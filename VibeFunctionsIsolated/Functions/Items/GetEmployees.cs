@@ -11,7 +11,7 @@ using VibeFunctionsIsolated.Enums;
 
 namespace VibeCollectiveFunctions.Functions.Items
 {
-    internal class GetEmployees
+    public class GetEmployees
     {
         private ISquareUtility squareUtility;
         private ISquareDAL squareDAL;
