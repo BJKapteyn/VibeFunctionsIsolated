@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Square.Models;
+using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
@@ -12,6 +13,7 @@ using VibeFunctionsIsolated.Models;
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
 
 [TestFixture]
+[Parallelizable]
 public class GetCategoriesByCategoryIdTests
 {
     private Mock<ILogger<GetCategoriesByCategoryId>> logger;
@@ -27,32 +29,41 @@ public class GetCategoriesByCategoryIdTests
     }
 
     [Test]
-    public async Task GetCategoriesByCategoryId_GetsBadId_ReturnsNotFound()
+    [Parallelizable]
+    [TestCaseSource(nameof(GetCategoriesByCategoryIdTestCases))]
+    public async Task GetCategoriesByCategoryIdTest(List<CatalogObject> squareResponseBody, CategoryId? requestBody, IActionResult expected)
     {
         // Arrange
         Mock<HttpRequest> mockRequest = new Mock<HttpRequest>();
-        //mockRequest.Object.Body = Stream.Null;
-        //mockRequest.Setup(x => x.Body).Returns(Stream.Null);
         CategoryId badId = new CategoryId("BadId");
-        SearchCatalogObjectsResponse? squareResponse = new SearchCatalogObjectsResponse(objects: new List<CatalogObject>());
+        SearchCatalogObjectsResponse? squareResponse = new SearchCatalogObjectsResponse(objects: squareResponseBody);
 
         squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CategoryId>()).Result).Returns(squareResponse);
-        squareUtility.Setup(x => x.DeserializeStream<CategoryId>(It.IsAny<Stream>()).Result).Returns(badId);
+        squareUtility.Setup(x => x.DeserializeStream<CategoryId>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
         GetCategoriesByCategoryId azureTestFunction = new GetCategoriesByCategoryId(logger.Object, squareDAL.Object, squareUtility.Object);
-
 
         // Act
         IActionResult result = await azureTestFunction.Run(mockRequest.Object);
 
         // Assert
-        Assert.That(result.GetType(), Is.EqualTo(new NotFoundResult().GetType()));
+        Assert.That(result.GetType(), Is.EqualTo(expected.GetType()));
     }
-    IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
+    private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
     {
+        CategoryId? goodId = new CategoryId("GoodId");
+        CategoryId? nullId = null;
 
+        List<CatalogObject> populatedResponseBody = new List<CatalogObject>() { new CatalogObject("ITEM", Guid.NewGuid().ToString()) };
+        List<CatalogObject>? emptyResponseBody = new ();
 
-        yield return new TestCaseData();
+        BadRequestResult badRequestResult = new BadRequestResult();
+        NotFoundResult notFoundResult = new NotFoundResult();
+        OkObjectResult okObjectResult = new OkObjectResult(new List<SquareCategory>());
+
+        yield return new TestCaseData(emptyResponseBody, goodId, notFoundResult);
+        yield return new TestCaseData(emptyResponseBody, nullId, badRequestResult);
+        yield return new TestCaseData(populatedResponseBody, goodId, okObjectResult);
     }
 
 }
