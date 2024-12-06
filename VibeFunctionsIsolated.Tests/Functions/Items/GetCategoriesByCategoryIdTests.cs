@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
 using VibeCollectiveFunctions.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
@@ -49,6 +48,7 @@ public class GetCategoriesByCategoryIdTests
         // Assert
         Assert.That(result.GetType(), Is.EqualTo(expected.GetType()));
     }
+
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
     {
         CategoryId? goodId = new CategoryId("GoodId");
@@ -65,5 +65,4 @@ public class GetCategoriesByCategoryIdTests
         yield return new TestCaseData(emptyResponseBody, nullId, badRequestResult);
         yield return new TestCaseData(populatedResponseBody, goodId, okObjectResult);
     }
-
 }
