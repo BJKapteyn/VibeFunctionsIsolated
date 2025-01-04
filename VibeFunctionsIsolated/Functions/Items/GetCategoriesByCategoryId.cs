@@ -9,7 +9,7 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
-    internal class GetCategoriesByCategoryId
+    public class GetCategoriesByCategoryId
     {
         private readonly ILogger<GetCategoriesByCategoryId> _logger;
         private readonly ISquareDAL squareDAL;
@@ -25,15 +25,15 @@ namespace VibeFunctionsIsolated.Functions.Items
         [Function("GetCategoriesByCategoryId")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
-            CategoryId? categoryName = await squareUtility.DeserializeStream<CategoryId>(req.Body);
-            if (categoryName == null)
+            CategoryId? categoryId = squareUtility.DeserializeStream<CategoryId>(req.Body).Result;
+            if (categoryId == null)
             {
                 _logger.LogError($"{nameof(GetCategoriesByCategoryId)} could not map the category id");
                 return new BadRequestResult();
             }
 
-            SearchCatalogObjectsResponse? response = await squareDAL.SearchCategoryObjectsByParentId(categoryName);
-            if (response == null) 
+            SearchCatalogObjectsResponse? response = await squareDAL.SearchCategoryObjectsByParentId(categoryId);
+            if (response?.Objects == null || response.Objects.Count == 0) 
             {
                 _logger.LogError($"{nameof(GetCategoriesByCategoryId)}: request failed");
                 return new NotFoundResult();

@@ -4,7 +4,7 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeCollectiveFunctions.Models
 {
-    internal class SquareEmployee : SquareCatalogItem
+    public class SquareEmployee : SquareCatalogItem
     {
         public SquareEmployee(CatalogObject item, IEnumerable<CatalogCustomAttributeValue> customAttributes, string? imageURL) : 
             base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)

@@ -1,6 +1,6 @@
 ﻿namespace VibeFunctionsIsolated.Enums;
 
-internal static class SquareProductCategory
+public static class SquareProductCategory
 {
     public static string Products = "Products";
     public static string Services = "Services";

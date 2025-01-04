@@ -10,7 +10,7 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
-internal class GetItemsByCategoryId
+public class GetItemsByCategoryId
 {
     private readonly ILogger<GetItemsByCategoryId> _logger;
     private readonly ISquareUtility squareUtility;

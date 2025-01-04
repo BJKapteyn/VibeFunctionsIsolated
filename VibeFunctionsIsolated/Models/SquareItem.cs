@@ -3,7 +3,7 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeCollectiveFunctions.Models
 {
-    internal class SquareItem : SquareCatalogItem
+    public class SquareItem : SquareCatalogItem
     {
         public SquareItem(string id, string name, string price, string duration) : 
             base(id, name, string.Empty, string.Empty)

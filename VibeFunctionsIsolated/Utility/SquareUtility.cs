@@ -7,7 +7,7 @@ using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Utility
 {
-    internal class SquareUtility : ISquareUtility
+    public class SquareUtility : ISquareUtility
     {
         private readonly ISquareDAL squareDAL;
         public SquareUtility(ISquareDAL squareDAL) 

@@ -2,7 +2,7 @@
 using VibeFunctionsIsolated.Models;
 namespace VibeFunctionsIsolated.DAL;
 
-internal interface ISquareDAL
+public interface ISquareDAL
 {
     public Task<SearchCatalogItemsResponse?> SearchCatalogItems(SearchCatalogItemsRequest requestBody);
     public Task<SearchCatalogObjectsResponse?> SearchCatalogObjects(SearchCatalogObjectsRequest requestBody);

@@ -13,7 +13,7 @@ using static VibeCollectiveFunctions.Enums.SquareEnums;
 namespace VibeCollectiveFunctions.Functions.Items;
 
 // Get all service offerings bundled by category
-internal class GetServiceItems
+public class GetServiceItems
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;

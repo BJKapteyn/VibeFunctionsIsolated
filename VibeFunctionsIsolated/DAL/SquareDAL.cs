@@ -8,7 +8,7 @@ using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;
 
-internal class SquareDAL : ISquareDAL
+public class SquareDAL : ISquareDAL
 {
     private readonly ILogger<SquareDAL> logger;
     private SquareClient squareClient { get; }

@@ -1,6 +1,6 @@
 ﻿namespace VibeFunctionsIsolated.Models.Interfaces;
 
-internal interface ISquareCatalogItem
+public interface ISquareCatalogItem
 {
     public string Id { get; set; }
     public string Name { get; set; } 

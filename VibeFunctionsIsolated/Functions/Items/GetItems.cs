@@ -10,7 +10,7 @@ using static VibeCollectiveFunctions.Enums.SquareEnums;
 
 namespace VibeCollectiveFunctions.Functions.Items;
 
-internal class GetItems
+public class GetItems
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
