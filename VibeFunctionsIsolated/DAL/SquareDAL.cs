@@ -48,14 +48,25 @@ public class SquareDAL : ISquareDAL
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryId categoryId)
     {
-        var categoryIds = new List<string>()
+        List<string> categoryIds = new ()
         {
             categoryId.Id
         };
+        
+        SearchCatalogItemsRequest.Builder bodyBuilder = new SearchCatalogItemsRequest.Builder()
+          .CategoryIds(categoryIds);
 
-        var body = new SearchCatalogItemsRequest.Builder()
-          .CategoryIds(categoryIds)
-          .Build();
+
+        if(categoryId.ProductType != null)
+        {
+            List<string> productTypes = new()
+            {
+                categoryId.ProductType
+            };
+            bodyBuilder.ProductTypes(productTypes);
+        }
+
+        SearchCatalogItemsRequest body = bodyBuilder.Build();
 
         SearchCatalogItemsResponse? response = await SearchCatalogItems(body);
 
@@ -64,7 +75,7 @@ public class SquareDAL : ISquareDAL
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
-        return response;
+          return response;
     }
 
     public async Task<SearchCatalogObjectsResponse?> SearchCatalogObjects(SearchCatalogObjectsRequest requestBody)
