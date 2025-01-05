@@ -25,8 +25,16 @@ internal class GetItemsByCategoryId
 
     [Function("GetItemsByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {
-        CategoryId? categoryId = await squareUtility.DeserializeStream<CategoryId?>(req.Body);
+    {        
+        CategoryId? categoryId = null;
+        try
+        {
+            categoryId = await squareUtility.DeserializeStream<CategoryId?>(req.Body);
+        }
+        catch(Exception e)
+        {
+            _logger.LogError(e.Message);
+        }
 
         if (categoryId == null)
         {

@@ -13,8 +13,8 @@ namespace VibeCollectiveFunctions.Functions.Items
 {
     internal class GetEmployees
     {
-        private ISquareUtility squareUtility;
-        private ISquareDAL squareDAL;
+        private readonly ISquareUtility squareUtility;
+        private readonly ISquareDAL squareDAL;
 
         public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
         {
