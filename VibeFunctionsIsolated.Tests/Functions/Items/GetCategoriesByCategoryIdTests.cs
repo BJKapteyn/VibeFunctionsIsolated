@@ -33,14 +33,14 @@ public class GetCategoriesByCategoryIdTests
     public async Task GetCategoriesByCategoryIdTest(List<CatalogObject> squareResponseBody, CategoryId? requestBody, IActionResult expected)
     {
         // Arrange
-        Mock<HttpRequest> mockRequest = new Mock<HttpRequest>();
-        CategoryId badId = new CategoryId("BadId");
-        SearchCatalogObjectsResponse? squareResponse = new SearchCatalogObjectsResponse(objects: squareResponseBody);
+        Mock<HttpRequest> mockRequest = new();
+        CategoryId badId = new("BadId");
+        SearchCatalogObjectsResponse? squareResponse = new(objects: squareResponseBody);
 
         squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CategoryId>()).Result).Returns(squareResponse);
         squareUtility.Setup(x => x.DeserializeStream<CategoryId>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
-        GetCategoriesByCategoryId azureTestFunction = new GetCategoriesByCategoryId(logger.Object, squareDAL.Object, squareUtility.Object);
+        GetCategoriesByCategoryId azureTestFunction = new(logger.Object, squareDAL.Object, squareUtility.Object);
 
         // Act
         IActionResult result = await azureTestFunction.Run(mockRequest.Object);
@@ -51,15 +51,15 @@ public class GetCategoriesByCategoryIdTests
 
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
     {
-        CategoryId? goodId = new CategoryId("GoodId");
+        CategoryId? goodId = new("GoodId");
         CategoryId? nullId = null;
 
-        List<CatalogObject> populatedResponseBody = new List<CatalogObject>() { new CatalogObject("ITEM", Guid.NewGuid().ToString()) };
-        List<CatalogObject>? emptyResponseBody = new ();
+        List<CatalogObject> populatedResponseBody = [new CatalogObject("ITEM", Guid.NewGuid().ToString())];
+        List<CatalogObject>? emptyResponseBody = new();
 
-        BadRequestResult badRequestResult = new BadRequestResult();
-        NotFoundResult notFoundResult = new NotFoundResult();
-        OkObjectResult okObjectResult = new OkObjectResult(new List<SquareCategory>());
+        BadRequestResult badRequestResult = new();
+        NotFoundResult notFoundResult = new();
+        OkObjectResult okObjectResult = new(new List<SquareCategory>());
 
         yield return new TestCaseData(emptyResponseBody, goodId, notFoundResult);
         yield return new TestCaseData(emptyResponseBody, nullId, badRequestResult);

@@ -3,6 +3,7 @@ using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
+using System.Web;
 using VibeFunctionsIsolated.Models;
 using static VibeCollectiveFunctions.Enums.SquareEnums;
 
@@ -10,15 +11,19 @@ namespace VibeFunctionsIsolated.DAL;
 
 public class SquareDAL : ISquareDAL
 {
+    #region PrivateMembers
+
     private readonly ILogger<SquareDAL> logger;
-    private SquareClient squareClient { get; }
+    private SquareClient SquareClient { get; }
+    #endregion
+
     public SquareDAL(ILogger<SquareDAL> logger)
     {
         this.logger = logger;    
-        squareClient = InitializeClient();
+        SquareClient = InitializeClient();
     }
 
-    public SquareClient InitializeClient()
+    public static SquareClient InitializeClient()
     {
         BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
         SquareClient client = new SquareClient.Builder()
@@ -35,7 +40,7 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            response = await squareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
+            response = await SquareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
@@ -48,10 +53,10 @@ public class SquareDAL : ISquareDAL
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryId categoryId)
     {
-        List<string> categoryIds = new ()
-        {
+        List<string> categoryIds =
+        [
             categoryId.Id
-        };
+        ];
         
         SearchCatalogItemsRequest.Builder bodyBuilder = new SearchCatalogItemsRequest.Builder()
           .CategoryIds(categoryIds);
@@ -59,10 +64,11 @@ public class SquareDAL : ISquareDAL
 
         if(categoryId.ProductType != null)
         {
-            List<string> productTypes = new()
-            {
+            List<string> productTypes =
+            [
                 categoryId.ProductType
-            };
+            ];
+
             bodyBuilder.ProductTypes(productTypes);
         }
 
@@ -80,16 +86,18 @@ public class SquareDAL : ISquareDAL
 
     public async Task<SearchCatalogObjectsResponse?> SearchCatalogObjects(SearchCatalogObjectsRequest requestBody)
     {
-        SearchCatalogObjectsResponse? response = null;
+        SearchCatalogObjectsResponse? response;
 
         try
         {
-            response = await squareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
+            response = await SquareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
-            logger.LogError($"{nameof(SearchCatalogObjects)} Response Code: {e.ResponseCode}");
-            logger.LogError($"Exception: {e.Message}");
+            string message = e.Message;
+            string responseCode = e.ResponseCode.ToString();
+            logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
+            logger.LogError("Exception: {message}", message);
 
             return null;
         }
@@ -99,10 +107,10 @@ public class SquareDAL : ISquareDAL
 
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CategoryId categoryId)
     {
-        List<string> objectTypes = new()
-        {
+        List<string> objectTypes =
+        [
             CatalogObjectType.CATEGORY.ToString(),
-        };
+        ];
 
         CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryId.Id)
         .Build();
@@ -133,18 +141,19 @@ public class SquareDAL : ISquareDAL
             return "";
 
         string? result;
-        RetrieveCatalogObjectResponse? item = null;
+        RetrieveCatalogObjectResponse? item;
 
         try
         {
-            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
+            item = await SquareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex.Message);
+            string message = ex.Message;
+            logger.LogError("{message}", message);
             return null;
         }
-        result = item?.MObject?.ImageData?.Url;
+        result = ((RetrieveCatalogObjectResponse?)null)?.MObject?.ImageData?.Url;
 
         return result;
     }
