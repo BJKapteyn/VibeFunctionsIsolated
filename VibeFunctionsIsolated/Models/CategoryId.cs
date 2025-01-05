@@ -2,16 +2,14 @@
 
 public class CategoryId 
 {
-    public CategoryId(string id, string? productType) 
+    public CategoryId(string id, string? productType = null, string? reportingCategoryId = null) 
     {
         Id = id;
         ProductType = productType;
-    }
-    public CategoryId(string id) : this(id, null)
-    {
-
+        ReportingCategoryId = reportingCategoryId;
     }
 
     public string Id { get; set; }
+    public string? ReportingCategoryId { get; set; }
     public string? ProductType { get; set; }
 }
