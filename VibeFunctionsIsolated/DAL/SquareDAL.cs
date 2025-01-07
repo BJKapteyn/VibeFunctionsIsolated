@@ -153,7 +153,7 @@ public class SquareDAL : ISquareDAL
             logger.LogError("{message}", message);
             return null;
         }
-        result = ((RetrieveCatalogObjectResponse?)null)?.MObject?.ImageData?.Url;
+        result = item?.MObject?.ImageData?.Url;
 
         return result;
     }
