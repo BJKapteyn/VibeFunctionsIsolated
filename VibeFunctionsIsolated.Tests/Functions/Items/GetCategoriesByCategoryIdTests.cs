@@ -30,7 +30,7 @@ public class GetCategoriesByCategoryIdTests
     [Test]
     [Parallelizable]
     [TestCaseSource(nameof(GetCategoriesByCategoryIdTestCases))]
-    public async Task GetCategoriesByCategoryIdTest(List<CatalogObject> squareResponseBody, CategoryId? requestBody, IActionResult expected)
+    public async Task GetCategoriesByCategoryId_CorrectResponseTest(List<CatalogObject> squareResponseBody, CategoryId? requestBody, IActionResult expected)
     {
         // Arrange
         Mock<HttpRequest> mockRequest = new();

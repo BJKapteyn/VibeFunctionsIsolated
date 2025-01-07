@@ -62,7 +62,12 @@ public class GetItemsByCategoryId
             string? imageURL = squareDAL.GetImageURL(imageId).Result;
 
             return new SquareItem(responseItem, imageURL);
-        });
+        }).ToList();
+
+        if(categoryId.ReportingCategoryId != null)
+        {
+            items = squareUtility.GetItemsWithReportingCategoryId(items, categoryId.ReportingCategoryId);
+        }
 
         return new OkObjectResult(items);
     }

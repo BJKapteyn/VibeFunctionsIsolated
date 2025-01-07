@@ -68,5 +68,13 @@ namespace VibeCollectiveFunctions.Utility
 
             return squareItems;
         }
+
+        public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
+        {
+            IEnumerable<SquareItem> itemsWithReportingCategoryId = items.Where(item => item.ReportingCategoryId == reportingCategoryId);
+
+            return itemsWithReportingCategoryId;
+        }
+
     }
 }

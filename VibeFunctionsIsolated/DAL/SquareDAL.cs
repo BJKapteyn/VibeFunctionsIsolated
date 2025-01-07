@@ -81,7 +81,7 @@ public class SquareDAL : ISquareDAL
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
-          return response;
+        return response;
     }
 
     public async Task<SearchCatalogObjectsResponse?> SearchCatalogObjects(SearchCatalogObjectsRequest requestBody)
