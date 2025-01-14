@@ -9,18 +9,18 @@ using Square.Models;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
-public class GetItemByItemId
+public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareDAL squareDal)
 {
-    private readonly ILogger<GetItemByItemId> _logger; 
-    private readonly ISquareUtility SquareUtility;
-    private readonly ISquareDAL SquareDal;
+    private readonly ILogger<GetItemByItemId> _logger = logger; 
+    private readonly ISquareUtility SquareUtility = squareUtility;
+    private readonly ISquareDAL SquareDal = squareDal;
 
-    public GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareDAL squareDal)
-    {
-        SquareUtility = squareUtility;
-        SquareDal = squareDal;
-        _logger = logger;
-    }
+    //public GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareDAL squareDal)
+    //{
+    //    SquareUtility = squareUtility;
+    //    SquareDal = squareDal;
+    //    _logger = logger;
+    //}
 
     [Function("GetItemByItemId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -36,7 +36,7 @@ public class GetItemByItemId
 
         RetrieveCatalogObjectResponse? response = await SquareDal.GetCatalogObjectById(itemId);
 
-        if(response == null)
+        if(response == null || response.RelatedObjects.Any() == false)
         {
             string className = nameof(GetItemByItemId);
             string itemIdString = itemId.Id.ToString();
@@ -44,8 +44,13 @@ public class GetItemByItemId
             return new NotFoundResult();
         }
 
+        List<SquareItem> items = response.RelatedObjects.Select(responseItem =>
+        {
+            string? imageId = responseItem.ItemData.ImageIds == null ? null : responseItem.ItemData.ImageIds[0];
+            string? imageURL = SquareDal.GetImageURL(imageId).Result;
 
-
+            return new SquareItem(responseItem, imageURL);
+        }).ToList();
 
 
         return new OkObjectResult("Ok");
