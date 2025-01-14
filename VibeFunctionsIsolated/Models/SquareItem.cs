@@ -1,7 +1,7 @@
 ﻿using Square.Models;
 using VibeFunctionsIsolated.Models;
 
-namespace VibeCollectiveFunctions.Models
+namespace VibeFunctionsIsolated.Models
 {
     public class SquareItem : SquareCatalogItem
     {

@@ -1,11 +1,11 @@
 ﻿using Square.Models;
 using System.Text.Json;
-using VibeCollectiveFunctions.Models;
+using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
-namespace VibeCollectiveFunctions.Utility
+namespace VibeFunctionsIsolated.Utility
 {
     public class SquareUtility : ISquareUtility
     {

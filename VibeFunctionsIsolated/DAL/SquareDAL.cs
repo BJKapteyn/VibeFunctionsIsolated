@@ -3,9 +3,10 @@ using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
+using System.Runtime.CompilerServices;
 using System.Web;
 using VibeFunctionsIsolated.Models;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;
 
@@ -51,7 +52,7 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryId categoryId)
+    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(ItemId categoryId)
     {
         List<string> categoryIds =
         [
@@ -96,8 +97,7 @@ public class SquareDAL : ISquareDAL
         {
             string message = e.Message;
             string responseCode = e.ResponseCode.ToString();
-            logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
-            logger.LogError("Exception: {message}", message);
+            logger.LogError("Exception: {message} Response Code: {responseCode}", message, responseCode);
 
             return null;
         }
@@ -105,7 +105,7 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CategoryId categoryId)
+    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(ItemId categoryId)
     {
         List<string> objectTypes =
         [
@@ -127,9 +127,27 @@ public class SquareDAL : ISquareDAL
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
-        if (response == null)
+        if (response?.Errors != null)
         {
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
+        }
+
+        return response;
+    }
+
+    public async Task<RetrieveCatalogObjectResponse?> GetCatalogObjectById(ItemId categoryId)
+    {
+        RetrieveCatalogObjectResponse? response = null;
+
+        try
+        {
+            response = await SquareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: categoryId.Id, includeRelatedObjects: true);
+        }
+        catch (ApiException e)
+        {
+            Console.WriteLine("Failed to make the request");
+            Console.WriteLine($"Response Code: {e.ResponseCode}");
+            Console.WriteLine($"Exception: {e.Message}");
         }
 
         return response;

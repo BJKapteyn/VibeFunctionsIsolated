@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Square.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
@@ -30,15 +30,15 @@ public class GetCategoriesByCategoryIdTests
     [Test]
     [Parallelizable]
     [TestCaseSource(nameof(GetCategoriesByCategoryIdTestCases))]
-    public async Task GetCategoriesByCategoryId_CorrectResponseTest(List<CatalogObject> squareResponseBody, CategoryId? requestBody, IActionResult expected)
+    public async Task GetCategoriesByCategoryId_CorrectResponseTest(List<CatalogObject> squareResponseBody, ItemId? requestBody, IActionResult expected)
     {
         // Arrange
         Mock<HttpRequest> mockRequest = new();
-        CategoryId badId = new("BadId");
+        ItemId badId = new("BadId");
         SearchCatalogObjectsResponse? squareResponse = new(objects: squareResponseBody);
 
-        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CategoryId>()).Result).Returns(squareResponse);
-        squareUtility.Setup(x => x.DeserializeStream<CategoryId>(It.IsAny<Stream>()).Result).Returns(requestBody);
+        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<ItemId>()).Result).Returns(squareResponse);
+        squareUtility.Setup(x => x.DeserializeStream<ItemId>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
         GetCategoriesByCategoryId azureTestFunction = new(logger.Object, squareDAL.Object, squareUtility.Object);
 
@@ -51,8 +51,8 @@ public class GetCategoriesByCategoryIdTests
 
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
     {
-        CategoryId? goodId = new("GoodId");
-        CategoryId? nullId = null;
+        ItemId? goodId = new("GoodId");
+        ItemId? nullId = null;
 
         List<CatalogObject> populatedResponseBody = [new CatalogObject("ITEM", Guid.NewGuid().ToString())];
         List<CatalogObject>? emptyResponseBody = new();

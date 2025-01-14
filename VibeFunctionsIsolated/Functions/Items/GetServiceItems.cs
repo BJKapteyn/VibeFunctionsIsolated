@@ -3,28 +3,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
-namespace VibeCollectiveFunctions.Functions.Items;
+namespace VibeFunctionsIsolated.Functions.Items;
 
-// Get all service offerings bundled by category
-public class GetServiceItems
+/// <summary>
+/// Get all service offerings bundled by category
+/// </summary>
+/// <param name="logger"></param>
+/// <param name="squareUtility"></param>
+/// <param name="squareDAL"></param>
+public class GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
 {
-    private readonly ILogger<GetItems> logger;
-    private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
+    private readonly ILogger<GetItems> logger = logger;
+    private readonly ISquareUtility squareUtility = squareUtility;
+    private readonly ISquareDAL squareDAL = squareDAL;
 
-    public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
-    {
-        this.logger = logger;
-        this.squareUtility = squareUtility;
-        this.squareDAL = squareDAL;
-    }
+    //public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    //{
+    //    this.logger = logger;
+    //    this.squareUtility = squareUtility;
+    //    this.squareDAL = squareDAL;
+    //}
 
     [Function("GetServiceItems")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
@@ -47,7 +51,7 @@ public class GetServiceItems
         }
 
         IEnumerable<SquareItem> squareItems = MapSquareItems(response, CatalogObjectType.ITEM.ToString());
-        List<string?> distinctItemCategoryIds = squareItems.Select(item => item.ReportingCategoryId).Distinct().ToList();
+        IEnumerable<string?> distinctItemCategoryIds = squareItems.Select(item => item.ReportingCategoryId).Distinct();
 
         IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Where(categoryId => categoryId != null).Select(categoryId =>
         {

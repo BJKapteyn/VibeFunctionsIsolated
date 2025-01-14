@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
 
@@ -25,13 +25,13 @@ public class GetItemsByCategoryId
 
     [Function("GetItemsByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {        
-        CategoryId? categoryId = null;
+    {
+        ItemId? categoryId = null;
         try
         {
-            categoryId = await squareUtility.DeserializeStream<CategoryId?>(req.Body);
+            categoryId = await squareUtility.DeserializeStream<ItemId?>(req.Body);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
         }
@@ -44,13 +44,7 @@ public class GetItemsByCategoryId
 
         SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItemsByCategoryId(categoryId);
 
-        if (response == null || response.Items == null)
-        {
-            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request returned no items");
-            return new NotFoundResult();
-        }
-
-        if(response.Errors != null)
+        if (response?.Errors != null || response == null)
         {
             _logger.LogError($"{nameof(GetItemsByCategoryId)} errors: /n{response?.Errors.ToString()}");
             return new BadRequestResult();
@@ -62,11 +56,17 @@ public class GetItemsByCategoryId
             string? imageURL = squareDAL.GetImageURL(imageId).Result;
 
             return new SquareItem(responseItem, imageURL);
-        }).ToList();
+        });
 
-        if(categoryId.ReportingCategoryId != null)
+        if (categoryId.ReportingCategoryId != null)
         {
             items = squareUtility.GetItemsWithReportingCategoryId(items, categoryId.ReportingCategoryId);
+        }
+
+        if (items.Any() == false) 
+        {
+            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request returned no items");
+            return new NotFoundResult();
         }
 
         return new OkObjectResult(items);

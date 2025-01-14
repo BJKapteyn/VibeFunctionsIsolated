@@ -1,7 +1,7 @@
 ﻿using Square.Models;
-using VibeCollectiveFunctions.Models;
+using VibeFunctionsIsolated.Models;
 
-namespace VibeCollectiveFunctions.Utility
+namespace VibeFunctionsIsolated.Utility
 {
     /// <summary>
     /// Utility methods for square api calls

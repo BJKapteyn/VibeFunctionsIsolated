@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
-    // Gets all shop items
+    /// <summary>
+    /// Gets all shop items
+    /// </summary>
     public class GetProductItems
     {
         private readonly ILogger<GetProductItems> _logger;

@@ -3,95 +3,94 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using System.Text.Json;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 
 
-namespace VibeCollectiveFunctions.Functions.Items
+namespace VibeFunctionsIsolated.Functions.Items;
+
+public class GetEmployees
 {
-    public class GetEmployees
+    private readonly ISquareUtility squareUtility;
+    private readonly ISquareDAL squareDAL;
+
+    public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
     {
-        private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        this.squareUtility = squareUtility;
+        this.squareDAL = squareDAL;
+    }
 
-        public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
+    [Function("GetEmployees")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    {
+        SearchCatalogItemsRequest requestBody = buildRequestBody();
+        SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(requestBody);
+
+        IEnumerable<SquareEmployee>? employees = modelEmployees(response);
+
+        if (employees == null) 
         {
-            this.squareUtility = squareUtility;
-            this.squareDAL = squareDAL;
+            return new NotFoundResult();
         }
 
-        [Function("GetEmployees")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+        string json = JsonSerializer.Serialize(employees);
+
+        return new OkObjectResult(json);
+    }
+
+    // Pair down response data to limit data exposure
+    // response - response from the square API
+    private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse? response)
+    {
+        if(response?.Items == null || response.Items.Count <= 0)
         {
-            SearchCatalogItemsRequest requestBody = buildRequestBody();
-            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(requestBody);
-
-            IEnumerable<SquareEmployee>? employees = modelEmployees(response);
-
-            if (employees == null) 
-            {
-                return new NotFoundResult();
-            }
-
-            string json = JsonSerializer.Serialize(employees);
-
-            return new OkObjectResult(json);
+            return null;
         }
 
-        // Pair down response data to limit data exposure
-        // response - response from the square API
-        private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse? response)
-        {
-            if(response?.Items == null || response.Items.Count <= 0)
+        IEnumerable<SquareEmployee> squareEmployees = response.Items
+            .Select(responseItem =>
             {
-                return null;
-            }
-
-            IEnumerable<SquareEmployee> squareEmployees = response.Items
-                .Select(responseItem =>
+                // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
+                IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
+                string? imageId;
+                if(responseItem.ItemData?.ImageIds != null)
                 {
-                    // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
-                    IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
-                    string? imageId;
-                    if(responseItem.ItemData?.ImageIds != null)
-                    {
-                        imageId = responseItem.ItemData?.ImageIds[0];
-                    }
-                    else
-                    {
-                        imageId = "";
-                    }
-                    string? imageURL = squareDAL.GetImageURL(imageId).Result;
-                    
-                    return new SquareEmployee(responseItem, customAttributeValues, imageURL);
-                })
-                .ToList();
+                    imageId = responseItem.ItemData?.ImageIds[0];
+                }
+                else
+                {
+                    imageId = "";
+                }
+                string? imageURL = squareDAL.GetImageURL(imageId).Result;
+                
+                return new SquareEmployee(responseItem, customAttributeValues, imageURL);
+            })
+            .ToList();
 
-            return squareEmployees;
-        }
+        return squareEmployees;
+    }
 
-        // Add ids and product type to narrow down results
-        private SearchCatalogItemsRequest buildRequestBody()
+    // Add ids and product type to narrow down results
+    private SearchCatalogItemsRequest buildRequestBody()
+    {
+        var categoryIds = new List<string>()
         {
-            var categoryIds = new List<string>()
-            {
-                // Id for Employee category
-                "BJMQNUV2IRXQ4LQLY3BD72ED"
-            };
+            // Id for Employee category
+            "BJMQNUV2IRXQ4LQLY3BD72ED"
+        };
 
-            var productTypes = new List<string>()
-            {
-                SquareProductType.AppointmentsService
-            };
+        var productTypes = new List<string>()
+        {
+            SquareProductType.AppointmentsService
+        };
 
-            SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
-              .CategoryIds(categoryIds)
-              .ProductTypes(productTypes)
-              .Build();
+        SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
+          .CategoryIds(categoryIds)
+          .ProductTypes(productTypes)
+          .Build();
 
-            return body;
-        }
+        return body;
     }
 }

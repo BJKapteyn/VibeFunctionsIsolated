@@ -1,4 +1,4 @@
-﻿namespace VibeCollectiveFunctions.Models
+﻿namespace VibeFunctionsIsolated.Models
 {
     // For inbound emails from the subscribe component
     public class CosmosEmail

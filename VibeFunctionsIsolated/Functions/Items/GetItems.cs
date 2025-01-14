@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
-namespace VibeCollectiveFunctions.Functions.Items;
+namespace VibeFunctionsIsolated.Functions.Items;
 
 public class GetItems
 {
@@ -36,18 +36,18 @@ public class GetItems
             .Build();
 
         SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjects(requestBody);
-        if (response == null) 
+        if (response == null)
         {
             return new NotFoundResult();
         }
 
-        IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareProductItems(response, CatalogObjectType.ITEM.ToString()); 
-        if(squareItems == null || squareItems.Count() == 0)
+        IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareProductItems(response, CatalogObjectType.ITEM.ToString());
+        if (squareItems == null || squareItems.Any())
         {
             return new BadRequestObjectResult(squareItems);
         }
 
-        return new OkObjectResult(squareItems); 
+        return new OkObjectResult(squareItems);
     }
 
-} 
+}
