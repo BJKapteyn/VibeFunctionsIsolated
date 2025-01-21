@@ -1,9 +1,9 @@
 ﻿using Square.Models;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models
 {
-    public class SquareItem : SquareCatalogItem
+    public class SquareItem : SquareCatalogItem, ISquareCatalogItem
     {
         public SquareItem(string id, string name, string price, string duration) : 
             base(id, name, string.Empty, string.Empty)
@@ -37,10 +37,11 @@ namespace VibeFunctionsIsolated.Models
 
             const int millisecondsPerMinute = 60000;
             HashSet<string> hashVariationNames = new();
-            List<SquareItem> variations = new ();
+            List<SquareItem> variations = new();
 
             foreach (CatalogObject variation in item.ItemData.Variations)
             {
+                // Remove duplicates
                 string variationName = variation.ItemVariationData.Name;
                 bool isDuplicate =  hashVariationNames.TryGetValue(variationName, out string? noOut);
 

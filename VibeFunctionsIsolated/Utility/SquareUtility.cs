@@ -4,6 +4,8 @@ using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
+using VibeFunctionsIsolated.Models.Interfaces;
+using Azure;
 
 namespace VibeFunctionsIsolated.Utility
 {
@@ -76,5 +78,55 @@ namespace VibeFunctionsIsolated.Utility
             return itemsWithReportingCategoryId;
         }
 
+        public ISquareCatalogItem? GetItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
+        {
+            if(response?.MObject == null)
+            {
+                return null;
+            }
+
+            ISquareCatalogItem? catalogItem = null;
+            bool isCategory = response.MObject.CategoryData != null;
+            bool isProduct = response.MObject.ItemData != null;
+
+            if (isCategory)
+            {
+                catalogItem = new SquareCategory(response.MObject, null);
+            }
+            else if (isProduct)
+            {
+                catalogItem = new SquareItem(response.MObject, null);
+            }
+
+            if(catalogItem == null)
+            {
+                return null;
+            }
+
+            string imageUrl = findImageUrlFromCatalogObjectResponse(response);
+
+            catalogItem.ImageURL = imageUrl;
+
+            return catalogItem;
+        }
+
+        // Search for the image url in the response, it isn't in the same spot for all item types
+        private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
+        {
+            // Check main object first
+            string? imageUrl = response?.MObject?.ImageData?.Url;
+
+            if (imageUrl == null)
+            {
+                // Check in the related objects
+                imageUrl = response?.RelatedObjects
+                               ?.Where(x => x.ImageData != null)
+                               ?.FirstOrDefault()
+                               ?.ImageData
+                               ?.Url;
+            }
+
+            return imageUrl ?? "";
+        }
     }
 }

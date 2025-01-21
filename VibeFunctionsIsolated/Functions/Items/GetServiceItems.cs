@@ -23,13 +23,6 @@ public class GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtil
     private readonly ISquareUtility squareUtility = squareUtility;
     private readonly ISquareDAL squareDAL = squareDAL;
 
-    //public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
-    //{
-    //    this.logger = logger;
-    //    this.squareUtility = squareUtility;
-    //    this.squareDAL = squareDAL;
-    //}
-
     [Function("GetServiceItems")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {

@@ -37,16 +37,16 @@ public class GetCategoriesByCategoryIdTests
         ItemId badId = new("BadId");
         SearchCatalogObjectsResponse? squareResponse = new(objects: squareResponseBody);
 
-        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<ItemId>()).Result).Returns(squareResponse);
-        squareUtility.Setup(x => x.DeserializeStream<ItemId>(It.IsAny<Stream>()).Result).Returns(requestBody);
+        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<ItemId>())).ReturnsAsync(squareResponse);
+        squareUtility.Setup(x => x.DeserializeStream<ItemId>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
 
-        GetCategoriesByCategoryId azureTestFunction = new(logger.Object, squareDAL.Object, squareUtility.Object);
+        GetCategoriesByCategoryId getCategoriesByCategoryIdTest = new(logger.Object, squareDAL.Object, squareUtility.Object);
 
         // Act
-        IActionResult result = await azureTestFunction.Run(mockRequest.Object);
+        IActionResult actual = await getCategoriesByCategoryIdTest.Run(mockRequest.Object);
 
         // Assert
-        Assert.That(result.GetType(), Is.EqualTo(expected.GetType()));
+        Assert.That(actual.GetType(), Is.EqualTo(expected.GetType()));
     }
 
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
