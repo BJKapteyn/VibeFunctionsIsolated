@@ -17,6 +17,7 @@ namespace VibeCollectiveFunctions.Models
         {
             ImageURL = imageURL;
             ReportingCategoryId = item.ItemData.ReportingCategory?.Id;
+            BuyNowUrl = item.ItemData.EcomSeoData?.Permalink;
 
             if(item.ItemData.Variations != null)
             {
@@ -27,6 +28,7 @@ namespace VibeCollectiveFunctions.Models
         public string? Price { get; set; }
         public string? ReportingCategoryId { get; set; }
         public string? DurationInMinutes { get; set; }
+        public string? BuyNowUrl { get; set; }
         public List<SquareItem>? Variations { get; set; }
 
         private static List<SquareItem>? setVariations(CatalogObject item)

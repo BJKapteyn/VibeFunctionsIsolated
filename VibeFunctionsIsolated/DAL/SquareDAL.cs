@@ -13,13 +13,13 @@ public class SquareDAL : ISquareDAL
 {
     #region PrivateMembers
 
-    private readonly ILogger<SquareDAL> logger;
+    private readonly ILogger<SquareDAL> Logger;
     private SquareClient SquareClient { get; }
     #endregion
 
     public SquareDAL(ILogger<SquareDAL> logger)
     {
-        this.logger = logger;    
+        this.Logger = logger;    
         SquareClient = InitializeClient();
     }
 
@@ -51,22 +51,19 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryId categoryId)
+    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryInformation categoryInfo)
     {
-        List<string> categoryIds =
-        [
-            categoryId.Id
-        ];
+        List<string> categoryIds = [ categoryInfo.Id ];
         
         SearchCatalogItemsRequest.Builder bodyBuilder = new SearchCatalogItemsRequest.Builder()
           .CategoryIds(categoryIds);
 
 
-        if(categoryId.ProductType != null)
+        if(categoryInfo.ProductType != null)
         {
             List<string> productTypes =
             [
-                categoryId.ProductType
+                categoryInfo.ProductType
             ];
 
             bodyBuilder.ProductTypes(productTypes);
@@ -78,7 +75,7 @@ public class SquareDAL : ISquareDAL
 
         if (response == null) 
         {
-            logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
+            Logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
         return response;
@@ -96,8 +93,8 @@ public class SquareDAL : ISquareDAL
         {
             string message = e.Message;
             string responseCode = e.ResponseCode.ToString();
-            logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
-            logger.LogError("Exception: {message}", message);
+            Logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
+            Logger.LogError("Exception: {message}", message);
 
             return null;
         }
@@ -105,7 +102,23 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CategoryId categoryId)
+    public async Task<string> GetItemsByIdRawData()
+    {
+        HttpClient client = new HttpClient();
+        string url = "https://connect.squareup.com/v2/catalog/list";
+        
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
+        request.Headers.Add("Accept", "application/json");
+
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        string responseBody = await response.Content.ReadAsStringAsync();
+
+        return "";
+    }
+
+    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CategoryInformation categoryId)
     {
         List<string> objectTypes =
         [
@@ -129,7 +142,7 @@ public class SquareDAL : ISquareDAL
 
         if (response == null)
         {
-            logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
+            Logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
         return response;
@@ -150,7 +163,7 @@ public class SquareDAL : ISquareDAL
         catch (Exception ex)
         {
             string message = ex.Message;
-            logger.LogError("{message}", message);
+            Logger.LogError("{message}", message);
             return null;
         }
         result = item?.MObject?.ImageData?.Url;

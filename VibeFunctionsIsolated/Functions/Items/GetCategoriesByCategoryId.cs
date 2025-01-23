@@ -25,7 +25,7 @@ namespace VibeFunctionsIsolated.Functions.Items
         [Function("GetCategoriesByCategoryId")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
-            CategoryId? categoryId = squareUtility.DeserializeStream<CategoryId>(req.Body).Result;
+            CategoryInformation? categoryId = squareUtility.DeserializeStream<CategoryInformation>(req.Body).Result;
             if (categoryId == null)
             {
                 _logger.LogError($"{nameof(GetCategoriesByCategoryId)} could not map the category id");

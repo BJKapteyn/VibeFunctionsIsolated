@@ -26,10 +26,11 @@ public class GetItemsByCategoryId
     [Function("GetItemsByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {        
-        CategoryId? categoryId = null;
+        CategoryInformation? categoryId = null;
+
         try
         {
-            categoryId = await squareUtility.DeserializeStream<CategoryId?>(req.Body);
+            categoryId = await squareUtility.DeserializeStream<CategoryInformation?>(req.Body);
         }
         catch(Exception e)
         {
