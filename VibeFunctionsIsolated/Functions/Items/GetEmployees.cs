@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using System.Text.Json;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 
 
-namespace VibeCollectiveFunctions.Functions.Items
+namespace VibeFunctionsIsolated.Functions.Items
 {
     public class GetEmployees
     {

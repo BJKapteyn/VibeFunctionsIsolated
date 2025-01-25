@@ -30,15 +30,15 @@ public class GetCategoriesByCategoryIdTests
     [Test]
     [Parallelizable]
     [TestCaseSource(nameof(GetCategoriesByCategoryIdTestCases))]
-    public async Task GetCategoriesByCategoryId_CorrectResponseTest(List<CatalogObject> squareResponseBody, CategoryInformation? requestBody, IActionResult expected)
+    public async Task GetCategoriesByCategoryId_CorrectResponseTest(List<CatalogObject> squareResponseBody, CatalogInformation? requestBody, IActionResult expected)
     {
         // Arrange
         Mock<HttpRequest> mockRequest = new();
-        CategoryInformation badId = new("BadId");
+        CatalogInformation badId = new("BadId");
         SearchCatalogObjectsResponse? squareResponse = new(objects: squareResponseBody);
 
-        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CategoryInformation>()).Result).Returns(squareResponse);
-        squareUtility.Setup(x => x.DeserializeStream<CategoryInformation>(It.IsAny<Stream>()).Result).Returns(requestBody);
+        squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CatalogInformation>()).Result).Returns(squareResponse);
+        squareUtility.Setup(x => x.DeserializeStream<CatalogInformation>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
         GetCategoriesByCategoryId azureTestFunction = new(logger.Object, squareDAL.Object, squareUtility.Object);
 
@@ -51,8 +51,8 @@ public class GetCategoriesByCategoryIdTests
 
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()
     {
-        CategoryInformation? goodId = new("GoodId");
-        CategoryInformation? nullId = null;
+        CatalogInformation? goodId = new("GoodId");
+        CatalogInformation? nullId = null;
 
         List<CatalogObject> populatedResponseBody = [new CatalogObject("ITEM", Guid.NewGuid().ToString())];
         List<CatalogObject>? emptyResponseBody = new();

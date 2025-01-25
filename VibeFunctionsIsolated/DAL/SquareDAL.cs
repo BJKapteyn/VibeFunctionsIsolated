@@ -1,26 +1,31 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure.Core;
+using Azure;
+using Microsoft.Extensions.Logging;
 using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
+using System.Text.Json;
 using System.Web;
 using VibeFunctionsIsolated.Models;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
+using System.Net;
 
 namespace VibeFunctionsIsolated.DAL;
 
 public class SquareDAL : ISquareDAL
 {
-    #region PrivateMembers
+    #region Private Members
 
-    private readonly ILogger<SquareDAL> Logger;
-    private SquareClient SquareClient { get; }
+    private readonly ILogger<SquareDAL> logger;
+    private SquareClient squareClient { get; }
     #endregion
 
     public SquareDAL(ILogger<SquareDAL> logger)
     {
-        this.Logger = logger;    
-        SquareClient = InitializeClient();
+        this.logger = logger;    
+        squareClient = InitializeClient();
+        
     }
 
     public static SquareClient InitializeClient()
@@ -40,7 +45,7 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            response = await SquareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
+            response = await squareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
@@ -51,7 +56,7 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CategoryInformation categoryInfo)
+    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CatalogInformation categoryInfo)
     {
         List<string> categoryIds = [ categoryInfo.Id ];
         
@@ -75,7 +80,7 @@ public class SquareDAL : ISquareDAL
 
         if (response == null) 
         {
-            Logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
+            logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
         return response;
@@ -87,14 +92,14 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            response = await SquareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
+            response = await squareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
             string message = e.Message;
             string responseCode = e.ResponseCode.ToString();
-            Logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
-            Logger.LogError("Exception: {message}", message);
+            logger.LogError("{message} Response Code: {responseCode}", message, responseCode);
+            logger.LogError("Exception: {message}", message);
 
             return null;
         }
@@ -102,30 +107,44 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<string> GetItemsByIdRawData()
+    public async Task<string> GetItemsByIdRawData(CatalogInformation catalogInfo)
     {
-        HttpClient client = new HttpClient();
-        string url = "https://connect.squareup.com/v2/catalog/list";
-        
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        IEnumerable<SquareItemRawData> itemCollection;
+
+        string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
+
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
+        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
-        HttpResponseMessage response = await client.SendAsync(request);
+        string responseJsonString = await getJsonStringResponse(request);
 
-        string responseBody = await response.Content.ReadAsStringAsync();
+        if(responseJsonString != "")
+        {
+            using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
+            {
+                JsonElement root = jsonBody.RootElement;
+                JsonElement items = root.GetProperty("objects");
+            }
+        }
 
-        return "";
+        //if(false)
+        //{
+        //    logger.LogError($"{nameof(GetItemsByIdRawData)} returned null");
+        //}
+
+        return "itemCollection";
     }
 
-    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CategoryInformation categoryId)
+    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
         List<string> objectTypes =
         [
             CatalogObjectType.CATEGORY.ToString(),
         ];
 
-        CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryId.Id)
+        CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryInfo.Id)
         .Build();
 
         var searchQuery = new CatalogQuery.Builder()
@@ -134,15 +153,15 @@ public class SquareDAL : ISquareDAL
 
 
         SearchCatalogObjectsRequest requestBody = new SearchCatalogObjectsRequest.Builder()
-            .ObjectTypes(objectTypes)
-            .Query(searchQuery)
-            .Build();
+          .ObjectTypes(objectTypes)
+          .Query(searchQuery)
+          .Build();
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
         if (response == null)
         {
-            Logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
+            logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
 
         return response;
@@ -158,16 +177,47 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            item = await SquareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
+            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
         }
         catch (Exception ex)
         {
             string message = ex.Message;
-            Logger.LogError("{message}", message);
+            logger.LogError("{message}", message);
             return null;
         }
         result = item?.MObject?.ImageData?.Url;
 
         return result;
     }
+
+    #region Private Methods
+    private async Task<string> getJsonStringResponse(HttpRequestMessage request)
+    {
+        HttpClient client = new HttpClient();
+        HttpResponseMessage response;
+        string responseBodyStr;
+
+        try
+        {
+            response = await client.SendAsync(request);
+
+            if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
+            {
+                string message = response.ReasonPhrase ?? "";
+                throw new HttpRequestException(message, null, response.StatusCode);
+            }
+
+            responseBodyStr = await response.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            string message = ex.Message;
+            logger.LogError("{message}", message);
+
+            responseBodyStr = "";
+        }
+
+        return responseBodyStr;
+    }
+    #endregion
 }

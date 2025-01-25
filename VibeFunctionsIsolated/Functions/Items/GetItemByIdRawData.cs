@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using VibeCollectiveFunctions.Functions.Items;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Functions.Items;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
+using VibeCollectiveIsolated.Models;
 
-namespace VibeFunctionsIsolated.Functions.Items
+namespace VibeCollectiveIsolated.Functions.Items
 {
     public class GetItemByIdRawData
     {
@@ -24,6 +25,7 @@ namespace VibeFunctionsIsolated.Functions.Items
         [Function("GetItemByIdRawData")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
+            CategoryInformation categoryInfo = squareUtility.DeserializeStream<CategoryInformation>(req.Body);
             string stuff = await squareDAL.GetItemsByIdRawData();
 
             return new OkObjectResult("Welcome to Azure Functions!");

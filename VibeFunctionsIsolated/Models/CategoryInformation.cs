@@ -1,8 +1,8 @@
 ﻿namespace VibeFunctionsIsolated.Models;
 
-public class CategoryInformation 
+public class CatalogInformation 
 {
-    public CategoryInformation(string id, string? productType = null, string? reportingCategoryId = null) 
+    public CatalogInformation(string id, string? productType = null, string? reportingCategoryId = null) 
     {
         Id = id;
         ProductType = productType;

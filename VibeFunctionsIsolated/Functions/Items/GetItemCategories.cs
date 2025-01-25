@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
-namespace VibeCollectiveFunctions.Functions.Items
+namespace VibeFunctionsIsolated.Functions.Items
 {
     public class GetItemCategories
     {

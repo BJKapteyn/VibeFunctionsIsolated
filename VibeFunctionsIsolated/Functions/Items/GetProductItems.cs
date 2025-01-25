@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 

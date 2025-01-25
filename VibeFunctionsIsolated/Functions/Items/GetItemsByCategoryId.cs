@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.DAL;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -26,11 +25,11 @@ public class GetItemsByCategoryId
     [Function("GetItemsByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {        
-        CategoryInformation? categoryId = null;
+        CatalogInformation? categoryId = null;
 
         try
         {
-            categoryId = await squareUtility.DeserializeStream<CategoryInformation?>(req.Body);
+            categoryId = await squareUtility.DeserializeStream<CatalogInformation?>(req.Body);
         }
         catch(Exception e)
         {

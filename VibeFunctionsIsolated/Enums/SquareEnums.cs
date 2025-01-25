@@ -1,4 +1,4 @@
-﻿namespace VibeCollectiveFunctions.Enums
+﻿namespace VibeFunctionsIsolated.Enums
 {
     public static class SquareEnums
     {
