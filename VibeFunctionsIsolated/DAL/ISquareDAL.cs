@@ -12,7 +12,7 @@ public interface ISquareDAL
     /// Calls the square api directly to get all items (doesn't use SDK)
     /// </summary>
     /// <returns>Square Item </returns>
-    public Task<string> GetItemsByIdRawData(CatalogInformation catalogInfo);
+    public Task<IEnumerable<SquareItemRawData>> GetItemsByIdRawData(CatalogInformation catalogInfo);
 
     public Task<string?> GetImageURL(string? imageId);
 }

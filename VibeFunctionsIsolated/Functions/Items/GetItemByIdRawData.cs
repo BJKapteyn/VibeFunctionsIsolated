@@ -5,30 +5,36 @@ using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
-using VibeCollectiveIsolated.Models;
+using VibeFunctionsIsolated.Models;
 
-namespace VibeCollectiveIsolated.Functions.Items
+namespace VibeCollectiveIsolated.Functions.Items;
+
+public class GetItemByIdRawData
 {
-    public class GetItemByIdRawData
+    private readonly ILogger<GetItems> logger;
+    private readonly ISquareUtility squareUtility;
+    private readonly ISquareDAL squareDAL;
+
+    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
     {
-        private readonly ILogger<GetItems> logger;
-        private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        this.logger = logger;
+        this.squareUtility = squareUtility;
+        this.squareDAL = squareDAL;
+    }
 
-        public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    [Function("GetItemByIdRawData")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    {
+        CatalogInformation? categoryInfo = await squareUtility.DeserializeStream<CatalogInformation>(req.Body);
+
+        if (categoryInfo == null)
         {
-            this.logger = logger;
-            this.squareUtility = squareUtility;
-            this.squareDAL = squareDAL;
+            logger.LogError($"{nameof(GetItemByIdRawData)} request wasn't formatted correctly");
+            return new BadRequestResult();
         }
 
-        [Function("GetItemByIdRawData")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
-        {
-            CategoryInformation categoryInfo = squareUtility.DeserializeStream<CategoryInformation>(req.Body);
-            string stuff = await squareDAL.GetItemsByIdRawData();
+        IEnumerable<SquareItemRawData> stuff = await squareDAL.GetItemsByIdRawData(categoryInfo);
 
-            return new OkObjectResult("Welcome to Azure Functions!");
-        }
+        return new OkObjectResult("Welcome to Azure Functions!");
     }
 }

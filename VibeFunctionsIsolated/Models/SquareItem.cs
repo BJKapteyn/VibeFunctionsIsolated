@@ -1,5 +1,4 @@
 ﻿using Square.Models;
-using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Models;
 
@@ -13,7 +12,7 @@ public class SquareItem : SquareCatalogItem
     }
 
     public SquareItem(CatalogObject item, string? imageURL) : 
-        base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
+        this(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
     {
         ImageURL = imageURL;
         ReportingCategoryId = item.ItemData.ReportingCategory?.Id;

@@ -7,7 +7,6 @@ using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Functions.Items;

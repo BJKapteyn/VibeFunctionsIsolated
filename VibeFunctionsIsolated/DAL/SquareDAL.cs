@@ -107,7 +107,7 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<string> GetItemsByIdRawData(CatalogInformation catalogInfo)
+    public async Task<IEnumerable<SquareItemRawData>> GetItemsByIdRawData(CatalogInformation catalogInfo)
     {
         IEnumerable<SquareItemRawData> itemCollection;
 
@@ -134,7 +134,7 @@ public class SquareDAL : ISquareDAL
         //    logger.LogError($"{nameof(GetItemsByIdRawData)} returned null");
         //}
 
-        return "itemCollection";
+        return new List<SquareItemRawData>();
     }
 
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)

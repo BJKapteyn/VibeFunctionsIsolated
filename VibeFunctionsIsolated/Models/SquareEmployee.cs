@@ -1,6 +1,5 @@
-﻿using Square.Models;
+﻿  using Square.Models;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Models
 {

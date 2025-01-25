@@ -7,6 +7,7 @@ using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
 
+
 public class SquareUtility : ISquareUtility
 {
     private readonly ISquareDAL squareDAL;
