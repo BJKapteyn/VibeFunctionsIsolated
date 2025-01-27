@@ -40,12 +40,12 @@ public class GetServiceItems
 
         SearchCatalogObjectsResponse? response = await squareDAL.SearchCatalogObjects(requestBody);
 
-        if(response == null)
+        if (response == null)
         {
             return new NotFoundResult();
         }
 
-        IEnumerable<SquareItem> squareItems = MapSquareItems(response, CatalogObjectType.ITEM.ToString());
+        IEnumerable<SquareItem> squareItems = squareUtility.MapSquareProductItems(response, CatalogObjectType.ITEM.ToString());
         List<string?> distinctItemCategoryIds = squareItems.Select(item => item.ReportingCategoryId).Distinct().ToList();
 
         IEnumerable<SquareServiceBundle> servicesByCategory = distinctItemCategoryIds.Where(categoryId => categoryId != null).Select(categoryId =>
@@ -62,49 +62,46 @@ public class GetServiceItems
 
         return new OkObjectResult(servicesByCategory);
     }
-
-
-    private IEnumerable<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, string type)
-    {
-        List<SquareItem> squareItems = new List<SquareItem>();
-
-        string employeeCategoryId = response.Objects.Where(responseItem =>
-        {
-            return responseItem.CategoryData?.Name.Equals(Categories.Employee.ToString()) ?? false;
-        })
-        .First().Id;
-
-        if (response.Objects.Count > 0)
-        {
-            squareItems = response.Objects
-                .Where(responseItem =>
-                {
-                    bool isCorrectType = responseItem.Type == type;
-                    bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
-                    bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
-
-                    return isCorrectType && isNOTEmployee && isAppointment;
-
-                })
-                .Select(responseItem =>
-                {
-                    string imageId = responseItem.ItemData.ImageIds != null ?
-                                     responseItem.ItemData.ImageIds.First() :
-                                     string.Empty;
-
-                    string? imageURL = null;
-
-                    if (imageId != string.Empty)
-                    {
-                        imageURL = squareDAL.GetImageURL(imageId).Result;
-                    }
-
-                    return new SquareItem(responseItem, imageURL);
-                })
-                .ToList();
-        }
-
-        return squareItems;
-    }
-
 }
+    //private IEnumerable<SquareItem> MapSquareItems(SearchCatalogObjectsResponse response, string type)
+    //{
+    //    List<SquareItem> squareItems = new List<SquareItem>();
+
+    //    string employeeCategoryId = response.Objects.Where(responseItem =>
+    //    {
+    //        return responseItem.CategoryData?.Name.Equals(Categories.Employee.ToString()) ?? false;
+    //    })
+    //    .First().Id;
+
+    //    if (response.Objects.Count > 0)
+    //    {
+    //        squareItems = response.Objects
+    //            .Where(responseItem =>
+    //            {
+    //                bool isCorrectType = responseItem.Type == type;
+    //                bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
+    //                bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
+
+    //                return isCorrectType && isNOTEmployee && isAppointment;
+
+    //            })
+    //            .Select(responseItem =>
+    //            {
+    //                string imageId = responseItem.ItemData.ImageIds != null ?
+    //                                 responseItem.ItemData.ImageIds.First() :
+    //                                 string.Empty;
+
+    //                string? imageURL = null;
+
+    //                if (imageId != string.Empty)
+    //                {
+    //                    imageURL = squareDAL.GetImageURL(imageId).Result;
+    //                }
+
+    //                return new SquareItem(responseItem, imageURL);
+    //            })
+    //            .ToList();
+    //    }
+
+    //    return squareItems;
+    //}

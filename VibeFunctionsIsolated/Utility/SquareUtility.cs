@@ -34,7 +34,7 @@ public class SquareUtility : ISquareUtility
         return deserializedJson;
     }
 
-    public IEnumerable<SquareItem>? MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
+    public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
     {
         IEnumerable<SquareItem>? squareItems = null;
 
@@ -47,30 +47,35 @@ public class SquareUtility : ISquareUtility
         if (response.Objects.Count > 0)
         {
             squareItems = response.Objects
-                .Where(responseItem =>
+            .Where(responseItem =>
+            {
+                bool isCorrectType = responseItem.Type == type;
+                bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
+                bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
+
+                return isCorrectType && isNOTEmployee && isAppointment;
+
+            })
+            .Select(responseItem =>
+            {
+                string imageId = responseItem.ItemData.ImageIds != null ?
+                                    responseItem.ItemData.ImageIds.First() :
+                                    "";
+                string? imageURL = null;
+
+                if (imageId != string.Empty)
                 {
-                    bool isCorrectType = responseItem.Type == type;
-                    bool isNOTEmployee = responseItem.ItemData?.ReportingCategory?.Id != employeeCategoryId;
-                    bool isAppointment = responseItem.ItemData?.ProductType == SquareProductType.AppointmentsService;
+                    imageURL = squareDAL.GetImageURL(imageId).Result;
+                }
 
-                    return isCorrectType && isNOTEmployee && isAppointment;
+                return new SquareItem(responseItem, imageURL);
+            })
+            .ToList();
+        }
 
-                })
-                .Select(responseItem =>
-                {
-                    string imageId = responseItem.ItemData.ImageIds != null ?
-                                     responseItem.ItemData.ImageIds.First() :
-                                     "";
-                    string? imageURL = null;
-
-                    if (imageId != string.Empty)
-                    {
-                        imageURL = squareDAL.GetImageURL(imageId).Result;
-                    }
-
-                    return new SquareItem(responseItem, imageURL);
-                })
-                .ToList();
+        if(squareItems is null)
+        {
+            squareItems = Array.Empty<SquareItem>();
         }
 
         return squareItems;

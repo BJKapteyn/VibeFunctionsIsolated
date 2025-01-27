@@ -4,6 +4,7 @@ namespace VibeFunctionsIsolated.Models;
 
 public class SquareItem : SquareCatalogItem
 {
+    #region Constructors
     public SquareItem(string id, string name, string price, string duration) : 
         base(id, name, string.Empty, string.Empty)
     {
@@ -23,6 +24,7 @@ public class SquareItem : SquareCatalogItem
             Variations = setVariations(item);
         }
     }
+    #endregion
 
     public string? Price { get; set; }
     public string? ReportingCategoryId { get; set; }
