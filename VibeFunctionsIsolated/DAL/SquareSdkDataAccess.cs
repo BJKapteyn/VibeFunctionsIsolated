@@ -1,42 +1,29 @@
-﻿using Azure.Core;
-using Azure;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
+using System.Net;
 using System.Text.Json;
-using System.Web;
+using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
-using System.Net;
 
 namespace VibeFunctionsIsolated.DAL;
 
-public class SquareDAL : ISquareDAL
+public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
 {
     #region Private Members
 
-    private readonly ILogger<SquareDAL> logger;
+    private readonly ILogger<SquareSdkDataAccess> logger;
     private SquareClient squareClient { get; }
     #endregion
 
-    public SquareDAL(ILogger<SquareDAL> logger)
+    public SquareSdkDataAccess(ILogger<SquareSdkDataAccess> logger)
     {
         this.logger = logger;    
         squareClient = InitializeClient();
-        
-    }
-
-    public static SquareClient InitializeClient()
-    {
-        BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
-        SquareClient client = new SquareClient.Builder()
-            .Environment(Square.Environment.Production)
-            .BearerAuthCredentials(bearerAuth)
-            .Build();
-
-        return client;
     }
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItems(SearchCatalogItemsRequest requestBody)
@@ -64,7 +51,7 @@ public class SquareDAL : ISquareDAL
           .CategoryIds(categoryIds);
 
 
-        if(categoryInfo.ProductType != null)
+        if (categoryInfo.ProductType != null)
         {
             List<string> productTypes =
             [
@@ -107,9 +94,9 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<IEnumerable<SquareItemRawData>> GetItemsByIdRawData(CatalogInformation catalogInfo)
+    public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
     {
-        IEnumerable<SquareItemRawData> itemCollection;
+        //IEnumerable<SquareItemRawData> itemCollection;
 
         string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
@@ -120,12 +107,38 @@ public class SquareDAL : ISquareDAL
 
         string responseJsonString = await getJsonStringResponse(request);
 
-        if(responseJsonString != "")
+        //List<SquareItemRawData> response = JsonSerializer.Deserialize<List<SquareItemRawData>>(responseJsonString) ?? 
+        //                                   new List<SquareItemRawData>();
+
+        if (responseJsonString != "")
         {
             using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
             {
+                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
                 JsonElement root = jsonBody.RootElement;
-                JsonElement items = root.GetProperty("objects");
+                JsonElement items;
+                bool hasItemsProperty = root.TryGetProperty("items", out items);
+                if (hasItemsProperty)
+                {
+                    foreach (JsonElement item in items.EnumerateArray())
+                    {
+                        JsonElement itemData = new();
+                        item.TryGetProperty("item_data", out itemData);
+
+                        JsonElement id = new();
+                        item.TryGetProperty("id", out id);
+
+                        string itemId = id.GetString() ?? "";
+
+                        SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
+
+                        if (squareItem != null)
+                        {
+                            squareItem.Id = itemId;
+                            squareItems.Add(squareItem);
+                        }
+                    }
+                }
             }
         }
 

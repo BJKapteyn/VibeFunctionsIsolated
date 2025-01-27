@@ -1,17 +1,17 @@
 ﻿using Square.Models;
 using System.Text.Json;
 using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Utility;
 
 
 public class SquareUtility : ISquareUtility
 {
-    private readonly ISquareDAL squareDAL;
-    public SquareUtility(ISquareDAL squareDAL) 
+    private readonly ISquareSdkDataAccess squareDAL;
+    public SquareUtility(ISquareSdkDataAccess squareDAL) 
     {
         this.squareDAL = squareDAL;
     }
@@ -82,5 +82,4 @@ public class SquareUtility : ISquareUtility
 
         return itemsWithReportingCategoryId;
     }
-
 }

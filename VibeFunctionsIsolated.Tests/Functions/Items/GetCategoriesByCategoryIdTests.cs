@@ -5,9 +5,9 @@ using Moq;
 using NUnit.Framework;
 using Square.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
 
@@ -17,14 +17,14 @@ public class GetCategoriesByCategoryIdTests
 {
     private Mock<ILogger<GetCategoriesByCategoryId>> logger;
     private Mock<ISquareUtility> squareUtility;
-    private Mock<ISquareDAL> squareDAL;
+    private Mock<ISquareSdkDataAccess> squareDAL;
 
     [SetUp]
     public void Setup()
     {
         logger = new Mock<ILogger<GetCategoriesByCategoryId>>();
         squareUtility = new Mock<ISquareUtility>();
-        squareDAL = new Mock<ISquareDAL>();
+        squareDAL = new Mock<ISquareSdkDataAccess>();
     }
 
     [Test]

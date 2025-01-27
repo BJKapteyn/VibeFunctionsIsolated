@@ -4,9 +4,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
@@ -14,9 +14,9 @@ namespace VibeFunctionsIsolated.Functions.Items
     {
         private readonly ILogger<GetItemCategories> _logger;
         private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        private readonly ISquareSdkDataAccess squareDAL;
 
-        public GetItemCategories(ILogger<GetItemCategories> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+        public GetItemCategories(ILogger<GetItemCategories> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
         {
             _logger = logger;
             this.squareUtility = squareUtility;

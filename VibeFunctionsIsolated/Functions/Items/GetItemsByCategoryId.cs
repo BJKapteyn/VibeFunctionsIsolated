@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -13,9 +13,9 @@ public class GetItemsByCategoryId
 {
     private readonly ILogger<GetItemsByCategoryId> _logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
+    private readonly ISquareSdkDataAccess squareDAL;
 
-    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
     {
         _logger = logger;
         this.squareUtility = squareUtility;

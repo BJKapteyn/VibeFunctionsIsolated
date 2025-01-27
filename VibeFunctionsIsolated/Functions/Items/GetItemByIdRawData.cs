@@ -2,20 +2,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
-namespace VibeCollectiveIsolated.Functions.Items;
+namespace VibeFunctionsIsolated.Functions.Items;
 
 public class GetItemByIdRawData
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
+    private readonly ISquareSdkDataAccess squareDAL;
 
-    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
     {
         this.logger = logger;
         this.squareUtility = squareUtility;
@@ -33,7 +32,7 @@ public class GetItemByIdRawData
             return new BadRequestResult();
         }
 
-        IEnumerable<SquareItemRawData> stuff = await squareDAL.GetItemsByIdRawData(categoryInfo);
+        IEnumerable<SquareItemRawData> stuff = await squareDAL.GetSquareAPIRawData(categoryInfo);
 
         return new OkObjectResult("Welcome to Azure Functions!");
     }

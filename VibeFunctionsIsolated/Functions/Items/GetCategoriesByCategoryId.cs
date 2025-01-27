@@ -4,18 +4,18 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
     public class GetCategoriesByCategoryId
     {
         private readonly ILogger<GetCategoriesByCategoryId> _logger;
-        private readonly ISquareDAL squareDAL;
+        private readonly ISquareSdkDataAccess squareDAL;
         private readonly ISquareUtility squareUtility;
 
-        public GetCategoriesByCategoryId(ILogger<GetCategoriesByCategoryId> logger, ISquareDAL squareDAL, ISquareUtility squareUtility)
+        public GetCategoriesByCategoryId(ILogger<GetCategoriesByCategoryId> logger, ISquareSdkDataAccess squareDAL, ISquareUtility squareUtility)
         {
             _logger = logger;
             this.squareDAL = squareDAL;

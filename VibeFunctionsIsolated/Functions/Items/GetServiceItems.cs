@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -16,9 +16,9 @@ public class GetServiceItems
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
+    private readonly ISquareSdkDataAccess squareDAL;
 
-    public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    public GetServiceItems(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
     {
         this.logger = logger;
         this.squareUtility = squareUtility;

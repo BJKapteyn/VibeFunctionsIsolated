@@ -5,8 +5,8 @@ using Square.Models;
 using System.Text.Json;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 
 namespace VibeFunctionsIsolated.Functions.Items
@@ -14,9 +14,9 @@ namespace VibeFunctionsIsolated.Functions.Items
     public class GetEmployees
     {
         private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        private readonly ISquareSdkDataAccess squareDAL;
 
-        public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
+        public GetEmployees(ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
         {
             this.squareUtility = squareUtility;
             this.squareDAL = squareDAL;

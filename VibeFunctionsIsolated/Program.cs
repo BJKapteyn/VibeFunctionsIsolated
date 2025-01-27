@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 
 var host = new HostBuilder()
@@ -13,7 +14,7 @@ var host = new HostBuilder()
         services.AddHttpClient();
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<ISquareUtility, SquareUtility>();
-        services.AddScoped<ISquareDAL, SquareDAL>();
+        services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
     })
     .Build();
 
