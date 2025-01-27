@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
-using Square;
-using Square.Authentication;
-using Square.Exceptions;
-using Square.Models;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
+using Square;
+using Square.Exceptions;
+using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
@@ -18,6 +16,7 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
 
     private readonly ILogger<SquareSdkDataAccess> logger;
     private SquareClient squareClient { get; }
+
     #endregion
 
     public SquareSdkDataAccess(ILogger<SquareSdkDataAccess> logger)
@@ -94,61 +93,56 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
         return response;
     }
 
-    public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
-    {
-        //IEnumerable<SquareItemRawData> itemCollection;
+    //public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
+    //{
+    //    string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
+    //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
 
-        string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
+    //    request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
+    //    request.Headers.Add("Accept", "application/json");
+    //    request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
-        request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
-        request.Headers.Add("Accept", "application/json");
-        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
+    //    string responseJsonString = await getJsonStringResponse(request);
 
-        string responseJsonString = await getJsonStringResponse(request);
+    //    if (responseJsonString != "")
+    //    {
+    //        using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
+    //        {
+    //            List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+    //            JsonElement root = jsonBody.RootElement;
+    //            JsonElement items;
+    //            bool hasItemsProperty = root.TryGetProperty("items", out items);
+    //            if (hasItemsProperty)
+    //            {
+    //                foreach (JsonElement item in items.EnumerateArray())
+    //                {
+    //                    JsonElement itemData = new();
+    //                    item.TryGetProperty("item_data", out itemData);
 
-        //List<SquareItemRawData> response = JsonSerializer.Deserialize<List<SquareItemRawData>>(responseJsonString) ?? 
-        //                                   new List<SquareItemRawData>();
+    //                    JsonElement id = new();
+    //                    item.TryGetProperty("id", out id);
 
-        if (responseJsonString != "")
-        {
-            using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
-            {
-                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
-                JsonElement root = jsonBody.RootElement;
-                JsonElement items;
-                bool hasItemsProperty = root.TryGetProperty("items", out items);
-                if (hasItemsProperty)
-                {
-                    foreach (JsonElement item in items.EnumerateArray())
-                    {
-                        JsonElement itemData = new();
-                        item.TryGetProperty("item_data", out itemData);
+    //                    string itemId = id.GetString() ?? "";
 
-                        JsonElement id = new();
-                        item.TryGetProperty("id", out id);
+    //                    SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
 
-                        string itemId = id.GetString() ?? "";
+    //                    if (squareItem != null)
+    //                    {
+    //                        squareItem.Id = itemId;
+    //                        squareItems.Add(squareItem);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
-                        SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
+    //    //if(false)
+    //    //{
+    //    //    logger.LogError($"{nameof(GetItemsByIdRawData)} returned null");
+    //    //}
 
-                        if (squareItem != null)
-                        {
-                            squareItem.Id = itemId;
-                            squareItems.Add(squareItem);
-                        }
-                    }
-                }
-            }
-        }
-
-        //if(false)
-        //{
-        //    logger.LogError($"{nameof(GetItemsByIdRawData)} returned null");
-        //}
-
-        return new List<SquareItemRawData>();
-    }
+    //    return new List<SquareItemRawData>();
+    //}
 
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
@@ -203,34 +197,5 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
         return result;
     }
 
-    #region Private Methods
-    private async Task<string> getJsonStringResponse(HttpRequestMessage request)
-    {
-        HttpClient client = new HttpClient();
-        HttpResponseMessage response;
-        string responseBodyStr;
-
-        try
-        {
-            response = await client.SendAsync(request);
-
-            if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
-            {
-                string message = response.ReasonPhrase ?? "";
-                throw new HttpRequestException(message, null, response.StatusCode);
-            }
-
-            responseBodyStr = await response.Content.ReadAsStringAsync();
-        }
-        catch (Exception ex)
-        {
-            string message = ex.Message;
-            logger.LogError("{message}", message);
-
-            responseBodyStr = "";
-        }
-
-        return responseBodyStr;
-    }
-    #endregion
+    
 }

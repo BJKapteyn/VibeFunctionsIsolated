@@ -15,6 +15,7 @@ var host = new HostBuilder()
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<ISquareUtility, SquareUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
+        services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
     })
     .Build();
 

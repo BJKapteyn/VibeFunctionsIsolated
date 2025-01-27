@@ -12,13 +12,13 @@ public class GetItemByIdRawData
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareSdkDataAccess squareDAL;
+    private readonly ISquareApiDataAccess squareApiDal;
 
-    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
+    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareApiDataAccess squareApiDal)
     {
         this.logger = logger;
         this.squareUtility = squareUtility;
-        this.squareDAL = squareDAL;
+        this.squareApiDal = squareApiDal;
     }
 
     [Function("GetItemByIdRawData")]
@@ -26,14 +26,19 @@ public class GetItemByIdRawData
     {
         CatalogInformation? categoryInfo = await squareUtility.DeserializeStream<CatalogInformation>(req.Body);
 
-        if (categoryInfo == null)
+        if (categoryInfo is null)
         {
             logger.LogError($"{nameof(GetItemByIdRawData)} request wasn't formatted correctly");
             return new BadRequestResult();
         }
 
-        IEnumerable<SquareItemRawData> stuff = await squareDAL.GetSquareAPIRawData(categoryInfo);
+        IEnumerable<SquareItemRawData> response = await squareApiDal.GetSquareAPIRawData(categoryInfo);
 
-        return new OkObjectResult("Welcome to Azure Functions!");
+        if(response.Any() is false)
+        {
+            return new NotFoundResult();
+        }
+
+        return new OkObjectResult(response);
     }
 }

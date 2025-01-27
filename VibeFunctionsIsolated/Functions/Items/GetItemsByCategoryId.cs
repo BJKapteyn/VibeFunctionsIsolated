@@ -27,14 +27,7 @@ public class GetItemsByCategoryId
     {        
         CatalogInformation? categoryId = null;
 
-        try
-        {
-            categoryId = await squareUtility.DeserializeStream<CatalogInformation?>(req.Body);
-        }
-        catch(Exception e)
-        {
-            _logger.LogError(e.Message);
-        }
+        categoryId = await squareUtility.DeserializeStream<CatalogInformation?>(req.Body);
 
         if (categoryId == null)
         {

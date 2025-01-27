@@ -15,7 +15,7 @@ namespace VibeFunctionsIsolated.Utility
         /// <param name="body"></param>
         /// <returns>Deserialized object</returns>
         public Task<T?> DeserializeStream<T>(Stream body);
-        public IEnumerable<SquareItem>? MapSquareProductItems(SearchCatalogObjectsResponse response, string type);
+        public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type);
         public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId);
     }
 }

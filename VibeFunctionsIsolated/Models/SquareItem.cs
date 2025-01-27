@@ -1,9 +1,12 @@
 ﻿using Square.Models;
+using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models;
 
-public class SquareItem : SquareCatalogItem
+public class SquareItem : SquareCatalogItem, ISquareCatalogItem
 {
+    #region Constructors
+
     public SquareItem(string id, string name, string price, string duration) : 
         base(id, name, string.Empty, string.Empty)
     {
@@ -12,7 +15,7 @@ public class SquareItem : SquareCatalogItem
     }
 
     public SquareItem(CatalogObject item, string? imageURL) : 
-        this(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
+        base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
     {
         ImageURL = imageURL;
         ReportingCategoryId = item.ItemData.ReportingCategory?.Id;
@@ -23,6 +26,8 @@ public class SquareItem : SquareCatalogItem
             Variations = setVariations(item);
         }
     }
+
+    #endregion
 
     public string? Price { get; set; }
     public string? ReportingCategoryId { get; set; }
