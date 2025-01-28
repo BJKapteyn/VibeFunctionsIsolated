@@ -32,9 +32,9 @@ public class GetItemByIdRawData
             return new BadRequestResult();
         }
 
-        IEnumerable<SquareItemRawData> response = await squareApiDal.GetSquareAPIRawData(categoryInfo);
+        string response = await squareApiDal.GetBuyNowLink(categoryInfo.Id);
 
-        if(response.Any() is false)
+        if (response.Any() is false)
         {
             return new NotFoundResult();
         }

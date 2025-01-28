@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure.Core;
+using Microsoft.Extensions.Logging;
 using Square;
 using System.Net;
 using System.Text.Json;
@@ -20,6 +21,38 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
     {
         this.logger = logger;
         squareClient = InitializeClient();
+    }
+
+    public async Task<string> GetBuyNowLink(string imageId)
+    {
+        string buyNowLink = "";
+        string getItemEndpoint = $"https://connect.squareup.com/v2/catalog/object/{imageId}";
+
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, getItemEndpoint);
+        request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
+        request.Headers.Add("Accept", "application/json");
+
+        string jsonResponseBody = await getJsonStringResponse(request);
+
+        if (jsonResponseBody != "")
+        {
+            using (JsonDocument jsonBody = JsonDocument.Parse(jsonResponseBody))
+            {
+
+                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+                JsonElement root = jsonBody.RootElement;
+                JsonElement squareObject;
+                bool bodyHasObject = root.TryGetProperty("object", out squareObject);
+
+                if (bodyHasObject)
+                {
+                    JsonElement itemData = squareObject.GetProperty("item_data");
+
+                    buyNowLink = itemData.GetProperty("ecom_uri").GetString() ?? "";
+                }
+            }
+        }
+        return buyNowLink;
     }
 
     public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
