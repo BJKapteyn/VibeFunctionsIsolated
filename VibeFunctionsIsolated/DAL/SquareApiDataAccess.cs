@@ -29,6 +29,9 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
 
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
+
+        GetItemByIdRequestInfo requestInfo = new GetItemByIdRequestInfo(catalogInfo.Id);
+
         request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
         string responseJsonString = await getJsonStringResponse(request);
@@ -62,9 +65,11 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
                         }
                     }
                 }
+
                 return squareItems;
             }
         }
+
         return new List<SquareItemRawData>();
     }
 
