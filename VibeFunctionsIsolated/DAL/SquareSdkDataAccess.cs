@@ -7,10 +7,11 @@ using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
+using Square.Authentication;
 
 namespace VibeFunctionsIsolated.DAL;
 
-public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
+public class SquareSdkDataAccess : ISquareSdkDataAccess
 {
     #region Private Members
 
@@ -23,6 +24,16 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
     {
         this.logger = logger;    
         squareClient = InitializeClient();
+    }
+    public static SquareClient InitializeClient()
+    {
+        BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
+        SquareClient client = new SquareClient.Builder()
+            .Environment(Square.Environment.Production)
+            .BearerAuthCredentials(bearerAuth)
+            .Build();
+
+        return client;
     }
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItems(SearchCatalogItemsRequest requestBody)
@@ -50,7 +61,7 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
           .CategoryIds(categoryIds);
 
 
-        if (categoryInfo.ProductType != null)
+        if (categoryInfo.ProductType != null && categoryInfo.ProductType != "")
         {
             List<string> productTypes =
             [
@@ -92,58 +103,6 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
 
         return response;
     }
-
-    //public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
-    //{
-    //    string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
-    //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
-
-    //    request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
-    //    request.Headers.Add("Accept", "application/json");
-    //    request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
-
-    //    string responseJsonString = await getJsonStringResponse(request);
-
-    //    if (responseJsonString != "")
-    //    {
-    //        using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
-    //        {
-    //            List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
-    //            JsonElement root = jsonBody.RootElement;
-    //            JsonElement items;
-    //            bool hasItemsProperty = root.TryGetProperty("items", out items);
-    //            if (hasItemsProperty)
-    //            {
-    //                foreach (JsonElement item in items.EnumerateArray())
-    //                {
-    //                    JsonElement itemData = new();
-    //                    item.TryGetProperty("item_data", out itemData);
-
-    //                    JsonElement id = new();
-    //                    item.TryGetProperty("id", out id);
-
-    //                    string itemId = id.GetString() ?? "";
-
-    //                    SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
-
-    //                    if (squareItem != null)
-    //                    {
-    //                        squareItem.Id = itemId;
-    //                        squareItems.Add(squareItem);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    //if(false)
-    //    //{
-    //    //    logger.LogError($"{nameof(GetItemsByIdRawData)} returned null");
-    //    //}
-
-    //    return new List<SquareItemRawData>();
-    //}
-
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
         List<string> objectTypes =
@@ -174,12 +133,13 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
         return response;
     }
 
-    public async Task<string?> GetImageURL(string? imageId)
+    public async Task<string> GetImageURL(string? imageId)
     {
         if (imageId == null)
             return "";
 
-        string? result;
+        string imageUrl;
+
         RetrieveCatalogObjectResponse? item;
 
         try
@@ -190,11 +150,12 @@ public class SquareSdkDataAccess : SquareDataAcess, ISquareSdkDataAccess
         {
             string message = ex.Message;
             logger.LogError("{message}", message);
-            return null;
+            return "";
         }
-        result = item?.MObject?.ImageData?.Url;
 
-        return result;
+        imageUrl = item?.MObject?.ImageData?.Url ?? "";
+
+        return imageUrl;
     }
 
     

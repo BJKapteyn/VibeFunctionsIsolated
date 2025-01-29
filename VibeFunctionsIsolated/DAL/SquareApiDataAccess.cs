@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
-using Square;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
@@ -8,19 +6,19 @@ using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.DAL;
 
-public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
+public class SquareApiDataAccess : ISquareApiDataAccess
 {
     #region Private Members
 
     private readonly ILogger<SquareSdkDataAccess> logger;
-    private SquareClient squareClient { get; }
+    private readonly HttpClient client;
 
     #endregion
 
     public SquareApiDataAccess(ILogger<SquareSdkDataAccess> logger)
     {
         this.logger = logger;
-        squareClient = InitializeClient();
+        client = new HttpClient();
     }
 
     public async Task<string> GetBuyNowLink(string imageId)
@@ -32,23 +30,27 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
-        string jsonResponseBody = await getJsonStringResponse(request);
+        string jsonResponseBody = await GetJsonStringResponse(request);
 
         if (jsonResponseBody != "")
         {
             using (JsonDocument jsonBody = JsonDocument.Parse(jsonResponseBody))
             {
-
                 List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
                 JsonElement root = jsonBody.RootElement;
                 JsonElement squareObject;
+
                 bool bodyHasObject = root.TryGetProperty("object", out squareObject);
 
                 if (bodyHasObject)
                 {
-                    JsonElement itemData = squareObject.GetProperty("item_data");
+                    squareObject.TryGetProperty("item_data", out JsonElement itemData);
+                    itemData.TryGetProperty("ecom_uri", out JsonElement ecomUriElement);
 
-                    buyNowLink = itemData.GetProperty("ecom_uri").GetString() ?? "";
+                    if(ecomUriElement.ValueKind == JsonValueKind.String)
+                    {
+                        buyNowLink = ecomUriElement.GetString() ?? "";
+                    }
                 }
             }
         }
@@ -65,9 +67,9 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
 
         GetItemByIdRequestInfo requestInfo = new GetItemByIdRequestInfo(catalogInfo.Id);
 
-        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
+          request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
-        string responseJsonString = await getJsonStringResponse(request);
+        string responseJsonString = await GetJsonStringResponse(request);
 
         if (responseJsonString != "")
         {
@@ -106,10 +108,8 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
         return new List<SquareItemRawData>();
     }
 
-    #region Private Methods
-    private async Task<string> getJsonStringResponse(HttpRequestMessage request)
+    public async Task<string> GetJsonStringResponse(HttpRequestMessage request)
     {
-        HttpClient client = new HttpClient();
         HttpResponseMessage response;
         string responseBodyStr;
 
@@ -135,5 +135,4 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
 
         return responseBodyStr;
     }
-    #endregion
 }
