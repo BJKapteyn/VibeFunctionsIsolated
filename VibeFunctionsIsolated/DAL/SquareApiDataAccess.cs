@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Square;
 using System.Net;
 using System.Text.Json;
@@ -38,17 +37,21 @@ public class SquareApiDataAccess : SquareDataAcess, ISquareApiDataAccess
         {
             using (JsonDocument jsonBody = JsonDocument.Parse(jsonResponseBody))
             {
-
                 List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
                 JsonElement root = jsonBody.RootElement;
                 JsonElement squareObject;
+
                 bool bodyHasObject = root.TryGetProperty("object", out squareObject);
 
                 if (bodyHasObject)
                 {
-                    JsonElement itemData = squareObject.GetProperty("item_data");
+                    squareObject.TryGetProperty("item_data", out JsonElement itemData);
+                    itemData.TryGetProperty("ecom_uri", out JsonElement ecomUriElement);
 
-                    buyNowLink = itemData.GetProperty("ecom_uri").GetString() ?? "";
+                    if(ecomUriElement.ValueKind == JsonValueKind.String)
+                    {
+                        buyNowLink = ecomUriElement.GetString() ?? "";
+                    }
                 }
             }
         }

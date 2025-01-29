@@ -83,6 +83,9 @@ public class SquareUtility : ISquareUtility
 
     public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
     {
+        if (reportingCategoryId == null || reportingCategoryId == "")
+            return items;
+
         IEnumerable<SquareItem> itemsWithReportingCategoryId = items.Where(item => item.ReportingCategoryId == reportingCategoryId);
 
         return itemsWithReportingCategoryId;

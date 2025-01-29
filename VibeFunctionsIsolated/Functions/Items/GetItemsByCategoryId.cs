@@ -13,13 +13,18 @@ public class GetItemsByCategoryId
 {
     private readonly ILogger<GetItemsByCategoryId> _logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareSdkDataAccess squareDAL;
+    private readonly ISquareSdkDataAccess squareSdkDal;
+    private readonly ISquareApiDataAccess squareApiDal;
 
-    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
+    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger,
+        ISquareUtility squareUtility,
+        ISquareSdkDataAccess squareSdkDal,
+        ISquareApiDataAccess squareApiDal)
     {
         _logger = logger;
         this.squareUtility = squareUtility;
-        this.squareDAL = squareDAL;
+        this.squareApiDal = squareApiDal;
+        this.squareSdkDal = squareSdkDal;
     }
 
     [Function("GetItemsByCategoryId")]
@@ -35,7 +40,7 @@ public class GetItemsByCategoryId
             return new BadRequestResult();
         }
 
-        SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItemsByCategoryId(categoryId);
+        SearchCatalogItemsResponse? response = await squareSdkDal.SearchCatalogItemsByCategoryId(categoryId);
 
         if (response == null || response.Items == null)
         {
@@ -51,10 +56,23 @@ public class GetItemsByCategoryId
 
         IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
         {
-            string? imageId = responseItem.ItemData.ImageIds == null ? null : responseItem.ItemData.ImageIds[0];
-            string? imageURL = squareDAL.GetImageURL(imageId).Result;
+            string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
 
-            return new SquareItem(responseItem, imageURL);
+            Task<string> imageUrlTask = squareSdkDal.GetImageURL(imageId);
+            Task<string> buyNowLinkTask = squareApiDal.GetBuyNowLink(responseItem.Id);
+
+            Console.WriteLine(imageUrlTask.Status);
+            Console.WriteLine(buyNowLinkTask.Status);
+
+            Task.WaitAll(imageUrlTask, buyNowLinkTask);
+
+            Console.WriteLine(imageUrlTask.Status);
+            Console.WriteLine(buyNowLinkTask.Status);
+
+            string imageURL = imageUrlTask.Result;
+            string buyNowLink = buyNowLinkTask.Result;
+
+            return new SquareItem(responseItem, imageURL, buyNowLink);
         }).ToList();
 
         if(categoryId.ReportingCategoryId != null)

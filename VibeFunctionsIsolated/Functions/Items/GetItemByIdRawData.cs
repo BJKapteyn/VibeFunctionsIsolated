@@ -34,7 +34,7 @@ public class GetItemByIdRawData
 
         string response = await squareApiDal.GetBuyNowLink(categoryInfo.Id);
 
-        if (response.Any() is false)
+        if (response.Length <= 0)
         {
             return new NotFoundResult();
         }

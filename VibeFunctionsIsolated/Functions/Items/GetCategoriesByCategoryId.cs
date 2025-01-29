@@ -43,8 +43,9 @@ namespace VibeFunctionsIsolated.Functions.Items
 
             IEnumerable<SquareCategory> catalogItems = response.Objects.Select(catalogItem =>
             {
+                // Refactor
                 string? imageId = catalogItem.CategoryData.ImageIds == null ? null : catalogItem.CategoryData.ImageIds[0];
-                string? imageURL = squareDAL.GetImageURL(imageId).Result;
+                string imageURL = squareDAL.GetImageURL(imageId).Result;
 
                 return new SquareCategory(catalogItem, imageURL);
             });

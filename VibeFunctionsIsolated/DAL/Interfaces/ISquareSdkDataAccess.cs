@@ -14,5 +14,5 @@ public interface ISquareSdkDataAccess
     ///// <returns>Square Item </returns>
     //public Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo);
 
-    public Task<string?> GetImageURL(string? imageId);
+    public Task<string> GetImageURL(string? imageId);
 }

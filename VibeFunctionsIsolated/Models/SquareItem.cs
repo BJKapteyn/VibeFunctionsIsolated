@@ -7,19 +7,20 @@ public class SquareItem : SquareCatalogItem, ISquareCatalogItem
 {
     #region Constructors
 
-    public SquareItem(string id, string name, string price, string duration) : 
+    public SquareItem(string id, string name, string price, string duration, string buyNowLink = "") : 
         base(id, name, string.Empty, string.Empty)
     {
         Price = price;
         DurationInMinutes = duration;
+        BuyNowLink = buyNowLink;
     }
 
-    public SquareItem(CatalogObject item, string? imageURL) : 
+    public SquareItem(CatalogObject item, string? imageURL, string buyNowLink = "") : 
         base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
     {
         ImageURL = imageURL;
         ReportingCategoryId = item.ItemData.ReportingCategory?.Id;
-        BuyNowUrl = item.ItemData.EcomSeoData?.Permalink;
+        BuyNowLink = buyNowLink;
 
         if(item.ItemData.Variations != null)
         {
@@ -32,7 +33,7 @@ public class SquareItem : SquareCatalogItem, ISquareCatalogItem
     public string? Price { get; set; }
     public string? ReportingCategoryId { get; set; }
     public string? DurationInMinutes { get; set; }
-    public string? BuyNowUrl { get; set; }
+    public string BuyNowLink { get; set; }
     public List<SquareItem>? Variations { get; set; }
 
     private static List<SquareItem>? setVariations(CatalogObject item)
