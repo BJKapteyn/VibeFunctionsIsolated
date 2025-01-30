@@ -61,7 +61,13 @@ public class GetItemsByCategoryId
             Task<string> imageUrlTask = squareSdkDal.GetImageURL(imageId);
             Task<string> buyNowLinkTask = squareApiDal.GetBuyNowLink(responseItem.Id);
 
+            Console.WriteLine(imageUrlTask.Status);
+            Console.WriteLine(buyNowLinkTask.Status);
+
             Task.WaitAll(imageUrlTask, buyNowLinkTask);
+
+            Console.WriteLine(imageUrlTask.Status);
+            Console.WriteLine(buyNowLinkTask.Status);
 
             string imageURL = imageUrlTask.Result;
             string buyNowLink = buyNowLinkTask.Result;
