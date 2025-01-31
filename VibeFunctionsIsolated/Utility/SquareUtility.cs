@@ -1,19 +1,21 @@
 ﻿using Square.Models;
 using System.Text.Json;
-using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.Enums;
-using static VibeFunctionsIsolated.Enums.SquareEnums;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.Models;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
 
 
 public class SquareUtility : ISquareUtility
 {
-    private readonly ISquareSdkDataAccess squareDAL;
-    public SquareUtility(ISquareSdkDataAccess squareDAL) 
+    private readonly ISquareSdkDataAccess squareSdkDal;
+    private readonly ISquareApiDataAccess squareApiDal;
+    public SquareUtility(ISquareSdkDataAccess squareDAL, ISquareApiDataAccess squareApiDal) 
     {
-        this.squareDAL = squareDAL;
+        this.squareSdkDal = squareDAL;
+        this.squareApiDal = squareApiDal;
     }
 
     public async Task<T?> DeserializeStream<T>(Stream body)
@@ -59,13 +61,12 @@ public class SquareUtility : ISquareUtility
             .Select(responseItem =>
             {
                 string imageId = responseItem.ItemData.ImageIds != null ?
-                                    responseItem.ItemData.ImageIds.First() :
-                                    "";
+                                 responseItem.ItemData.ImageIds.First() : "";
                 string? imageURL = null;
 
                 if (imageId != string.Empty)
                 {
-                    imageURL = squareDAL.GetImageURL(imageId).Result;
+                    imageURL = squareSdkDal.GetImageURL(imageId).Result;
                 }
 
                 return new SquareItem(responseItem, imageURL);
@@ -90,4 +91,38 @@ public class SquareUtility : ISquareUtility
 
         return itemsWithReportingCategoryId;
     }
+
+    public async Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks = false)
+    {
+        Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
+
+        IEnumerable<SquareItem> squareItems = catalogObjects.Select(responseItem =>
+        {
+            string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
+            List<Task<string>> getExtraDataTasks = new List<Task<string>>();
+
+            getExtraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
+            if(needsBuyNowLinks)
+                getExtraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
+
+            itemIdToExtraData.TryAdd(responseItem.Id, getExtraDataTasks);
+
+            return new SquareItem(responseItem, "");
+        }).ToList();
+
+        await Task.WhenAll(itemIdToExtraData.Values.SelectMany(x => x).ToArray());
+
+        foreach (SquareItem item in squareItems)
+        {
+            List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
+            Task.WaitAll(extraDataTasks.ToArray());
+            item.ImageURL = extraDataTasks[0].Result;
+
+            if(needsBuyNowLinks)
+                item.BuyNowLink = extraDataTasks[1].Result;
+        }
+
+        return squareItems;
+    }
+
 }

@@ -54,36 +54,38 @@ public class GetItemsByCategoryId
             return new BadRequestResult();
         }
 
-        Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
+        IEnumerable<SquareItem> squareItems = await squareUtility.MapCatalogObjectsToLocalModel(response.Items, true);
 
-        IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
-        {
-            string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
+        //Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
 
-            List<Task<string>> extraDataTasks = new List<Task<string>>();
+        //IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
+        //{
+        //    string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
 
-            extraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
-            extraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
+        //    List<Task<string>> extraDataTasks = new List<Task<string>>();
 
-            itemIdToExtraData.Add(responseItem.Id, extraDataTasks);
+        //    extraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
+        //    extraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
 
-            return new SquareItem(responseItem, "");
-        }).ToList();
+        //    itemIdToExtraData.Add(responseItem.Id, extraDataTasks);
 
-        foreach (SquareItem item in items)
-        {
-            List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
-            Task.WaitAll(extraDataTasks.ToArray());
-            item.ImageURL = extraDataTasks[0].Result;
-            item.BuyNowLink = extraDataTasks[1].Result;
-        }
+        //    return new SquareItem(responseItem, "");
+        //}).ToList();
+
+        //foreach (SquareItem item in items)
+        //{
+        //    List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
+        //    Task.WaitAll(extraDataTasks.ToArray());
+        //    item.ImageURL = extraDataTasks[0].Result;
+        //    item.BuyNowLink = extraDataTasks[1].Result;
+        //}
 
         if (categoryId.ReportingCategoryId != null)
         {
-            items = squareUtility.GetItemsWithReportingCategoryId(items, categoryId.ReportingCategoryId);
+            squareItems = squareUtility.GetItemsWithReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
         }
 
-        return new OkObjectResult(items);
+        return new OkObjectResult(squareItems);
     }
 }
 
