@@ -1,8 +1,7 @@
-﻿using Square.Models;
+﻿  using Square.Models;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 
-namespace VibeCollectiveFunctions.Models
+namespace VibeFunctionsIsolated.Models
 {
     public class SquareEmployee : SquareCatalogItem
     {

@@ -1,4 +1,4 @@
-﻿using VibeCollectiveFunctions.Models;
+﻿using VibeFunctionsIsolated.Models;
 
 namespace VibeFunctionsIsolated.Models
 {

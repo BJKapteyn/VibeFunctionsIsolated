@@ -6,10 +6,10 @@ using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 
-namespace VibeCollectiveFunctions.Functions.Email;
+namespace VibeFunctionsIsolated.Functions.Email;
 
 public class InsertCustomerEmail
 {

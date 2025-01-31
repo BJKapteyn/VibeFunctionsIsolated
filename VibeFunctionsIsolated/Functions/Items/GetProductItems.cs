@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
-using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
@@ -15,9 +15,9 @@ namespace VibeFunctionsIsolated.Functions.Items
     {
         private readonly ILogger<GetProductItems> _logger;
         private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        private readonly ISquareSdkDataAccess squareDAL;
 
-        public GetProductItems(ILogger<GetProductItems> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+        public GetProductItems(ILogger<GetProductItems> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
         {
             _logger = logger;
             this.squareUtility = squareUtility;

@@ -1,8 +1,9 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using VibeCollectiveFunctions.Utility;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 
 var host = new HostBuilder()
@@ -12,8 +13,9 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.AddHttpClient();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddSingleton<ISquareUtility, SquareUtility>();
-        services.AddScoped<ISquareDAL, SquareDAL>();
+        services.AddSingleton<ISquareUtility, SquareDalUtility>();
+        services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
+        services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
     })
     .Build();
 

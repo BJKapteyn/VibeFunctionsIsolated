@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
-using VibeFunctionsIsolated.DAL;
-using static VibeCollectiveFunctions.Enums.SquareEnums;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
+using static VibeFunctionsIsolated.Enums.SquareEnums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
-namespace VibeCollectiveFunctions.Functions.Items;
+namespace VibeFunctionsIsolated.Functions.Items;
 
 public class GetItems
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
-    public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    private readonly ISquareSdkDataAccess squareDAL;
+    public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
     {
         logger = _logger;
         this.squareUtility = squareUtility;

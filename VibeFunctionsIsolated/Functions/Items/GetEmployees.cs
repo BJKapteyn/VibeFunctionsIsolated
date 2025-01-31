@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using System.Text.Json;
-using VibeCollectiveFunctions.Models;
-using VibeCollectiveFunctions.Utility;
-using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 
-namespace VibeCollectiveFunctions.Functions.Items
+namespace VibeFunctionsIsolated.Functions.Items
 {
     public class GetEmployees
     {
         private readonly ISquareUtility squareUtility;
-        private readonly ISquareDAL squareDAL;
+        private readonly ISquareSdkDataAccess squareDAL;
 
-        public GetEmployees(ISquareUtility squareUtility, ISquareDAL squareDAL)
+        public GetEmployees(ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
         {
             this.squareUtility = squareUtility;
             this.squareDAL = squareDAL;
@@ -49,25 +49,24 @@ namespace VibeCollectiveFunctions.Functions.Items
                 return null;
             }
 
-            IEnumerable<SquareEmployee> squareEmployees = response.Items
-                .Select(responseItem =>
+            IEnumerable<SquareEmployee> squareEmployees = response.Items.Select(responseItem =>
+            {
+                // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
+                IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
+                string? imageId;
+                if(responseItem.ItemData?.ImageIds != null)
                 {
-                    // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
-                    IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
-                    string? imageId;
-                    if(responseItem.ItemData?.ImageIds != null)
-                    {
-                        imageId = responseItem.ItemData?.ImageIds[0];
-                    }
-                    else
-                    {
-                        imageId = "";
-                    }
-                    string? imageURL = squareDAL.GetImageURL(imageId).Result;
+                    imageId = responseItem.ItemData?.ImageIds[0];
+                }
+                else
+                {
+                    imageId = "";
+                }
+                string? imageURL = squareDAL.GetImageURL(imageId).Result;
                     
-                    return new SquareEmployee(responseItem, customAttributeValues, imageURL);
-                })
-                .ToList();
+                return new SquareEmployee(responseItem, customAttributeValues, imageURL);
+            })
+            .ToList();
 
             return squareEmployees;
         }
