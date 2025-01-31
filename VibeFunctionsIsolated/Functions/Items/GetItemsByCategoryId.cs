@@ -54,22 +54,31 @@ public class GetItemsByCategoryId
             return new BadRequestResult();
         }
 
+        Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
+
         IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
         {
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
 
-            Task<string> imageUrlTask = squareSdkDal.GetImageURL(imageId);
-            Task<string> buyNowLinkTask = squareApiDal.GetBuyNowLink(responseItem.Id);
+            List<Task<string>> extraDataTasks = new List<Task<string>>();
 
-            Task.WaitAll(imageUrlTask, buyNowLinkTask);
+            extraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
+            extraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
 
-            string imageURL = imageUrlTask.Result;
-            string buyNowLink = buyNowLinkTask.Result;
+            itemIdToExtraData.Add(responseItem.Id, extraDataTasks);
 
-            return new SquareItem(responseItem, imageURL, buyNowLink);
+            return new SquareItem(responseItem, "");
         }).ToList();
 
-        if(categoryId.ReportingCategoryId != null)
+        foreach (SquareItem item in items)
+        {
+            List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
+            Task.WaitAll(extraDataTasks.ToArray());
+            item.ImageURL = extraDataTasks[0].Result;
+            item.BuyNowLink = extraDataTasks[1].Result;
+        }
+
+        if (categoryId.ReportingCategoryId != null)
         {
             items = squareUtility.GetItemsWithReportingCategoryId(items, categoryId.ReportingCategoryId);
         }

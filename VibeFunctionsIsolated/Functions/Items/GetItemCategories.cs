@@ -42,13 +42,27 @@ namespace VibeFunctionsIsolated.Functions.Items
                 return new NotFoundResult();
             }
 
+            Dictionary<string, Task<string>> itemIdToExtraData = [];
+
             IEnumerable<SquareCategory> catalogItems = response.Objects.Select(catalogItem =>
             {
                 string? imageId = catalogItem.CategoryData.ImageIds == null ? null : catalogItem.CategoryData.ImageIds[0];
-                string? imageURL = squareDAL.GetImageURL(imageId).Result;
 
-                return new SquareCategory(catalogItem, imageURL);
-            });
+                Task<string> imageUrlTask = squareDAL.GetImageURL(imageId);
+
+                itemIdToExtraData.TryAdd(catalogItem.Id, imageUrlTask);
+
+                return new SquareCategory(catalogItem, "");
+            }).ToList();
+
+            Task.WaitAll(itemIdToExtraData.Values.ToArray());
+
+            foreach (SquareCategory category in catalogItems)
+            {
+                string imageUrl = itemIdToExtraData[category.Id].Result;
+
+                category.ImageURL = imageUrl;
+            }
 
             return new OkObjectResult(catalogItems);
         }
