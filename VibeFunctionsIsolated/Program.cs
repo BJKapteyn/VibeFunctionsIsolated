@@ -13,7 +13,7 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.AddHttpClient();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddSingleton<ISquareUtility, SquareUtility>();
+        services.AddSingleton<ISquareUtility, SquareDalUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
     })

@@ -8,11 +8,11 @@ using static VibeFunctionsIsolated.Enums.SquareEnums;
 namespace VibeFunctionsIsolated.Utility;
 
 
-public class SquareUtility : ISquareUtility
+public class SquareDalUtility : ISquareUtility
 {
     private readonly ISquareSdkDataAccess squareSdkDal;
     private readonly ISquareApiDataAccess squareApiDal;
-    public SquareUtility(ISquareSdkDataAccess squareDAL, ISquareApiDataAccess squareApiDal) 
+    public SquareDalUtility(ISquareSdkDataAccess squareDAL, ISquareApiDataAccess squareApiDal) 
     {
         this.squareSdkDal = squareDAL;
         this.squareApiDal = squareApiDal;
@@ -38,7 +38,7 @@ public class SquareUtility : ISquareUtility
 
     public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
     {
-        IEnumerable<SquareItem>? squareItems = null;
+        IEnumerable<SquareItem> mappedSquareItems;
 
         string employeeCategoryId = response.Objects.Where(responseItem =>
         {
@@ -48,7 +48,7 @@ public class SquareUtility : ISquareUtility
 
         if (response.Objects.Count > 0)
         {
-            squareItems = response.Objects
+            IEnumerable<CatalogObject> squareObjects = response.Objects
             .Where(responseItem =>
             {
                 bool isCorrectType = responseItem.Type == type;
@@ -57,29 +57,17 @@ public class SquareUtility : ISquareUtility
 
                 return isCorrectType && isNOTEmployee && isAppointment;
 
-            })
-            .Select(responseItem =>
-            {
-                string imageId = responseItem.ItemData.ImageIds != null ?
-                                 responseItem.ItemData.ImageIds.First() : "";
-                string? imageURL = null;
+            }).ToList();
 
-                if (imageId != string.Empty)
-                {
-                    imageURL = squareSdkDal.GetImageURL(imageId).Result;
-                }
+            mappedSquareItems = MapCatalogObjectsToLocalModel(squareObjects).Result;
 
-                return new SquareItem(responseItem, imageURL);
-            })
-            .ToList();
         }
-
-        if(squareItems is null)
+        else
         {
-            squareItems = Array.Empty<SquareItem>();
+            mappedSquareItems = Array.Empty<SquareItem>();
         }
 
-        return squareItems;
+        return mappedSquareItems;
     }
 
     public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
