@@ -1,4 +1,5 @@
 ﻿using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL.Interfaces
 {

@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using VibeFunctionsIsolated.Utility;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 

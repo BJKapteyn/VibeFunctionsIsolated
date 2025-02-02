@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL;
 
@@ -67,7 +68,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
         GetItemByIdRequestInfo requestInfo = new GetItemByIdRequestInfo(catalogInfo.Id);
 
-          request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
+        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
         string responseJsonString = await GetJsonStringResponse(request);
 

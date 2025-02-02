@@ -8,6 +8,7 @@ using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
 

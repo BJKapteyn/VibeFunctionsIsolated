@@ -2,7 +2,7 @@
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;

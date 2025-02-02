@@ -1,6 +1,6 @@
 ﻿using VibeFunctionsIsolated.Models.Interfaces;
 
-namespace VibeFunctionsIsolated.Models
+namespace VibeFunctionsIsolated.Models.Square
 {
     public class SquareCatalogItem : ISquareCatalogItem
     {

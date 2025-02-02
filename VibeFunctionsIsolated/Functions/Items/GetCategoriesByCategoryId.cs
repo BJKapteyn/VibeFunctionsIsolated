@@ -6,6 +6,7 @@ using Square.Models;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
