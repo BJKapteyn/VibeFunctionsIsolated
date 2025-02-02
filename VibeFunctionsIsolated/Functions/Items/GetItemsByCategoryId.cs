@@ -56,30 +56,6 @@ public class GetItemsByCategoryId
 
         IEnumerable<SquareItem> squareItems = await squareUtility.MapCatalogObjectsToLocalModel(response.Items, true);
 
-        //Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
-
-        //IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
-        //{
-        //    string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
-
-        //    List<Task<string>> extraDataTasks = new List<Task<string>>();
-
-        //    extraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
-        //    extraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
-
-        //    itemIdToExtraData.Add(responseItem.Id, extraDataTasks);
-
-        //    return new SquareItem(responseItem, "");
-        //}).ToList();
-
-        //foreach (SquareItem item in items)
-        //{
-        //    List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
-        //    Task.WaitAll(extraDataTasks.ToArray());
-        //    item.ImageURL = extraDataTasks[0].Result;
-        //    item.BuyNowLink = extraDataTasks[1].Result;
-        //}
-
         if (categoryId.ReportingCategoryId != null)
         {
             squareItems = squareUtility.GetItemsWithReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
