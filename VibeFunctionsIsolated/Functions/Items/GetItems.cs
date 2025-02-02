@@ -12,12 +12,10 @@ namespace VibeFunctionsIsolated.Functions.Items;
 
 public class GetItems
 {
-    private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
     private readonly ISquareSdkDataAccess squareDAL;
-    public GetItems(ILogger<GetItems> _logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
+    public GetItems(ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
     {
-        logger = _logger;
         this.squareUtility = squareUtility;
         this.squareDAL = squareDAL;
     }
@@ -44,7 +42,7 @@ public class GetItems
         IEnumerable<SquareItem>? squareItems = squareUtility.MapSquareProductItems(response, CatalogObjectType.ITEM.ToString()); 
         if(squareItems == null || squareItems.Count() == 0)
         {
-            return new BadRequestObjectResult(squareItems);
+            return new BadRequestResult();
         }
 
         return new OkObjectResult(squareItems); 
