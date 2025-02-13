@@ -144,4 +144,23 @@ public class SquareDalUtility : ISquareUtility
 
         return catalogItem;
     }
+
+    // Search for the image url in the response, it isn't in the same spot for all item types
+    private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
+    {
+        // Check main object first
+        string? imageUrl = response?.MObject?.ImageData?.Url;
+
+        if (imageUrl == null)
+        {
+            // Check in the related objects
+            imageUrl = response?.RelatedObjects
+                           ?.Where(x => x.ImageData != null)
+                           ?.FirstOrDefault()
+                           ?.ImageData
+                           ?.Url;
+        }
+
+        return imageUrl ?? "";
+    }
 }
