@@ -3,6 +3,7 @@ using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Interfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
@@ -112,5 +113,35 @@ public class SquareDalUtility : ISquareUtility
 
         return squareItems;
     }
+    public ISquareCatalogItem? GetItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
+    {
+        if (response?.MObject == null)
+        {
+            return null;
+        }
 
+        ISquareCatalogItem? catalogItem = null;
+        bool isCategory = response.MObject.CategoryData != null;
+        bool isProduct = response.MObject.ItemData != null;
+
+        if (isCategory)
+        {
+            catalogItem = new SquareCategory(response.MObject, null);
+        }
+        else if (isProduct)
+        {
+            catalogItem = new SquareItem(response.MObject, null);
+        }
+
+        if (catalogItem == null)
+        {
+            return null;
+        }
+
+        string imageUrl = findImageUrlFromCatalogObjectResponse(response);
+
+        catalogItem.ImageURL = imageUrl;
+
+        return catalogItem;
+    }
 }
