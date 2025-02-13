@@ -130,6 +130,24 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         return response;
     }
 
+    public async Task<RetrieveCatalogObjectResponse?> GetCatalogObjectById(CatalogInformation categoryId)
+    {
+        RetrieveCatalogObjectResponse? response = null;
+
+        try
+        {
+            response = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: categoryId.Id, includeRelatedObjects: true);
+        }
+        catch (ApiException e)
+        {
+            Console.WriteLine("Failed to make the request");
+            Console.WriteLine($"Response Code: {e.ResponseCode}");
+            Console.WriteLine($"Exception: {e.Message}");
+        }
+
+        return response;
+    }
+
     public async Task<string> GetImageURL(string? imageId)
     {
         if (imageId == null)
