@@ -1,6 +1,5 @@
 ﻿using Square.Models;
 using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Utility
 {
@@ -13,18 +12,18 @@ namespace VibeFunctionsIsolated.Utility
         /// Deserialize into api model
         /// </summary>
         /// <typeparam name="T">The type of model to deserialize into</typeparam>
-        /// <param name="body">Request body as a stream</param>
+        /// <param name="body">Body of the response as a stream</param>
         /// <returns>Deserialized object</returns>
         public Task<T?> DeserializeStream<T>(Stream body);
-
-        /// <summary>
-        /// Maps square catalog object api response into a collection of square items
-        /// </summary>
-        /// <param name="response">Square Catalog Object Response</param>
-        /// <param name="catalogObjectType">Type of object to return, usually ITEM or Category</param>
-        /// <returns></returns>
-        public IEnumerable<SquareItem>? MapSquareProductItems(SearchCatalogObjectsResponse response, string catalogObjectType);
+        public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type);
         public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId);
-        public ISquareCatalogItem? GetItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response);
+        /// <summary>
+        /// Add image urls to the items
+        /// </summary>
+        /// <param name="items">Items that need image urls</param>
+        /// <param name="needsBuyNowLinks">If the items need buy now links</param>
+        /// <param name="needsImageUrls">If the items need image urls</param>   
+        /// <returns>The original collection with image urls</returns>
+        public Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks);
     }
 }

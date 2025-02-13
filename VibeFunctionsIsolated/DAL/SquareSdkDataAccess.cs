@@ -3,27 +3,26 @@ using Square;
 using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
-using System.Runtime.CompilerServices;
-using System.Web;
+using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;
 
-public class SquareDAL : ISquareDAL
+public class SquareSdkDataAccess : ISquareSdkDataAccess
 {
-    #region PrivateMembers
+    #region Private Members
 
-    private readonly ILogger<SquareDAL> logger;
-    private SquareClient SquareClient { get; }
+    private readonly ILogger<SquareSdkDataAccess> logger;
+    private SquareClient squareClient { get; }
+
     #endregion
 
-    public SquareDAL(ILogger<SquareDAL> logger)
+    public SquareSdkDataAccess(ILogger<SquareSdkDataAccess> logger)
     {
         this.logger = logger;    
-        SquareClient = InitializeClient();
+        squareClient = InitializeClient();
     }
-
     public static SquareClient InitializeClient()
     {
         BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
@@ -41,7 +40,7 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            response = await SquareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
+            response = await squareClient.CatalogApi.SearchCatalogItemsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
@@ -52,22 +51,19 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(ItemId categoryId)
+    public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CatalogInformation categoryInfo)
     {
-        List<string> categoryIds =
-        [
-            categoryId.Id
-        ];
+        List<string> categoryIds = [ categoryInfo.Id ];
         
         SearchCatalogItemsRequest.Builder bodyBuilder = new SearchCatalogItemsRequest.Builder()
           .CategoryIds(categoryIds);
 
 
-        if(categoryId.ProductType != null)
+        if (categoryInfo.ProductType != null && categoryInfo.ProductType != "")
         {
             List<string> productTypes =
             [
-                categoryId.ProductType
+                categoryInfo.ProductType
             ];
 
             bodyBuilder.ProductTypes(productTypes);
@@ -91,7 +87,7 @@ public class SquareDAL : ISquareDAL
 
         try
         {
-            response = await SquareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
+            response = await squareClient.CatalogApi.SearchCatalogObjectsAsync(body: requestBody);
         }
         catch (ApiException e)
         {
@@ -104,15 +100,14 @@ public class SquareDAL : ISquareDAL
 
         return response;
     }
-
-    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(ItemId categoryId)
+    public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
         List<string> objectTypes =
         [
             CatalogObjectType.CATEGORY.ToString(),
         ];
 
-        CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryId.Id)
+        CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryInfo.Id)
         .Build();
 
         var searchQuery = new CatalogQuery.Builder()
@@ -121,9 +116,9 @@ public class SquareDAL : ISquareDAL
 
 
         SearchCatalogObjectsRequest requestBody = new SearchCatalogObjectsRequest.Builder()
-            .ObjectTypes(objectTypes)
-            .Query(searchQuery)
-            .Build();
+          .ObjectTypes(objectTypes)
+          .Query(searchQuery)
+          .Build();
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
@@ -135,44 +130,30 @@ public class SquareDAL : ISquareDAL
         return response;
     }
 
-    public async Task<RetrieveCatalogObjectResponse?> GetCatalogObjectById(ItemId categoryId)
-    {
-        RetrieveCatalogObjectResponse? response = null;
-
-        try
-        {
-            response = await SquareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: categoryId.Id, includeRelatedObjects: true);
-        }
-        catch (ApiException e)
-        {
-            Console.WriteLine("Failed to make the request");
-            Console.WriteLine($"Response Code: {e.ResponseCode}");
-            Console.WriteLine($"Exception: {e.Message}");
-        }
-
-        return response;
-    }
-
-    public async Task<string?> GetImageURL(string? imageId)
+    public async Task<string> GetImageURL(string? imageId)
     {
         if (imageId == null)
             return "";
 
-        string? result;
+        string imageUrl;
+
         RetrieveCatalogObjectResponse? item;
 
         try
         {
-            item = await SquareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
+            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
         }
         catch (Exception ex)
         {
             string message = ex.Message;
             logger.LogError("{message}", message);
-            return null;
+            return "";
         }
-        result = item?.MObject?.ImageData?.Url;
 
-        return result;
+        imageUrl = item?.MObject?.ImageData?.Url ?? "";
+
+        return imageUrl;
     }
+
+    
 }

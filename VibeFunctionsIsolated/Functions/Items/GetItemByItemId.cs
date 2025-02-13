@@ -7,19 +7,20 @@ using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Models;
 using Square.Models;
 using VibeFunctionsIsolated.Models.Interfaces;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
-public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareDAL squareDal)
+public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDal)
 {
     private readonly ILogger<GetItemByItemId> _logger = logger; 
-    private readonly ISquareUtility SquareUtility = squareUtility;
-    private readonly ISquareDAL SquareDal = squareDal;
+    private readonly ISquareUtility squareUtility = squareUtility;
+    private readonly ISquareSdkDataAccess squareDal = squareDal;
 
     [Function("GetItemByItemId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
-        ItemId? itemId = await SquareUtility.DeserializeStream<ItemId>(req.Body);
+        CatalogInformation? itemId = await squareUtility.DeserializeStream<CatalogInformation>(req.Body);
 
         if (itemId == null)
         {
@@ -28,7 +29,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
             return new BadRequestResult();
         }
 
-        RetrieveCatalogObjectResponse? response = await SquareDal.GetCatalogObjectById(itemId);
+        RetrieveCatalogObjectResponse? response = await squareDal.GetCatalogObjectById(itemId);
 
         if (response?.MObject?.ItemData == null) // || (response?.RelatedObjects?.Any() ?? false)
         {
@@ -38,7 +39,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
             return new NotFoundResult();
         }
 
-        ISquareCatalogItem? item = SquareUtility.GetItemFromCatalogObjectResponse(response);
+        ISquareCatalogItem? item = squareUtility.GetItemFromCatalogObjectResponse(response);
 
         return new OkObjectResult(item);
     }

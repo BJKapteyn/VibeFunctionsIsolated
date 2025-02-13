@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -13,27 +13,26 @@ public class GetItemsByCategoryId
 {
     private readonly ILogger<GetItemsByCategoryId> _logger;
     private readonly ISquareUtility squareUtility;
-    private readonly ISquareDAL squareDAL;
+    private readonly ISquareSdkDataAccess squareSdkDal;
+    private readonly ISquareApiDataAccess squareApiDal;
 
-    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger, ISquareUtility squareUtility, ISquareDAL squareDAL)
+    public GetItemsByCategoryId(ILogger<GetItemsByCategoryId> logger,
+        ISquareUtility squareUtility,
+        ISquareSdkDataAccess squareSdkDal,
+        ISquareApiDataAccess squareApiDal)
     {
         _logger = logger;
         this.squareUtility = squareUtility;
-        this.squareDAL = squareDAL;
+        this.squareApiDal = squareApiDal;
+        this.squareSdkDal = squareSdkDal;
     }
 
     [Function("GetItemsByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {
-        ItemId? categoryId = null;
-        try
-        {
-            categoryId = await squareUtility.DeserializeStream<ItemId?>(req.Body);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-        }
+    {        
+        CatalogInformation? categoryId = null;
+
+        categoryId = await squareUtility.DeserializeStream<CatalogInformation?>(req.Body);
 
         if (categoryId == null)
         {
@@ -41,7 +40,7 @@ public class GetItemsByCategoryId
             return new BadRequestResult();
         }
 
-        SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItemsByCategoryId(categoryId);
+        SearchCatalogItemsResponse? response = await squareSdkDal.SearchCatalogItemsByCategoryId(categoryId);
 
         if (response?.Errors != null || response == null)
         {
@@ -49,26 +48,14 @@ public class GetItemsByCategoryId
             return new BadRequestResult();
         }
 
-        IEnumerable<SquareItem> items = response.Items.Select(responseItem =>
-        {
-            string? imageId = responseItem.ItemData.ImageIds == null ? null : responseItem.ItemData.ImageIds[0];
-            string? imageURL = squareDAL.GetImageURL(imageId).Result;
-
-            return new SquareItem(responseItem, imageURL);
-        });
+        IEnumerable<SquareItem> squareItems = await squareUtility.MapCatalogObjectsToLocalModel(response.Items, true);
 
         if (categoryId.ReportingCategoryId != null)
         {
-            items = squareUtility.GetItemsWithReportingCategoryId(items, categoryId.ReportingCategoryId);
+            squareItems = squareUtility.GetItemsWithReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
         }
 
-        if (items.Any() == false) 
-        {
-            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request returned no items");
-            return new NotFoundResult();
-        }
-
-        return new OkObjectResult(items);
+        return new OkObjectResult(squareItems);
     }
 }
 
