@@ -52,7 +52,7 @@ public class GetItemsByCategoryId
 
         if (categoryId.ReportingCategoryId != null)
         {
-            squareItems = squareUtility.GetItemsWithReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
+            squareItems = squareUtility.GetItemsByReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
         }
 
         return new OkObjectResult(squareItems);

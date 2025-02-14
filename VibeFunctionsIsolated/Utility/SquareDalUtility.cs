@@ -61,7 +61,6 @@ public class SquareDalUtility : ISquareUtility
             }).ToList();
 
             mappedSquareItems = MapCatalogObjectsToLocalModel(squareObjects).Result;
-
         }
         else
         {
@@ -71,7 +70,7 @@ public class SquareDalUtility : ISquareUtility
         return mappedSquareItems;
     }
 
-    public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
+    public IEnumerable<SquareItem> GetItemsByReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
     {
         if (reportingCategoryId == null || reportingCategoryId == "")
             return items;
@@ -88,23 +87,24 @@ public class SquareDalUtility : ISquareUtility
         IEnumerable<SquareItem> squareItems = catalogObjects.Select(responseItem =>
         {
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
-            List<Task<string>> getExtraDataTasks = new List<Task<string>>();
+            List<Task<string>> getPropertiesTasks = new List<Task<string>>();
 
-            getExtraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
+            getPropertiesTasks.Add(squareSdkDal.GetImageURL(imageId));
             if(needsBuyNowLinks)
-                getExtraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
+                getPropertiesTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
 
-            itemIdToExtraData.TryAdd(responseItem.Id, getExtraDataTasks);
+            itemIdToExtraData.TryAdd(responseItem.Id, getPropertiesTasks);
 
             return new SquareItem(responseItem, "");
         }).ToList();
 
         await Task.WhenAll(itemIdToExtraData.Values.SelectMany(x => x).ToArray());
 
+        // Add extra properties that needed seperate requests to the items
         foreach (SquareItem item in squareItems)
         {
             List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
-            Task.WaitAll(extraDataTasks.ToArray());
+
             item.ImageURL = extraDataTasks[0].Result;
 
             if(needsBuyNowLinks)

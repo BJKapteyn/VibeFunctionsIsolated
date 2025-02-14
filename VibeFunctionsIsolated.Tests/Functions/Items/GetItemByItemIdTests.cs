@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Square.Models;
 using VibeFunctionsIsolated.DAL;
+using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
@@ -17,26 +18,26 @@ public class GetItemByItemIdTests
 {
     private Mock<ILogger<GetItemByItemId>> logger;
     private Mock<ISquareUtility> squareUtility;
-    private Mock<ISquareDAL> squareDAL;
+    private Mock<ISquareSdkDataAccess> squareDAL;
 
     [SetUp]
     public void Setup()
     {
         logger = new Mock<ILogger<GetItemByItemId>>();
         squareUtility = new Mock<ISquareUtility>();
-        squareDAL = new Mock<ISquareDAL>();
+        squareDAL = new Mock<ISquareSdkDataAccess>();
     }
 
     [Test]
     [Parallelizable]
     [TestCaseSource(nameof(GetItemByItemIdCorrectResponseTestCases))]
-    public async Task GetItemByItemId_CorrectResponseTest(CatalogObject? squareResponseMObject, ItemId? requestBody, IActionResult expected)
+    public async Task GetItemByItemId_CorrectResponseTest(CatalogObject? squareResponseMObject, CatalogInformation? requestBody, IActionResult expected)
     {
         // Arrange
         CatalogObject? populatedResponseBody = new CatalogObject("ITEM", Guid.NewGuid().ToString());
         RetrieveCatalogObjectResponse squareResponse = new(mObject: squareResponseMObject);
-        squareUtility.Setup(utility => utility.DeserializeStream<ItemId>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
-        squareDAL.Setup(dal => dal.GetCatalogObjectById(It.IsAny<ItemId>())).ReturnsAsync(squareResponse);
+        squareUtility.Setup(utility => utility.DeserializeStream<CatalogInformation>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
+        squareDAL.Setup(dal => dal.GetCatalogObjectById(It.IsAny<CatalogInformation>())).ReturnsAsync(squareResponse);
         Mock<HttpRequest> mockRequest = new();
 
         GetItemByItemId function = new GetItemByItemId(logger.Object, squareUtility.Object, squareDAL.Object);
@@ -51,15 +52,15 @@ public class GetItemByItemIdTests
 
     public static IEnumerable<TestCaseData> GetItemByItemIdCorrectResponseTestCases()
     {
-        ItemId? goodRequestId = new("GoodId");
-        ItemId? nullRequestId = null;
+        CatalogInformation? goodRequestId = new ("GoodId");
+        CatalogInformation? nullRequestId = null;
 
-        CatalogObject? populatedResponseBody = new CatalogObject("ITEM", "itemId", itemData: new CatalogItem());
+        CatalogObject? populatedResponseBody = new CatalogObject ("ITEM", "itemId", itemData: new CatalogItem());
         CatalogObject? emptyResponseBody = null;
 
-        BadRequestResult badRequestResult = new();
-        NotFoundResult notFoundResult = new();
-        OkObjectResult okObjectResult = new(new List<SquareCategory>());
+        BadRequestResult badRequestResult = new ();
+        NotFoundResult notFoundResult = new ();
+        OkObjectResult okObjectResult = new (new List<SquareCategory>());
 
         yield return new TestCaseData(emptyResponseBody, goodRequestId, notFoundResult);
         yield return new TestCaseData(emptyResponseBody, nullRequestId, badRequestResult);

@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.DAL;
-using VibeFunctionsIsolated.Models;
 using Square.Models;
-using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Interfaces;
+using VibeFunctionsIsolated.Utility;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
