@@ -8,27 +8,27 @@ using VibeFunctionsIsolated.DAL.Interfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
-public class GetItemByIdRawData
+public class GetBuyNowLinkByItemId
 {
     private readonly ILogger<GetItems> logger;
     private readonly ISquareUtility squareUtility;
     private readonly ISquareApiDataAccess squareApiDal;
 
-    public GetItemByIdRawData(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareApiDataAccess squareApiDal)
+    public GetBuyNowLinkByItemId(ILogger<GetItems> logger, ISquareUtility squareUtility, ISquareApiDataAccess squareApiDal)
     {
         this.logger = logger;
         this.squareUtility = squareUtility;
         this.squareApiDal = squareApiDal;
     }
 
-    [Function("GetItemByIdRawData")]
+    [Function("GetBuyNowLinkByItemId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
         CatalogInformation? categoryInfo = await squareUtility.DeserializeStream<CatalogInformation>(req.Body);
 
         if (categoryInfo is null)
         {
-            logger.LogError($"{nameof(GetItemByIdRawData)} request wasn't formatted correctly");
+            logger.LogError($"{nameof(GetBuyNowLinkByItemId)} request wasn't formatted correctly");
             return new BadRequestResult();
         }
 

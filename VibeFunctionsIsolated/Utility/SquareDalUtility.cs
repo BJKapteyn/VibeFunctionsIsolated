@@ -82,28 +82,30 @@ public class SquareDalUtility : ISquareUtility
 
     public async Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks = false)
     {
-        Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
+        Dictionary<string, Task<string>[]> itemIdToExtraItemProperties = [];
 
         IEnumerable<SquareItem> squareItems = catalogObjects.Select(responseItem =>
         {
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
-            List<Task<string>> getPropertiesTasks = new List<Task<string>>();
+            Task<string>[] getPropertiesTasks = new Task<string>[2];
 
-            getPropertiesTasks.Add(squareSdkDal.GetImageURL(imageId));
-            if(needsBuyNowLinks)
-                getPropertiesTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
+            Thread.Sleep(50);
+            getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
+            if (needsBuyNowLinks)
+                getPropertiesTasks[1] = squareApiDal.GetBuyNowLink(responseItem.Id);
 
-            itemIdToExtraData.TryAdd(responseItem.Id, getPropertiesTasks);
+            itemIdToExtraItemProperties.TryAdd(responseItem.Id, getPropertiesTasks);
 
             return new SquareItem(responseItem, "");
         }).ToList();
 
-        await Task.WhenAll(itemIdToExtraData.Values.SelectMany(x => x).ToArray());
+        await Task.WhenAll(itemIdToExtraItemProperties.Values.SelectMany(x => x).ToArray());
 
         // Add extra properties that needed seperate requests to the items
         foreach (SquareItem item in squareItems)
         {
-            List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
+            Task<string>[] extraDataTasks = itemIdToExtraItemProperties[item.Id];
+            Task.WaitAll(extraDataTasks);
 
             item.ImageURL = extraDataTasks[0].Result;
 

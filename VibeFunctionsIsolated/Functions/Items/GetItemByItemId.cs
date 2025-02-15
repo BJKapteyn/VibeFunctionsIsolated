@@ -30,7 +30,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
 
         RetrieveCatalogObjectResponse? response = await squareDal.GetCatalogObjectById(itemId);
 
-        if (response?.MObject?.ItemData == null) // || (response?.RelatedObjects?.Any() ?? false)
+        if (response?.MObject?.ItemData == null)
         {
             string className = nameof(GetItemByItemId);
             string itemIdString = itemId.Id.ToString();

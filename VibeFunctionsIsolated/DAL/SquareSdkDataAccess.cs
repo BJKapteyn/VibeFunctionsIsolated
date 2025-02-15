@@ -20,7 +20,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
     public SquareSdkDataAccess(ILogger<SquareSdkDataAccess> logger)
     {
-        this.logger = logger;    
+        this.logger = logger;
         squareClient = InitializeClient();
     }
     public static SquareClient InitializeClient()
@@ -53,8 +53,8 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
     public async Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CatalogInformation categoryInfo)
     {
-        List<string> categoryIds = [ categoryInfo.Id ];
-        
+        List<string> categoryIds = [categoryInfo.Id];
+
         SearchCatalogItemsRequest.Builder bodyBuilder = new SearchCatalogItemsRequest.Builder()
           .CategoryIds(categoryIds);
 
@@ -73,7 +73,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         SearchCatalogItemsResponse? response = await SearchCatalogItems(body);
 
-        if (response == null) 
+        if (response == null)
         {
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
@@ -150,16 +150,15 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
     public async Task<string> GetImageURL(string? imageId)
     {
-        if (imageId == null)
+        if (imageId == null || imageId == "")
             return "";
 
         string imageUrl;
-
         RetrieveCatalogObjectResponse? item;
 
         try
         {
-            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(imageId);
+            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: imageId);
         }
         catch (Exception ex)
         {
@@ -172,6 +171,4 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return imageUrl;
     }
-
-    
 }
