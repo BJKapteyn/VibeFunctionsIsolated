@@ -91,21 +91,21 @@ public class SquareDalUtility : ISquareUtility
 
             Thread.Sleep(50);
             getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
-            if (needsBuyNowLinks)
-                getPropertiesTasks[1] = squareApiDal.GetBuyNowLink(responseItem.Id);
+            getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLink(responseItem.Id) : new Task<string>(() => "");
+            getPropertiesTasks[1].Start();
 
             itemIdToExtraItemProperties.TryAdd(responseItem.Id, getPropertiesTasks);
 
             return new SquareItem(responseItem, "");
         }).ToList();
 
-        await Task.WhenAll(itemIdToExtraItemProperties.Values.SelectMany(x => x).ToArray());
+
 
         // Add extra properties that needed seperate requests to the items
         foreach (SquareItem item in squareItems)
         {
             Task<string>[] extraDataTasks = itemIdToExtraItemProperties[item.Id];
-            Task.WaitAll(extraDataTasks);
+            await Task.WhenAll(extraDataTasks);
 
             item.ImageURL = extraDataTasks[0].Result;
 
