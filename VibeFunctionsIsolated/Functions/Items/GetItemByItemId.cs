@@ -10,11 +10,17 @@ using VibeFunctionsIsolated.Utility;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
+/// <summary>
+/// Gets single item by item id
+/// </summary>
+/// <param name="logger">Logger for logging errors</param>
+/// <param name="squareUtility">Injected utility class for square related work</param>
+/// <param name="squareDal">Injected class for data retrieval from the Square API</param>
 public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDal)
 {
     private readonly ILogger<GetItemByItemId> _logger = logger; 
     private readonly ISquareUtility squareUtility = squareUtility;
-    private readonly ISquareSdkDataAccess squareDal = squareDal;
+    private readonly ISquareSdkDataAccess squareSdkDal = squareDal;
 
     [Function("GetItemByItemId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -28,7 +34,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
             return new BadRequestResult();
         }
 
-        RetrieveCatalogObjectResponse? response = await squareDal.GetCatalogObjectById(itemId);
+        RetrieveCatalogObjectResponse? response = await squareSdkDal.GetCatalogObjectById(itemId);
 
         if (response?.MObject?.ItemData == null)
         {

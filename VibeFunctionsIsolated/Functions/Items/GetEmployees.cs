@@ -12,12 +12,10 @@ namespace VibeFunctionsIsolated.Functions.Items;
 
 public class GetEmployees
 {
-    private readonly ISquareUtility squareUtility;
     private readonly ISquareSdkDataAccess squareDAL;
 
-    public GetEmployees(ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
+    public GetEmployees(ISquareSdkDataAccess squareDAL)
     {
-        this.squareUtility = squareUtility;
         this.squareDAL = squareDAL;
     }
 
