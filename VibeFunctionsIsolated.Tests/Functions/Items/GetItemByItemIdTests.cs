@@ -19,6 +19,7 @@ public class GetItemByItemIdTests
     private Mock<ILogger<GetItemByItemId>> logger;
     private Mock<ISquareUtility> squareUtility;
     private Mock<ISquareSdkDataAccess> squareDAL;
+    private Mock<ISquareApiDataAccess> squareApiDAL;
 
     [SetUp]
     public void Setup()
@@ -26,6 +27,7 @@ public class GetItemByItemIdTests
         logger = new Mock<ILogger<GetItemByItemId>>();
         squareUtility = new Mock<ISquareUtility>();
         squareDAL = new Mock<ISquareSdkDataAccess>();
+        squareApiDAL = new Mock<ISquareApiDataAccess>();
     }
 
     [Test]
@@ -37,10 +39,11 @@ public class GetItemByItemIdTests
         CatalogObject? populatedResponseBody = new CatalogObject("ITEM", Guid.NewGuid().ToString());
         RetrieveCatalogObjectResponse squareResponse = new(mObject: squareResponseMObject);
         squareUtility.Setup(utility => utility.DeserializeStream<CatalogInformation>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
+        squareUtility.Setup(utility => utility.MapItemFromCatalogObjectResponse(It.IsAny<RetrieveCatalogObjectResponse?>())).Returns(new SquareItem("", "", "", ""));
         squareDAL.Setup(dal => dal.GetCatalogObjectById(It.IsAny<CatalogInformation>())).ReturnsAsync(squareResponse);
         Mock<HttpRequest> mockRequest = new();
 
-        GetItemByItemId function = new GetItemByItemId(logger.Object, squareUtility.Object, squareDAL.Object);
+        GetItemByItemId function = new GetItemByItemId(logger.Object, squareUtility.Object, squareDAL.Object, squareApiDAL.Object);
 
         // Act
         IActionResult actual = await function.Run(mockRequest.Object);

@@ -7,6 +7,8 @@ public class SquareItem : SquareCatalogItem, ISquareCatalogItem
 {
     #region Constructors
 
+    public SquareItem() : this (string.Empty, string.Empty, string.Empty, string.Empty) { }
+
     public SquareItem(string id, string name, string price, string duration, string buyNowLink = "") : 
         base(id, name, string.Empty, string.Empty)
     {

@@ -8,7 +8,6 @@ using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
 
-
 public class SquareDalUtility : ISquareUtility
 {
     private readonly ISquareSdkDataAccess squareSdkDal;
@@ -115,7 +114,7 @@ public class SquareDalUtility : ISquareUtility
         return squareItems;
     }
 
-    public ISquareCatalogItem? GetItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
+    public ISquareCatalogItem? MapItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
     {
         if (response?.MObject == null)
         {
@@ -141,21 +140,24 @@ public class SquareDalUtility : ISquareUtility
         }
 
         string imageUrl = findImageUrlFromCatalogObjectResponse(response);
-
         catalogItem.ImageURL = imageUrl;
 
         return catalogItem;
     }
 
-    // Search for the image url in the response, it isn't in the same spot for all item types
+    /// <summary>
+    /// Search for the image url in the response, it isn't in the same spot for all item types
+    /// </summary>
+    /// <param name="response">Catolog API response object</param>
+    /// <returns>Image URL if found, empty string if not</returns>
     private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
     {
-        // Check main object first
+        // Check main object
         string? imageUrl = response?.MObject?.ImageData?.Url;
 
         if (imageUrl == null)
         {
-            // Check in the related objects
+            // Check the related objects
             imageUrl = response?.RelatedObjects
                            ?.Where(x => x.ImageData != null)
                            ?.FirstOrDefault()
