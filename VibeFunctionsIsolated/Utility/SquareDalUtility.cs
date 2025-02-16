@@ -114,6 +114,7 @@ public class SquareDalUtility : ISquareUtility
 
         return squareItems;
     }
+
     public ISquareCatalogItem? GetItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
     {
         if (response?.MObject == null)
