@@ -46,7 +46,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
             return new NotFoundResult();
         }
 
-        ISquareCatalogItem? item = squareUtility.GetItemFromCatalogObjectResponse(response);
+        ISquareCatalogItem? item = squareUtility.MapItemFromCatalogObjectResponse(response);
 
         return new OkObjectResult(item);
     }
