@@ -55,6 +55,7 @@ public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squ
             string className = nameof(GetItemByItemId);
             string itemIdString = itemId.Id.ToString();
             _logger.LogError("{className} could not map the item with id {itemIdString}", className, itemIdString);
+
             return new NotFoundResult();
         }   
 
