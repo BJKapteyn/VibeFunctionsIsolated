@@ -3,51 +3,51 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using System.Text.Json;
+using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models.Square;
 
+namespace VibeFunctionsIsolated.Functions.Items;
 
-namespace VibeFunctionsIsolated.Functions.Items
+/// <summary>
+/// Get all employees from the Square API
+/// </summary>
+public class GetEmployees
 {
-    public class GetEmployees
+    private readonly ISquareSdkDataAccess squareDAL;
+
+    public GetEmployees(ISquareSdkDataAccess squareDAL)
     {
-        private readonly ISquareUtility squareUtility;
-        private readonly ISquareSdkDataAccess squareDAL;
+        this.squareDAL = squareDAL;
+    }
 
-        public GetEmployees(ISquareUtility squareUtility, ISquareSdkDataAccess squareDAL)
+    [Function("GetEmployees")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    {
+        SearchCatalogItemsRequest requestBody = buildRequestBody();
+        SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(requestBody);
+
+        IEnumerable<SquareEmployee>? employees = modelEmployees(response);
+
+        if (employees == null) 
         {
-            this.squareUtility = squareUtility;
-            this.squareDAL = squareDAL;
+            return new NotFoundResult();
         }
 
-        [Function("GetEmployees")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+        string json = JsonSerializer.Serialize(employees);
+
+        return new OkObjectResult(json);
+    }
+
+    // Pair down response data to limit data exposure
+    // response - response from the square API
+    private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse? response)
+    {
+        if(response?.Items == null || response.Items.Count <= 0)
         {
-            SearchCatalogItemsRequest requestBody = buildRequestBody();
-            SearchCatalogItemsResponse? response = await squareDAL.SearchCatalogItems(requestBody);
-
-            IEnumerable<SquareEmployee>? employees = modelEmployees(response);
-
-            if (employees == null) 
-            {
-                return new NotFoundResult();
-            }
-
-            string json = JsonSerializer.Serialize(employees);
-
-            return new OkObjectResult(json);
+            return null;
         }
-
-        // Pair down response data to limit data exposure
-        // response - response from the square API
-        private IEnumerable<SquareEmployee>? modelEmployees(SearchCatalogItemsResponse? response)
-        {
-            if(response?.Items == null || response.Items.Count <= 0)
-            {
-                return null;
-            }
 
             IEnumerable<SquareEmployee> squareEmployees = response.Items.Select(responseItem =>
             {
@@ -63,34 +63,33 @@ namespace VibeFunctionsIsolated.Functions.Items
                     imageId = "";
                 }
                 string? imageURL = squareDAL.GetImageURL(imageId).Result;
-                    
+                
                 return new SquareEmployee(responseItem, customAttributeValues, imageURL);
             })
             .ToList();
 
-            return squareEmployees;
-        }
+        return squareEmployees;
+    }
 
-        // Add ids and product type to narrow down results
-        private SearchCatalogItemsRequest buildRequestBody()
+    // Add ids and product type to narrow down results
+    private SearchCatalogItemsRequest buildRequestBody()
+    {
+        var categoryIds = new List<string>()
         {
-            var categoryIds = new List<string>()
-            {
-                // Id for Employee category
-                "BJMQNUV2IRXQ4LQLY3BD72ED"
-            };
+            // Id for Employee category
+            "BJMQNUV2IRXQ4LQLY3BD72ED"
+        };
 
-            var productTypes = new List<string>()
-            {
-                SquareProductType.AppointmentsService
-            };
+        var productTypes = new List<string>()
+        {
+            SquareProductType.AppointmentsService
+        };
 
-            SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
-              .CategoryIds(categoryIds)
-              .ProductTypes(productTypes)
-              .Build();
+        SearchCatalogItemsRequest body = new SearchCatalogItemsRequest.Builder()
+          .CategoryIds(categoryIds)
+          .ProductTypes(productTypes)
+          .Build();
 
-            return body;
-        }
+        return body;
     }
 }

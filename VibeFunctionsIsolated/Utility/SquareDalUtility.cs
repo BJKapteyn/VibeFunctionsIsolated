@@ -2,11 +2,11 @@
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Interfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
-
 
 public class SquareDalUtility : ISquareUtility
 {
@@ -60,7 +60,6 @@ public class SquareDalUtility : ISquareUtility
             }).ToList();
 
             mappedSquareItems = MapCatalogObjectsToLocalModel(squareObjects).Result;
-
         }
         else
         {
@@ -70,7 +69,7 @@ public class SquareDalUtility : ISquareUtility
         return mappedSquareItems;
     }
 
-    public IEnumerable<SquareItem> GetItemsWithReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
+    public IEnumerable<SquareItem> GetItemsByReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId)
     {
         if (reportingCategoryId == null || reportingCategoryId == "")
             return items;
@@ -82,28 +81,30 @@ public class SquareDalUtility : ISquareUtility
 
     public async Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks = false)
     {
-        Dictionary<string, List<Task<string>>> itemIdToExtraData = [];
+        Dictionary<string, Task<string>[]> itemIdToExtraItemProperties = [];
 
         IEnumerable<SquareItem> squareItems = catalogObjects.Select(responseItem =>
         {
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
-            List<Task<string>> getExtraDataTasks = new List<Task<string>>();
+            Task<string>[] getPropertiesTasks = new Task<string>[2];
 
-            getExtraDataTasks.Add(squareSdkDal.GetImageURL(imageId));
-            if(needsBuyNowLinks)
-                getExtraDataTasks.Add(squareApiDal.GetBuyNowLink(responseItem.Id));
+            Thread.Sleep(50);
+            getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
+            getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLink(responseItem.Id) : new Task<string>(() => "");
+            if (getPropertiesTasks[1].Status == TaskStatus.Created)
+                getPropertiesTasks[1].Start();
 
-            itemIdToExtraData.TryAdd(responseItem.Id, getExtraDataTasks);
+            itemIdToExtraItemProperties.TryAdd(responseItem.Id, getPropertiesTasks);
 
             return new SquareItem(responseItem, "");
         }).ToList();
 
-        await Task.WhenAll(itemIdToExtraData.Values.SelectMany(x => x).ToArray());
-
+        // Add extra properties that needed seperate requests to the items
         foreach (SquareItem item in squareItems)
         {
-            List<Task<string>> extraDataTasks = itemIdToExtraData[item.Id];
-            Task.WaitAll(extraDataTasks.ToArray());
+            Task<string>[] extraDataTasks = itemIdToExtraItemProperties[item.Id];
+            await Task.WhenAll(extraDataTasks);
+
             item.ImageURL = extraDataTasks[0].Result;
 
             if(needsBuyNowLinks)
@@ -113,4 +114,57 @@ public class SquareDalUtility : ISquareUtility
         return squareItems;
     }
 
+    public ISquareCatalogItem? MapItemFromCatalogObjectResponse(RetrieveCatalogObjectResponse? response)
+    {
+        if (response?.MObject == null)
+        {
+            return null;
+        }
+
+        ISquareCatalogItem? catalogItem = null;
+        bool isCategory = response.MObject.CategoryData != null;
+        bool isProduct = response.MObject.ItemData != null;
+
+        if (isCategory)
+        {
+            catalogItem = new SquareCategory(response.MObject, null);
+        }
+        else if (isProduct)
+        {
+            catalogItem = new SquareItem(response.MObject, null);
+        }
+
+        if (catalogItem == null)
+        {
+            return null;
+        }
+
+        string imageUrl = findImageUrlFromCatalogObjectResponse(response);
+        catalogItem.ImageURL = imageUrl;
+
+        return catalogItem;
+    }
+
+    /// <summary>
+    /// Search for the image url in the response, it isn't in the same spot for all item types
+    /// </summary>
+    /// <param name="response">Catolog API response object</param>
+    /// <returns>Image URL if found, empty string if not</returns>
+    private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
+    {
+        // Check main object first
+        string? imageUrl = response?.MObject?.ImageData?.Url;
+
+        if (imageUrl == null)
+        {
+            // Check in the related objects
+            imageUrl = response?.RelatedObjects
+                           ?.Where(x => x.ImageData != null)
+                           ?.FirstOrDefault()
+                           ?.ImageData
+                           ?.Url;
+        }
+
+        return imageUrl ?? "";
+    }
 }

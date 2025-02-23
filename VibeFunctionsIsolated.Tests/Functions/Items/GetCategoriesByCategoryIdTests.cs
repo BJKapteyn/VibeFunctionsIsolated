@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Square.Models;
 using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
@@ -41,13 +42,13 @@ public class GetCategoriesByCategoryIdTests
         squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CatalogInformation>()).Result).Returns(squareResponse);
         squareUtility.Setup(x => x.DeserializeStream<CatalogInformation>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
-        GetCategoriesByCategoryId azureTestFunction = new(logger.Object, squareDAL.Object, squareUtility.Object);
+        GetCategoriesByCategoryId getCategoriesByCategoryIdTest = new(logger.Object, squareDAL.Object, squareUtility.Object);
 
         // Act
-        IActionResult result = await azureTestFunction.Run(mockRequest.Object);
+        IActionResult actual = await getCategoriesByCategoryIdTest.Run(mockRequest.Object);
 
         // Assert
-        Assert.That(result.GetType(), Is.EqualTo(expected.GetType()));
+        Assert.That(actual.GetType(), Is.EqualTo(expected.GetType()));
     }
 
     private static IEnumerable<TestCaseData> GetCategoriesByCategoryIdTestCases()

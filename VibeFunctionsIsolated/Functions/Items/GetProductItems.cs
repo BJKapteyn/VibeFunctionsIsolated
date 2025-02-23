@@ -10,7 +10,9 @@ using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {
-    // Gets all shop items
+    /// <summary>
+    /// Gets all shop items
+    /// </summary>
     public class GetProductItems
     {
         private readonly ILogger<GetProductItems> _logger;

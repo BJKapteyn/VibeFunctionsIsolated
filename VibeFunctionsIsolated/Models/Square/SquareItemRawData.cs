@@ -17,6 +17,6 @@ namespace VibeFunctionsIsolated.Models.Square
 
         [JsonPropertyName("ecom_uri")]
         public string? BuyNowUrl { get; set; }
-        public string? ImageUrl { get; set; }
+        public string? ImageURL { get; set; }
     }
 }

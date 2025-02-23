@@ -43,13 +43,7 @@ public class GetItemsByCategoryId
 
         SearchCatalogItemsResponse? response = await squareSdkDal.SearchCatalogItemsByCategoryId(categoryId);
 
-        if (response == null || response.Items == null)
-        {
-            _logger.LogError($"{nameof(GetItemsByCategoryId)}: request returned no items");
-            return new NotFoundResult();
-        }
-
-        if(response.Errors != null)
+        if (response?.Errors != null || response == null)
         {
             _logger.LogError($"{nameof(GetItemsByCategoryId)} errors: /n{response?.Errors.ToString()}");
             return new BadRequestResult();
@@ -59,7 +53,7 @@ public class GetItemsByCategoryId
 
         if (categoryId.ReportingCategoryId != null)
         {
-            squareItems = squareUtility.GetItemsWithReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
+            squareItems = squareUtility.GetItemsByReportingCategoryId(squareItems, categoryId.ReportingCategoryId);
         }
 
         return new OkObjectResult(squareItems);

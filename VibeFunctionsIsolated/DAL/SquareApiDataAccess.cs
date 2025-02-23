@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
@@ -71,42 +72,44 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
         string responseJsonString = await GetJsonStringResponse(request);
-
+         
         if (responseJsonString != "")
         {
-            using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
+            return new List<SquareItemRawData>();
+
+        }
+        using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
+        {
+            List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+            JsonElement root = jsonBody.RootElement;
+            JsonElement items;
+            bool hasItemsProperty = root.TryGetProperty("items", out items);
+
+            if (hasItemsProperty)
             {
-                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
-                JsonElement root = jsonBody.RootElement;
-                JsonElement items;
-                bool hasItemsProperty = root.TryGetProperty("items", out items);
-                if (hasItemsProperty)
+                foreach (JsonElement item in items.EnumerateArray())
                 {
-                    foreach (JsonElement item in items.EnumerateArray())
+                    JsonElement itemData = new ();
+                    item.TryGetProperty("item_data", out itemData);
+
+                    JsonElement id = new ();
+                    item.TryGetProperty("id", out id);
+
+                    string itemId = id.GetString() ?? "";
+
+                    SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
+
+                    if (squareItem != null)
                     {
-                        JsonElement itemData = new();
-                        item.TryGetProperty("item_data", out itemData);
-
-                        JsonElement id = new();
-                        item.TryGetProperty("id", out id);
-
-                        string itemId = id.GetString() ?? "";
-
-                        SquareItemRawData? squareItem = JsonSerializer.Deserialize<SquareItemRawData>(itemData);
-
-                        if (squareItem != null)
-                        {
-                            squareItem.Id = itemId;
-                            squareItems.Add(squareItem);
-                        }
+                        squareItem.Id = itemId;
+                        squareItems.Add(squareItem);
                     }
                 }
-
-                return squareItems;
             }
+
+            return squareItems;
         }
 
-        return new List<SquareItemRawData>();
     }
 
     public async Task<string> GetJsonStringResponse(HttpRequestMessage request)
@@ -120,8 +123,10 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
             {
-                string message = response.ReasonPhrase ?? "";
-                throw new HttpRequestException(message, null, response.StatusCode);
+                StringBuilder stringbui = new StringBuilder();
+                stringbui.AppendLine(response.ReasonPhrase ?? "");
+                stringbui.AppendLine(request.Content?.ToString() ?? "");
+                throw new HttpRequestException(stringbui.ToString(), null, response.StatusCode);
             }
 
             responseBodyStr = await response.Content.ReadAsStringAsync();
