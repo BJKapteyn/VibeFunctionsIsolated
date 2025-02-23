@@ -48,24 +48,24 @@ public class GetEmployees
             return null;
         }
 
-            IEnumerable<SquareEmployee> squareEmployees = response.Items.Select(responseItem =>
+        IEnumerable<SquareEmployee> squareEmployees = response.Items.Select(responseItem =>
+        {
+            // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
+            IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
+            string? imageId;
+            if(responseItem.ItemData?.ImageIds != null)
             {
-                // The custom attribute dictionary uses unpredictable keys so I'm using linq on the list instead to get values during construction
-                IEnumerable<CatalogCustomAttributeValue> customAttributeValues = responseItem.ItemData.Variations[0].CustomAttributeValues.Values;
-                string? imageId;
-                if(responseItem.ItemData?.ImageIds != null)
-                {
-                    imageId = responseItem.ItemData?.ImageIds[0];
-                }
-                else
-                {
-                    imageId = "";
-                }
-                string? imageURL = squareDAL.GetImageURL(imageId).Result;
+                imageId = responseItem.ItemData?.ImageIds[0];
+            }
+            else
+            {
+                imageId = "";
+            }
+            string? imageURL = squareDAL.GetImageURL(imageId).Result;
                 
-                return new SquareEmployee(responseItem, customAttributeValues, imageURL);
-            })
-            .ToList();
+            return new SquareEmployee(responseItem, customAttributeValues, imageURL);
+        })
+        .ToList();
 
         return squareEmployees;
     }
