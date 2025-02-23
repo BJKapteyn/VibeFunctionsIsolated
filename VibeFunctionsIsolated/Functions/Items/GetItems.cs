@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using VibeFunctionsIsolated.Utility;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 

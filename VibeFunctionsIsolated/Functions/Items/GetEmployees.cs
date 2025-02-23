@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Square.Models;
 using System.Text.Json;
-using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.Utility;
-using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 

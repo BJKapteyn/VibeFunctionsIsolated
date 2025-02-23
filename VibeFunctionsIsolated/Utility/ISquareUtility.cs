@@ -1,6 +1,6 @@
 ﻿using Square.Models;
-using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.Utility
 {

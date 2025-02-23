@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Square.Models;
-using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using VibeFunctionsIsolated.Utility;
 
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
