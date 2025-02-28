@@ -3,6 +3,9 @@ using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL.Interfaces
 {
+    /// <summary>
+    /// Retrieve data directly from the square API 
+    /// </summary>
     public interface ISquareApiDataAccess
     {
         public Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo);

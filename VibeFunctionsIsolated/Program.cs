@@ -16,6 +16,7 @@ var host = new HostBuilder()
         services.AddSingleton<ISquareUtility, SquareDalUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
+        services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
     })
     .Build();
 
