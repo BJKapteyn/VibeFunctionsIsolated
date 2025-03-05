@@ -6,7 +6,7 @@ using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Interfaces;
-using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -16,16 +16,20 @@ namespace VibeFunctionsIsolated.Functions.Items;
 /// <param name="logger">Logger for logging errors</param>
 /// <param name="squareUtility">Injected utility class for square related work</param>
 /// <param name="squareDal">Injected class for data retrieval from the Square API</param>
-public class GetItemByItemId(ILogger<GetItemByItemId> logger, ISquareUtility squareUtility, ISquareSdkDataAccess squareDal)
+public class GetItemByItemId(ILogger<GetItemByItemId> logger,
+                            ISquareUtility squareUtility,
+                            ISquareSdkDataAccess squareDal,
+                            IApplicationUtility applicationUtility)
 {
     private readonly ILogger<GetItemByItemId> _logger = logger; 
     private readonly ISquareUtility squareUtility = squareUtility;
     private readonly ISquareSdkDataAccess squareSdkDal = squareDal;
+    private readonly IApplicationUtility applicationUtility = applicationUtility;
 
     [Function("GetItemByItemId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
-        CatalogInformation? itemId = await squareUtility.DeserializeStream<CatalogInformation>(req.Body);
+        CatalogInformation? itemId = await applicationUtility.DeserializeStream<CatalogInformation>(req.Body);
 
         if (itemId == null)
         {

@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Square.Models;
-using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
 
@@ -20,6 +20,7 @@ public class GetCategoriesByCategoryIdTests
     private Mock<ILogger<GetCategoriesByCategoryId>> logger;
     private Mock<ISquareUtility> squareUtility;
     private Mock<ISquareSdkDataAccess> squareDAL;
+    private Mock<IApplicationUtility> appUtility;
 
     [SetUp]
     public void Setup()
@@ -27,6 +28,7 @@ public class GetCategoriesByCategoryIdTests
         logger = new Mock<ILogger<GetCategoriesByCategoryId>>();
         squareUtility = new Mock<ISquareUtility>();
         squareDAL = new Mock<ISquareSdkDataAccess>();
+        appUtility = new Mock<IApplicationUtility>();
     }
 
     [Test]
@@ -40,9 +42,9 @@ public class GetCategoriesByCategoryIdTests
         SearchCatalogObjectsResponse? squareResponse = new(objects: squareResponseBody);
 
         squareDAL.Setup(dal => dal.SearchCategoryObjectsByParentId(It.IsAny<CatalogInformation>()).Result).Returns(squareResponse);
-        squareUtility.Setup(x => x.DeserializeStream<CatalogInformation>(It.IsAny<Stream>()).Result).Returns(requestBody);
+        appUtility.Setup(x => x.DeserializeStream<CatalogInformation>(It.IsAny<Stream>()).Result).Returns(requestBody);
 
-        GetCategoriesByCategoryId getCategoriesByCategoryIdTest = new(logger.Object, squareDAL.Object, squareUtility.Object);
+        GetCategoriesByCategoryId getCategoriesByCategoryIdTest = new(logger.Object, squareDAL.Object, squareUtility.Object, appUtility.Object);
 
         // Act
         IActionResult actual = await getCategoriesByCategoryIdTest.Run(mockRequest.Object);

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 
 var host = new HostBuilder()

@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility
 {
-    public class ApplicationUtility(ILogger<ApplicationUtility> logger)
+    public class ApplicationUtility(ILogger<ApplicationUtility> logger) : IApplicationUtility
     {
         private readonly ILogger<ApplicationUtility> logger = logger;
+
         public async Task<T?> DeserializeStream<T>(Stream body)
         {
             T? deserializedJson;
@@ -22,7 +24,7 @@ namespace VibeFunctionsIsolated.Utility
                     deserializedJson = JsonSerializer.Deserialize<T>(streamText);
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.LogError(ex, "Failed to deserialize stream");
                 deserializedJson = default;

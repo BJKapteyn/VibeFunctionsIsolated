@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
-using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Functions.Items;

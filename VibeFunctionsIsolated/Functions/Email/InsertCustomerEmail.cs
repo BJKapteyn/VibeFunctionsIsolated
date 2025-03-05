@@ -7,19 +7,21 @@ using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
 using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Email;
 
 public class InsertCustomerEmail
 {
     private readonly ILogger<InsertCustomerEmail> _logger;
-    private readonly ISquareUtility SquareUtility;
+    private readonly ISquareUtility squareUtility;
+    private readonly IApplicationUtility applicationUtility;
 
-    public InsertCustomerEmail(ILogger<InsertCustomerEmail> logger, ISquareUtility squareUtility)
+    public InsertCustomerEmail(ILogger<InsertCustomerEmail> logger, ISquareUtility squareUtility, IApplicationUtility applicationUtility)
     {
         _logger = logger;
-        SquareUtility = squareUtility;
+        this.squareUtility = squareUtility;
+        this.applicationUtility = applicationUtility;
     }
 
     [Function("InsertCustomerEmail")]
@@ -32,7 +34,7 @@ public class InsertCustomerEmail
             return new BadRequestResult();
         }
 
-        CosmosEmail? cosmosEmail = await SquareUtility.DeserializeStream<CosmosEmail?>(req.Body);
+        CosmosEmail? cosmosEmail = await applicationUtility.DeserializeStream<CosmosEmail?>(req.Body);
 
         bool isEmail = VerifyEmail(cosmosEmail?.email);
 

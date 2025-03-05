@@ -4,6 +4,7 @@ using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;

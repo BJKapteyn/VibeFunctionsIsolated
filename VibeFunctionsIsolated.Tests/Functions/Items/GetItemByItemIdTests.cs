@@ -8,7 +8,7 @@ using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Functions.Items;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Square;
-using VibeFunctionsIsolated.Utility;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Tests.Functions.Items;
 
@@ -19,6 +19,7 @@ public class GetItemByItemIdTests
     private Mock<ILogger<GetItemByItemId>> logger;
     private Mock<ISquareUtility> squareUtility;
     private Mock<ISquareSdkDataAccess> squareDAL;
+    private Mock<IApplicationUtility> appUtility;
 
     [SetUp]
     public void Setup()
@@ -26,6 +27,7 @@ public class GetItemByItemIdTests
         logger = new Mock<ILogger<GetItemByItemId>>();
         squareUtility = new Mock<ISquareUtility>();
         squareDAL = new Mock<ISquareSdkDataAccess>();
+        appUtility = new Mock<IApplicationUtility>();
     }
 
     [Test]
@@ -36,11 +38,11 @@ public class GetItemByItemIdTests
         // Arrange
         CatalogObject? populatedResponseBody = new CatalogObject("ITEM", Guid.NewGuid().ToString());
         RetrieveCatalogObjectResponse squareResponse = new(mObject: squareResponseMObject);
-        squareUtility.Setup(utility => utility.DeserializeStream<CatalogInformation>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
+        appUtility.Setup(utility => utility.DeserializeStream<CatalogInformation>(It.IsAny<Stream>())).ReturnsAsync(requestBody);
         squareDAL.Setup(dal => dal.GetCatalogObjectById(It.IsAny<CatalogInformation>())).ReturnsAsync(squareResponse);
         Mock<HttpRequest> mockRequest = new();
 
-        GetItemByItemId function = new GetItemByItemId(logger.Object, squareUtility.Object, squareDAL.Object);
+        GetItemByItemId function = new GetItemByItemId(logger.Object, squareUtility.Object, squareDAL.Object, appUtility.Object);
 
         // Act
         IActionResult actual = await function.Run(mockRequest.Object);
