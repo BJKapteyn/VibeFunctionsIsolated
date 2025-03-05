@@ -18,24 +18,7 @@ public class SquareDalUtility : ISquareUtility
         this.squareApiDal = squareApiDal;
     }
 
-    public async Task<T?> DeserializeStream<T>(Stream body)
-    {
-        T? deserializedJson;
-        try
-        {
-            using (StreamReader reader = new(body))
-            {
-                string streamText = await reader.ReadToEndAsync();
-                deserializedJson = JsonSerializer.Deserialize<T>(streamText);
-            };
-        }
-        catch
-        {
-            deserializedJson = default;
-        }
-        return deserializedJson;
-    }
-
+    
     public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
     {
         IEnumerable<SquareItem> mappedSquareItems;
