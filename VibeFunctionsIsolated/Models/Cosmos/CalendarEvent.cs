@@ -1,8 +1,8 @@
 ﻿namespace VibeFunctionsIsolated.Models.Cosmos;
 
-public class Event
+public class CalendarEvent
 {
-    public Event(string eventId, string name, string description, DateTime startDate, DateTime endDate)
+    public CalendarEvent(string eventId, string name, string description, DateTime startDate, DateTime endDate)
     {
         EventId = eventId;
         EventName = name;
