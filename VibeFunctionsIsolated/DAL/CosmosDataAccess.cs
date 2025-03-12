@@ -19,12 +19,14 @@ public class CosmosDataAccess : ICosmosDataAccess
         string? cosmosKey = System.Environment.GetEnvironmentVariable("CosmosDBKey");
         string? cosmosEndpoint = System.Environment.GetEnvironmentVariable("CosmosDBEndpoint");
         string? comsosDBId = System.Environment.GetEnvironmentVariable("CosmosDBId");
+        
 
         if (string.IsNullOrEmpty(cosmosKey) || string.IsNullOrEmpty(cosmosEndpoint) || string.IsNullOrEmpty(comsosDBId))
         {
-            logger.LogError("CosmosDBKey or CosmosDBEndpoint is not set in the environment variables");
+            const string errorMessage = "CosmosDBKey or CosmosDBEndpoint is not set in the environment variables";
+            logger.LogError(message: errorMessage);
 
-            throw new ArgumentNullException("CosmosDBKey or CosmosDBEndpoint is not set in the environment variables");
+            throw new ArgumentNullException(cosmosKey, errorMessage);
         }
 
         cosmosClient = new CosmosClient(cosmosEndpoint, cosmosKey);
@@ -38,7 +40,7 @@ public class CosmosDataAccess : ICosmosDataAccess
 
     public async Task<IEnumerable<T>> GetItemsAsync<T>(string query)
     {
-        List<T> items = new List<T>();
+        List<T> items = [];
         QueryDefinition queryDefinition = new(query);
         cosmosClient.GetContainer(container.Database.Id, container.Id);
         FeedIterator<T> feedIterator = container.GetItemQueryIterator<T>(queryDefinition);
@@ -73,7 +75,8 @@ public class CosmosDataAccess : ICosmosDataAccess
 
         if (response.StatusCode != System.Net.HttpStatusCode.OK || response.StatusCode != System.Net.HttpStatusCode.Created)
         {
-            logger.LogError($"Error updating item {id} in CosmosDB");
+            Type? upsertType = item?.GetType();
+            logger.LogError("Error updating item with {id} and type {upsertType} in CosmosDB", id, upsertType);
         }
 
         return response.Resource;
