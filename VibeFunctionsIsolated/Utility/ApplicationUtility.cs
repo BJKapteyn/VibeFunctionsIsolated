@@ -26,6 +26,5 @@ namespace VibeFunctionsIsolated.Utility
             }
             return deserializedJson;
         }
-
     }
 }

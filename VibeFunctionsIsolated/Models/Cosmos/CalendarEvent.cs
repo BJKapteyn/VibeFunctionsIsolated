@@ -3,25 +3,16 @@
 namespace VibeFunctionsIsolated.Models.Cosmos;
 
 [JsonSerializable(typeof(CalendarEvent))]
-public class CalendarEvent
+public class CalendarEvent(string eventId, string name, string? description, DateTime startDate, DateTime? endDate)
 {
-    public CalendarEvent(string eventId, string name, string? description, DateTime startDate, DateTime? endDate)
-    {
-        EventId = eventId;
-        EventName = name;
-        EventDescription = description;
-        StartDate = startDate;
-        EndDate = endDate;
-    }
-
     [JsonPropertyName("eventId")]
-    public string EventId { get; set; }
+    public string EventId { get; set; } = eventId;
     [JsonPropertyName("eventName")]
-    public string EventName { get; set; }
+    public string EventName { get; set; } = name;
     [JsonPropertyName("eventDescription")]
-    public string? EventDescription { get; set; }
+    public string? EventDescription { get; set; } = description;
     [JsonPropertyName("startDate")]
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; set; } = startDate;
     [JsonPropertyName("endDate")]
-    public DateTime? EndDate { get; set; }
+    public DateTime? EndDate { get; set; } = endDate;
 }

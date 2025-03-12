@@ -69,14 +69,23 @@ public class CosmosDataAccess : ICosmosDataAccess
         return default;
     }
 
-    public async Task<T> UpsertItemAsync<T>(string id, T item)
+    public async Task<T> UpsertItemAsync<T>(T item, string? updateItemId = null)
     {
         ItemResponse<T> response = await container.UpsertItemAsync(item);
 
         if (response.StatusCode != System.Net.HttpStatusCode.OK || response.StatusCode != System.Net.HttpStatusCode.Created)
         {
             Type? upsertType = item?.GetType();
-            logger.LogError("Error updating item with {id} and type {upsertType} in CosmosDB", id, upsertType);
+            logger.LogError("Error updating item with {updateItemId} and type {upsertType} in CosmosDB", updateItemId, upsertType);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            logger.LogInformation("Item with {updateItemId} updated in CosmosDB", updateItemId);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Created)
+        {
+            logger.LogInformation("Item with {updateItemId} created in CosmosDB", updateItemId);
         }
 
         return response.Resource;
