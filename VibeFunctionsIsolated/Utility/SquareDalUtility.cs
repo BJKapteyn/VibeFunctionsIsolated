@@ -2,8 +2,9 @@
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
@@ -18,24 +19,7 @@ public class SquareDalUtility : ISquareUtility
         this.squareApiDal = squareApiDal;
     }
 
-    public async Task<T?> DeserializeStream<T>(Stream body)
-    {
-        T? deserializedJson;
-        try
-        {
-            using (StreamReader reader = new(body))
-            {
-                string streamText = await reader.ReadToEndAsync();
-                deserializedJson = JsonSerializer.Deserialize<T>(streamText);
-            };
-        }
-        catch
-        {
-            deserializedJson = default;
-        }
-        return deserializedJson;
-    }
-
+    
     public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
     {
         IEnumerable<SquareItem> mappedSquareItems;

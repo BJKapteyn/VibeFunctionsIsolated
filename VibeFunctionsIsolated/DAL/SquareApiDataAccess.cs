@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL;
 
@@ -77,6 +78,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
             return new List<SquareItemRawData>();
 
         }
+
         using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
         {
             List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
@@ -108,7 +110,6 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             return squareItems;
         }
-
     }
 
     public async Task<string> GetJsonStringResponse(HttpRequestMessage request)
@@ -122,18 +123,19 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
             {
-                StringBuilder stringbui = new StringBuilder();
-                stringbui.AppendLine(response.ReasonPhrase ?? "");
-                stringbui.AppendLine(request.Content?.ToString() ?? "");
-                throw new HttpRequestException(stringbui.ToString(), null, response.StatusCode);
+                StringBuilder stringBuild = new StringBuilder();
+                stringBuild.AppendLine(response.ReasonPhrase ?? "");
+                stringBuild.AppendLine(request.Content?.ToString() ?? "");
+                throw new HttpRequestException(stringBuild.ToString(), null, response.StatusCode);
             }
 
             responseBodyStr = await response.Content.ReadAsStringAsync();
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             string message = ex.Message;
-            logger.LogError("{message}", message);
+            string className = nameof(SquareApiDataAccess);
+            logger.LogError("{className} had an http error with message: {message}", className, message);
 
             responseBodyStr = "";
         }

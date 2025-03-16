@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeFunctionsIsolated.Models;
-using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VibeFunctionsIsolated.Models
+namespace VibeFunctionsIsolated.Models.Square
 {
     [JsonSerializable(typeof(GetItemByIdRequestInfo))]
     public class GetItemByIdRequestInfo

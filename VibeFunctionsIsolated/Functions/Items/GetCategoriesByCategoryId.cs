@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Square.Models;
-using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Items;
 
@@ -14,18 +15,23 @@ public class GetCategoriesByCategoryId
     private readonly ILogger<GetCategoriesByCategoryId> _logger;
     private readonly ISquareSdkDataAccess squareDAL;
     private readonly ISquareUtility squareUtility;
+    private readonly IApplicationUtility applicationUtility;
 
-    public GetCategoriesByCategoryId(ILogger<GetCategoriesByCategoryId> logger, ISquareSdkDataAccess squareDAL, ISquareUtility squareUtility)
+    public GetCategoriesByCategoryId(ILogger<GetCategoriesByCategoryId> logger,
+                                    ISquareSdkDataAccess squareDAL,
+                                    ISquareUtility squareUtility,
+                                    IApplicationUtility applicationUtility)
     {
         _logger = logger;
         this.squareDAL = squareDAL;
         this.squareUtility = squareUtility;
+        this.applicationUtility = applicationUtility;
     }
 
     [Function("GetCategoriesByCategoryId")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
-        CatalogInformation? categoryId = squareUtility.DeserializeStream<CatalogInformation>(req.Body).Result;
+        CatalogInformation? categoryId = applicationUtility.DeserializeStream<CatalogInformation>(req.Body).Result;
 
         if (categoryId == null)
         {
