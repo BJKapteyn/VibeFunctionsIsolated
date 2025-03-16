@@ -152,12 +152,12 @@ public class SquareDalUtility : ISquareUtility
     /// <returns>Image URL if found, empty string if not</returns>
     private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
     {
-        // Check main object first
+        // Check main object
         string? imageUrl = response?.MObject?.ImageData?.Url;
 
         if (imageUrl == null)
         {
-            // Check in the related objects
+            // Check the related objects
             imageUrl = response?.RelatedObjects
                            ?.Where(x => x.ImageData != null)
                            ?.FirstOrDefault()
