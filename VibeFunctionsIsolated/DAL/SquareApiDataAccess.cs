@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL;

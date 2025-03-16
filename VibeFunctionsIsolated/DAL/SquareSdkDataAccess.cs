@@ -4,7 +4,7 @@ using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;

@@ -19,7 +19,6 @@ public class SquareDalUtility : ISquareUtility
         this.squareApiDal = squareApiDal;
     }
 
-    
     public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
     {
         IEnumerable<SquareItem> mappedSquareItems;

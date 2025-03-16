@@ -1,5 +1,5 @@
 ﻿using Square.Models;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 namespace VibeFunctionsIsolated.DAL.Interfaces;
 
 public interface ISquareSdkDataAccess
