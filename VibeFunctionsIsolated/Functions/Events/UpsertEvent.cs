@@ -10,9 +10,9 @@ namespace VibeFunctionsIsolated.Functions.Events
 {
     public class UpsertEvent(ILogger<UpsertEvent> logger, ICosmosDataAccess cosmosDataAccess, IApplicationUtility applicationUtility)
     {
+        private readonly string containerName = "Events";
         private readonly ILogger<UpsertEvent> logger = logger;
         private readonly ICosmosDataAccess cosmosDataAccess = cosmosDataAccess;
-        private readonly string containerName = "Events";
         private readonly IApplicationUtility applicationUtility = applicationUtility;
 
         [Function("UpsertEvent")]
@@ -31,7 +31,9 @@ namespace VibeFunctionsIsolated.Functions.Events
 
             CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertItemAsync(calendarEvent, calendarEvent.EventId);
 
-            return new OkObjectResult("Welcome to Azure Functions!");
+
+
+            return new OkObjectResult(upsertedEvent);
         }
     }
 }
