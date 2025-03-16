@@ -100,6 +100,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return response;
     }
+
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
         List<string> objectTypes =
@@ -108,17 +109,17 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         ];
 
         CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryInfo.Id)
-        .Build();
+            .Build();
 
         var searchQuery = new CatalogQuery.Builder()
-          .ExactQuery(exactQuery)
-          .Build();
+            .ExactQuery(exactQuery)
+            .Build();
 
 
         SearchCatalogObjectsRequest requestBody = new SearchCatalogObjectsRequest.Builder()
-          .ObjectTypes(objectTypes)
-          .Query(searchQuery)
-          .Build();
+            .ObjectTypes(objectTypes)
+            .Query(searchQuery)
+            .Build();
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
@@ -170,5 +171,31 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         imageUrl = item?.MObject?.ImageData?.Url ?? "";
 
         return imageUrl;
+    }
+
+    public async Task<IEnumerable<SquareTeamMember>> GetAllActiveTeamMembersAsync()
+    {
+        var filter = new SearchTeamMembersFilter.Builder()
+            .Status("ACTIVE")
+            .Build();
+
+        var query = new SearchTeamMembersQuery.Builder()
+            .Filter(filter)
+            .Build();
+
+        var body = new SearchTeamMembersRequest.Builder()
+            .Query(query)
+            .Build();
+
+        try
+        {
+            SearchTeamMembersResponse result = await squareClient.TeamApi.SearchTeamMembersAsync(body: body);
+        }
+        catch (ApiException e)
+        {
+            Console.WriteLine("Failed to make the request");
+            Console.WriteLine($"Response Code: {e.ResponseCode}");
+            Console.WriteLine($"Exception: {e.Message}");
+        }
     }
 }
