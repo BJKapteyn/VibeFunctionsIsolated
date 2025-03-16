@@ -197,5 +197,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
             Console.WriteLine($"Response Code: {e.ResponseCode}");
             Console.WriteLine($"Exception: {e.Message}");
         }
+
+        return new List<SquareTeamMember>();
     }
 }
