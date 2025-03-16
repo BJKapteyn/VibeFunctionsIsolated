@@ -173,8 +173,9 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         return imageUrl;
     }
 
-    public async Task<IEnumerable<SquareTeamMember>> GetAllActiveTeamMembersAsync()
+    public async Task<SearchTeamMembersResponse> GetAllActiveTeamMembersAsync()
     {
+        SearchTeamMembersResponse result;
         var filter = new SearchTeamMembersFilter.Builder()
             .Status("ACTIVE")
             .Build();
@@ -189,15 +190,16 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         try
         {
-            SearchTeamMembersResponse result = await squareClient.TeamApi.SearchTeamMembersAsync(body: body);
+            result = await squareClient.TeamApi.SearchTeamMembersAsync(body: body);
         }
         catch (ApiException e)
         {
+            logger.LogError("Exception: {message} Response Code: {responseCode}", e.Message, e.ResponseCode);
             Console.WriteLine("Failed to make the request");
-            Console.WriteLine($"Response Code: {e.ResponseCode}");
             Console.WriteLine($"Exception: {e.Message}");
+            result = new SearchTeamMembersResponse();
         }
 
-        return new List<SquareTeamMember>();
+        return result;
     }
 }
