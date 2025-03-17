@@ -7,7 +7,7 @@ namespace VibeFunctionsIsolated.Models.Square
     {
         public GetItemByIdRequestInfo(string categoryId)
         {
-            CategoryIds = new List<string> { categoryId };
+            CategoryIds = [categoryId];
         }
 
         [JsonPropertyName("category_ids")]
