@@ -46,7 +46,7 @@ public class SquareDalUtility : ISquareUtility
         }
         else
         {
-            mappedSquareItems = Array.Empty<SquareItem>();
+            mappedSquareItems = [];
         }
 
         return mappedSquareItems;
@@ -133,20 +133,17 @@ public class SquareDalUtility : ISquareUtility
     /// </summary>
     /// <param name="response">Catolog API response object</param>
     /// <returns>Image URL if found, empty string if not</returns>
-    private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
+    private static string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
     {
         // Check main object
         string? imageUrl = response?.MObject?.ImageData?.Url;
 
-        if (imageUrl == null)
-        {
-            // Check the related objects
-            imageUrl = response?.RelatedObjects
-                           ?.Where(x => x.ImageData != null)
-                           ?.FirstOrDefault()
-                           ?.ImageData
-                           ?.Url;
-        }
+        // Check the related objects
+        imageUrl ??= response?.RelatedObjects
+                        ?.Where(x => x.ImageData != null)
+                        ?.FirstOrDefault()
+                        ?.ImageData
+                        ?.Url;
 
         return imageUrl ?? "";
     }

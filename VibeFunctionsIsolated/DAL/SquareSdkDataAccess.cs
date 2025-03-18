@@ -202,4 +202,26 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return result;
     }
+
+    public async Task<BulkRetrieveTeamMemberBookingProfilesResponse> GetTeamMemberBookingInformation(List<string> ids)
+    {
+        var body = new BulkRetrieveTeamMemberBookingProfilesRequest.Builder(teamMemberIds: ids)
+            .Build();
+        BulkRetrieveTeamMemberBookingProfilesResponse response;
+
+        try
+        {
+            response = await squareClient.BookingsApi.BulkRetrieveTeamMemberBookingProfilesAsync(body: body);
+        }
+        catch (ApiException e)
+        {
+            logger.LogError("Exception: {message} Response Code: {responseCode}", e.Message, e.ResponseCode);
+            string requestName = nameof(BulkRetrieveTeamMemberBookingProfilesResponse);
+            Console.WriteLine(string.Format("Failed to make the {0} request", requestName));
+            
+            response = new BulkRetrieveTeamMemberBookingProfilesResponse();
+        }
+
+        return response;
+    }
 }

@@ -1,11 +1,13 @@
-﻿namespace VibeFunctionsIsolated.Enums
+﻿namespace VibeFunctionsIsolated.Enums;
+
+/// <summary>
+/// Custom attributes for Square items
+/// </summary>
+public static class CustomAttributes
 {
-    public static class CustomAttributes
-    {
-        public static string Email = "Email";
-        public static string Sign = "Sign";
-        public static string Describe = "Describes Me";
-        public static string Expertise = "Expertise";
-    }
+    public static readonly string Email = "Email";
+    public static readonly string Sign = "Sign";
+    public static readonly string Describe = "Describes Me";
+    public static readonly string Expertise = "Expertise";
 }
 
