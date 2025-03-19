@@ -128,6 +128,13 @@ public class SquareDalUtility : ISquareUtility
         return catalogItem;
     }
 
+    public async Task<IEnumerable<SquareTeamMember>> GetAllTeamMembersWithDetails()
+    {
+        SearchTeamMembersResponse teamMembers = await squareSdkDal.GetAllActiveTeamMembersAsync(); 
+
+        return [];
+    }
+
     /// <summary>
     /// Search for the image url in the response, it isn't in the same spot for all item types
     /// </summary>

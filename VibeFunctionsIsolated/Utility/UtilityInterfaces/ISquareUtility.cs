@@ -28,5 +28,11 @@ namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
         /// <param name="needsImageUrls">If the items need image urls</param>   
         /// <returns>The original collection with image urls</returns>
         public Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks);
+
+        /// <summary>
+        /// Get all active team members and their booking information
+        /// </summary>
+        /// <returns>All team members and their booking information</returns>
+        public Task<IEnumerable<SquareTeamMember>> GetAllTeamMembersWithDetails();
     }
 }

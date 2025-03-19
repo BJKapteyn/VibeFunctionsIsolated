@@ -44,6 +44,7 @@ public class CosmosDataAccess : ICosmosDataAccess
         QueryDefinition queryDefinition = new(query);
         cosmosClient.GetContainer(container.Database.Id, container.Id);
         FeedIterator<T> feedIterator = container.GetItemQueryIterator<T>(queryDefinition);
+
         while (feedIterator.HasMoreResults)
         {
             FeedResponse<T> response = await feedIterator.ReadNextAsync();

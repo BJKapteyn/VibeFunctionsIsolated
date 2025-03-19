@@ -149,9 +149,9 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         return response;
     }
 
-    public async Task<string> GetImageURL(string? imageId)
+    public async Task<string> GetImageURL(string? itemId)
     {
-        if (imageId == null || imageId == "")
+        if (itemId == null || itemId == "")
             return "";
 
         string imageUrl;
@@ -159,7 +159,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         try
         {
-            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: imageId);
+            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: itemId);
         }
         catch (Exception ex)
         {

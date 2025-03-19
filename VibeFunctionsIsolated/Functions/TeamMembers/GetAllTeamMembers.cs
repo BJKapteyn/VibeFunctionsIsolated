@@ -3,25 +3,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.TeamMembers
 {
     public class GetAllTeamMembers
     {
         private readonly ILogger<GetAllTeamMembers> _logger;
-        private readonly ISquareSdkDataAccess squareSdkDataAccess;
+        private readonly ISquareUtility squareUtility;
+        private readonly IApplicationUtility applicationUtility;
 
-        public GetAllTeamMembers(ILogger<GetAllTeamMembers> logger, ISquareSdkDataAccess squareSdkDataAccess)
+        public GetAllTeamMembers(ILogger<GetAllTeamMembers> logger, ISquareUtility squareUtility, IApplicationUtility applicationUtility)
         {
             _logger = logger;
-            this.squareSdkDataAccess = squareSdkDataAccess;
+            this.squareUtility = squareUtility;
+            this.applicationUtility = applicationUtility;
         }
 
         [Function("GetAllTeamMembers")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            
-            return new OkObjectResult("Welcome to Azure Functions!");
+
+
+            IEnumerable<SquareTeamMember> teamMembers = await squareUtility.GetAllTeamMembersWithDetails();
+
+            return new OkObjectResult(teamMembers);
         }
     }
 }
