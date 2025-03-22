@@ -23,6 +23,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         this.logger = logger;
         squareClient = InitializeClient();
     }
+
     public static SquareClient InitializeClient()
     {
         BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
@@ -201,6 +202,12 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         }
 
         return result;
+    }
+
+    public async Task GetAllBookableTeamMembers()
+    {
+        var result = await squareClient.BookingsApi.ListTeamMemberBookingProfilesAsync();
+
     }
 
     public async Task<BulkRetrieveTeamMemberBookingProfilesResponse> GetTeamMemberBookingInformation(List<string> ids)

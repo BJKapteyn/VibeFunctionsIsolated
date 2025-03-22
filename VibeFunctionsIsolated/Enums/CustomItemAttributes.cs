@@ -3,7 +3,7 @@
 /// <summary>
 /// Custom attributes for Square items
 /// </summary>
-public static class CustomAttributes
+public static class CustomItemAttributes
 {
     public static readonly string Email = "Email";
     public static readonly string Sign = "Sign";

@@ -18,6 +18,7 @@ var host = new HostBuilder()
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
         services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
+        services.AddScoped<IApplicationUtility, ApplicationUtility>();
     })
     .Build();
 

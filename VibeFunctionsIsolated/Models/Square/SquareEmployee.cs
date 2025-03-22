@@ -9,10 +9,10 @@ namespace VibeFunctionsIsolated.Models.Square
             base(item.Id, item.ItemData.Name, item.ItemData.Description, imageURL)
         {
             CategoryId = item.ItemData.CategoryId;
-            Sign = getCustomAttribute(CustomAttributes.Sign, customAttributes);
-            Email = getCustomAttribute(CustomAttributes.Email, customAttributes);
-            ThreeWordsToDescribe = getCustomAttribute(CustomAttributes.Describe, customAttributes);
-            Expertise = getCustomAttribute(CustomAttributes.Expertise, customAttributes);
+            Sign = getCustomAttribute(CustomItemAttributes.Sign, customAttributes);
+            Email = getCustomAttribute(CustomItemAttributes.Email, customAttributes);
+            ThreeWordsToDescribe = getCustomAttribute(CustomItemAttributes.Describe, customAttributes);
+            Expertise = getCustomAttribute(CustomItemAttributes.Expertise, customAttributes);
         }
 
         public string CategoryId { get; set; }

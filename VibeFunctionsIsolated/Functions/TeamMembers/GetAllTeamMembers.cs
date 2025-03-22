@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
@@ -24,9 +23,19 @@ namespace VibeFunctionsIsolated.Functions.TeamMembers
         [Function("GetAllTeamMembers")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
+            //IEnumerable<string>? teamMemberIds = await applicationUtility.DeserializeStream<IEnumerable<string>>(req.Body);
 
+            //if(teamMemberIds is null || teamMemberIds.Count() == 0)
+            //{
+            //    _logger.LogError("{0} bad http request", nameof(GetAllTeamMembers));
+            //    return new BadRequestResult();
+            //}
 
             IEnumerable<SquareTeamMember> teamMembers = await squareUtility.GetAllTeamMembersWithDetails();
+
+            
+
+
 
             return new OkObjectResult(teamMembers);
         }

@@ -1,5 +1,5 @@
-﻿using Square.Models;
-using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.Models.Interfaces;
@@ -11,11 +11,14 @@ namespace VibeFunctionsIsolated.Utility;
 
 public class SquareDalUtility : ISquareUtility
 {
+    private readonly ILogger<SquareDalUtility> logger;
     private readonly ISquareSdkDataAccess squareSdkDal;
     private readonly ISquareApiDataAccess squareApiDal;
-    public SquareDalUtility(ISquareSdkDataAccess squareDAL, ISquareApiDataAccess squareApiDal) 
+
+    public SquareDalUtility(ILogger<SquareDalUtility> logger, ISquareSdkDataAccess squareSdkDal, ISquareApiDataAccess squareApiDal) 
     {
-        this.squareSdkDal = squareDAL;
+        this.logger = logger;
+        this.squareSdkDal = squareSdkDal;
         this.squareApiDal = squareApiDal;
     }
 
@@ -71,9 +74,11 @@ public class SquareDalUtility : ISquareUtility
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
             Task<string>[] getPropertiesTasks = new Task<string>[2];
 
+            // Add a delay to prevent rate limiting
             Thread.Sleep(50);
             getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
             getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLink(responseItem.Id) : new Task<string>(() => "");
+
             if (getPropertiesTasks[1].Status == TaskStatus.Created)
                 getPropertiesTasks[1].Start();
 
@@ -130,7 +135,40 @@ public class SquareDalUtility : ISquareUtility
 
     public async Task<IEnumerable<SquareTeamMember>> GetAllTeamMembersWithDetails()
     {
-        SearchTeamMembersResponse teamMembers = await squareSdkDal.GetAllActiveTeamMembersAsync(); 
+        //SearchTeamMembersResponse response = await squareSdkDal.GetAllActiveTeamMembersAsync();
+        //IEnumerable<SquareTeamMember> teamMembers;
+        //BulkRetrieveTeamMemberBookingProfilesResponse teamMemberDetails;
+        //SearchTeamMembersResponse response = await squareSdkDal.GetAllActiveTeamMembersAsync(); 
+
+        //IEnumerable<string> teamMemberIds = response.TeamMembers?.Select(teamMember => teamMember.Id) ?? [];
+
+        //if (teamMemberIds.Any())
+        //{
+        //    teamMemberDetails = await squareSdkDal.GetTeamMemberBookingInformation(teamMemberIds.ToList());
+        //}
+        //else
+        //{
+        //    teamMemberDetails = new BulkRetrieveTeamMemberBookingProfilesResponse();
+        //}
+
+        //if(teamMemberDetails?.TeamMemberBookingProfiles != null)
+        //{
+        //    teamMembers = response.TeamMembers.Select(teamMember =>
+        //    {
+        //        bool bookingProfilez = teamMemberDetails
+        //            .TeamMemberBookingProfiles
+        //            .TryGetValue(teamMember.Id, out RetrieveTeamMemberBookingProfileResponse? bookingProfile);
+
+        //        return new SquareTeamMember(teamMember.Id,
+        //            teamMember.GivenName,
+        //            bookingProfile.TeamMemberBookingProfile.Description,
+        //            bookingProfile.TeamMemberBookingProfile.);
+        //    });
+        //}
+        //else
+        //{
+        //    teamMembers = [];
+        //}
 
         return [];
     }
