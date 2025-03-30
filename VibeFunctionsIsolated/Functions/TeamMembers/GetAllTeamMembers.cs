@@ -31,7 +31,7 @@ namespace VibeFunctionsIsolated.Functions.TeamMembers
             //    return new BadRequestResult();
             //}
 
-            IEnumerable<SquareTeamMember> teamMembers = await squareUtility.GetAllTeamMembersWithDetails();
+            IEnumerable<SquareTeamMember> teamMembers = await squareUtility.MapAllBookableTeamMembersWithDetails();
 
             
 

@@ -33,6 +33,6 @@ namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
         /// Get all active team members and their booking information
         /// </summary>
         /// <returns>All team members and their booking information</returns>
-        public Task<IEnumerable<SquareTeamMember>> GetAllTeamMembersWithDetails();
+        public Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembersWithDetails();
     }
 }

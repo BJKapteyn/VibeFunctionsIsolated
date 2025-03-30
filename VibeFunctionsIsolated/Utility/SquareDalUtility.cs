@@ -133,8 +133,28 @@ public class SquareDalUtility : ISquareUtility
         return catalogItem;
     }
 
-    public async Task<IEnumerable<SquareTeamMember>> GetAllTeamMembersWithDetails()
+    public async Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembersWithDetails()
     {
+
+        IEnumerable<TeamMemberBookingProfile> teamMembers = await squareSdkDal.GetAllTeamMembers();
+
+        if (teamMembers.Any())
+        {
+
+            IEnumerable<SquareTeamMember> squareTeamMembers = teamMembers
+                .Where(teamMember => teamMember.IsBookable == true)
+                .Select(teamMember =>
+            {
+                SquareTeamMember mappedTeamMember = new (teamMember.TeamMemberId, teamMember.DisplayName, teamMember.Description, teamMember.ProfileImageUrl);
+
+                return mappedTeamMember;
+            });
+
+            return squareTeamMembers;
+        }
+
+        return [];
+
         //SearchTeamMembersResponse response = await squareSdkDal.GetAllActiveTeamMembersAsync();
         //IEnumerable<SquareTeamMember> teamMembers;
         //BulkRetrieveTeamMemberBookingProfilesResponse teamMemberDetails;
@@ -169,8 +189,6 @@ public class SquareDalUtility : ISquareUtility
         //{
         //    teamMembers = [];
         //}
-
-        return [];
     }
 
     /// <summary>
