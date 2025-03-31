@@ -24,14 +24,14 @@ namespace VibeFunctionsIsolated.Functions.TeamMembers
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
 
-            IEnumerable<SquareTeamMember> teamMembers = await squareUtility.MapAllBookableTeamMembersWithDetails();
+            IEnumerable<SquareTeamMember> teamMembers = await squareUtility.MapAllBookableTeamMembers();
 
             if(teamMembers.Any() == false)
             {;
                 logger.LogError("No team members were found calling {0}", nameof(GetAllTeamMembers));
+
                 return new NotFoundResult();
             }
-            logger.LogDebug("GetAllTeamMembers Success");
 
             return new OkObjectResult(teamMembers);
         }

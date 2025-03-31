@@ -133,7 +133,7 @@ public class SquareDalUtility : ISquareUtility
         return catalogItem;
     }
 
-    public async Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembersWithDetails()
+    public async Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembers()
     {
         IEnumerable<TeamMemberBookingProfile> teamMembers = await squareSdkDal.GetAllTeamMembers();
 
@@ -143,7 +143,10 @@ public class SquareDalUtility : ISquareUtility
                 .Where(teamMember => teamMember.IsBookable == true)
                 .Select(teamMember =>
             {
-                SquareTeamMember mappedTeamMember = new (teamMember.TeamMemberId, teamMember.DisplayName, teamMember.Description, teamMember.ProfileImageUrl);
+                SquareTeamMember mappedTeamMember = new (teamMember.TeamMemberId,
+                    teamMember.DisplayName, 
+                    teamMember.Description, 
+                    teamMember.ProfileImageUrl);
 
                 return mappedTeamMember;
             });

@@ -175,36 +175,6 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         return imageUrl;
     }
 
-    //public async Task<SearchTeamMembersResponse> GetAllActiveTeamMembers()
-    //{
-    //    SearchTeamMembersResponse result;
-    //    var filter = new SearchTeamMembersFilter.Builder()
-    //        .Status("ACTIVE")
-    //        .Build();
-
-    //    var query = new SearchTeamMembersQuery.Builder()
-    //        .Filter(filter)
-    //        .Build();
-
-    //    var body = new SearchTeamMembersRequest.Builder()
-    //        .Query(query)
-    //        .Build();
-
-    //    try
-    //    {
-    //        result = await squareClient.TeamApi.SearchTeamMembersAsync(body: body);
-    //    }
-    //    catch (ApiException e)
-    //    {
-    //        logger.LogError("Exception: {message} Response Code: {responseCode}", e.Message, e.ResponseCode);
-    //        Console.WriteLine("Failed to make the request");
-    //        Console.WriteLine($"Exception: {e.Message}");
-    //        result = new SearchTeamMembersResponse();
-    //    }
-
-    //    return result;
-    //}
-
     public async Task<IEnumerable<TeamMemberBookingProfile>> GetAllTeamMembers()
     {
         ListTeamMemberBookingProfilesResponse response = await squareClient.BookingsApi.ListTeamMemberBookingProfilesAsync();
@@ -212,39 +182,10 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         if(response.Errors.Any())
         {
             logger.LogError("API response threw Errors: {message}", response.Errors.ToString());
+
             return [];
         }
 
         return response.TeamMemberBookingProfiles;
     }
-
-    //public async Task<BulkRetrieveTeamMemberBookingProfilesResponse> GetTeamMemberBookingInformation(List<string> ids)
-    //{
-    //    var body = new BulkRetrieveTeamMemberBookingProfilesRequest.Builder(teamMemberIds: ids)
-    //        .Build();
-
-    //    BulkRetrieveTeamMemberBookingProfilesResponse response = await squareClient
-    //        .BookingsApi
-    //        .BulkRetrieveTeamMemberBookingProfilesAsync(body: body);
-
-    //    if (response.Errors.Any())
-    //    {
-    //        logger.LogError("API response threw Errors: {message}", response.Errors.ToString());
-    //    }
-
-    //    //    try
-    //    //{
-    //    //    response 
-    //    //}
-    //    //catch (ApiException e)
-    //    //{
-    //    //    logger.LogError("Exception: {message} Response Code: {responseCode}", e.Message, e.ResponseCode);
-    //    //    string requestName = nameof(BulkRetrieveTeamMemberBookingProfilesResponse);
-    //    //    Console.WriteLine(string.Format("Failed to make the {0} request", requestName));
-            
-    //    //    response = new BulkRetrieveTeamMemberBookingProfilesResponse();
-    //    //}
-
-    //    return response;
-    //}
 }
