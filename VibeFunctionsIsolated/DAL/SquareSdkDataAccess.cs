@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventLog;
 using Square;
 using Square.Authentication;
 using Square.Exceptions;
@@ -125,7 +124,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
-        if (response?.Errors != null)
+        if (response?.Errors is not null)
         {
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
@@ -181,7 +180,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         if(response.Errors.Any())
         {
-            logger.LogError("API response threw Errors: {message}", response.Errors.ToString());
+            logger.LogError("API response threw errors: {message}", response.Errors.ToString());
 
             return [];
         }
