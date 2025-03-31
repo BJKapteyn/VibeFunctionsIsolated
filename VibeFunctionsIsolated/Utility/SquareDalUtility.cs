@@ -135,12 +135,10 @@ public class SquareDalUtility : ISquareUtility
 
     public async Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembersWithDetails()
     {
-
         IEnumerable<TeamMemberBookingProfile> teamMembers = await squareSdkDal.GetAllTeamMembers();
 
         if (teamMembers.Any())
         {
-
             IEnumerable<SquareTeamMember> squareTeamMembers = teamMembers
                 .Where(teamMember => teamMember.IsBookable == true)
                 .Select(teamMember =>
@@ -154,41 +152,6 @@ public class SquareDalUtility : ISquareUtility
         }
 
         return [];
-
-        //SearchTeamMembersResponse response = await squareSdkDal.GetAllActiveTeamMembersAsync();
-        //IEnumerable<SquareTeamMember> teamMembers;
-        //BulkRetrieveTeamMemberBookingProfilesResponse teamMemberDetails;
-        //SearchTeamMembersResponse response = await squareSdkDal.GetAllActiveTeamMembersAsync(); 
-
-        //IEnumerable<string> teamMemberIds = response.TeamMembers?.Select(teamMember => teamMember.Id) ?? [];
-
-        //if (teamMemberIds.Any())
-        //{
-        //    teamMemberDetails = await squareSdkDal.GetTeamMemberBookingInformation(teamMemberIds.ToList());
-        //}
-        //else
-        //{
-        //    teamMemberDetails = new BulkRetrieveTeamMemberBookingProfilesResponse();
-        //}
-
-        //if(teamMemberDetails?.TeamMemberBookingProfiles != null)
-        //{
-        //    teamMembers = response.TeamMembers.Select(teamMember =>
-        //    {
-        //        bool bookingProfilez = teamMemberDetails
-        //            .TeamMemberBookingProfiles
-        //            .TryGetValue(teamMember.Id, out RetrieveTeamMemberBookingProfileResponse? bookingProfile);
-
-        //        return new SquareTeamMember(teamMember.Id,
-        //            teamMember.GivenName,
-        //            bookingProfile.TeamMemberBookingProfile.Description,
-        //            bookingProfile.TeamMemberBookingProfile.);
-        //    });
-        //}
-        //else
-        //{
-        //    teamMembers = [];
-        //}
     }
 
     /// <summary>

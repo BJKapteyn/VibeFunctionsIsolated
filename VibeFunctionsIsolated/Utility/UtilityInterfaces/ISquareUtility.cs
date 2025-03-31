@@ -9,7 +9,6 @@ namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
     /// </summary>
     public interface ISquareUtility
     {
-
         public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type);
         public IEnumerable<SquareItem> GetItemsByReportingCategoryId(IEnumerable<SquareItem> items, string? reportingCategoryId);
 

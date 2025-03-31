@@ -9,13 +9,13 @@ namespace VibeFunctionsIsolated.Functions.TeamMembers
 {
     public class GetAllTeamMembers
     {
-        private readonly ILogger<GetAllTeamMembers> _logger;
+        private readonly ILogger<GetAllTeamMembers> logger;
         private readonly ISquareUtility squareUtility;
         private readonly IApplicationUtility applicationUtility;
 
         public GetAllTeamMembers(ILogger<GetAllTeamMembers> logger, ISquareUtility squareUtility, IApplicationUtility applicationUtility)
         {
-            _logger = logger;
+            this.logger = logger;
             this.squareUtility = squareUtility;
             this.applicationUtility = applicationUtility;
         }
@@ -23,19 +23,15 @@ namespace VibeFunctionsIsolated.Functions.TeamMembers
         [Function("GetAllTeamMembers")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            //IEnumerable<string>? teamMemberIds = await applicationUtility.DeserializeStream<IEnumerable<string>>(req.Body);
-
-            //if(teamMemberIds is null || teamMemberIds.Count() == 0)
-            //{
-            //    _logger.LogError("{0} bad http request", nameof(GetAllTeamMembers));
-            //    return new BadRequestResult();
-            //}
 
             IEnumerable<SquareTeamMember> teamMembers = await squareUtility.MapAllBookableTeamMembersWithDetails();
 
-            
-
-
+            if(teamMembers.Any() == false)
+            {;
+                logger.LogError("No team members were found calling {0}", nameof(GetAllTeamMembers));
+                return new NotFoundResult();
+            }
+            logger.LogDebug("GetAllTeamMembers Success");
 
             return new OkObjectResult(teamMembers);
         }
