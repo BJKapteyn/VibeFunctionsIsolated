@@ -24,9 +24,9 @@ namespace VibeFunctionsIsolated.Tests.Functions.TeamMember
         }
 
         [Test]
-        [TestCaseSource(nameof(GetAllTeamMembersTestCases))]
+        [TestCaseSource(nameof(GetAllTeamMembers_CorrectResponseTestCases))]
         [Parallelizable(ParallelScope.Self)]
-        public async Task GetAllTeamMembersUnitTests(List<SquareTeamMember> returnedTeamMembers, IActionResult expected)
+        public async Task GetAllTeamMembers_CorrectResponseTest(List<SquareTeamMember> returnedTeamMembers, IActionResult expected)
         {
             // Arrange
             mockSquareUtility.Setup(x => x.MapAllBookableTeamMembers()).ReturnsAsync(returnedTeamMembers);
@@ -40,7 +40,7 @@ namespace VibeFunctionsIsolated.Tests.Functions.TeamMember
             Assert.That(actual.GetType(), Is.EqualTo(expected.GetType()));
         }
 
-        private static IEnumerable<TestCaseData> GetAllTeamMembersTestCases()
+        private static IEnumerable<TestCaseData> GetAllTeamMembers_CorrectResponseTestCases()
         {
             List<SquareTeamMember> emptyTeamMemberList = new List<SquareTeamMember>();
             List<SquareTeamMember> populatedTeamMemberList = new List<SquareTeamMember>
