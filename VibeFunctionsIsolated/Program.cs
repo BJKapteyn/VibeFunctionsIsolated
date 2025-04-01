@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 
 var host = new HostBuilder()
@@ -16,6 +17,8 @@ var host = new HostBuilder()
         services.AddSingleton<ISquareUtility, SquareDalUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
+        services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
+        services.AddScoped<IApplicationUtility, ApplicationUtility>();
     })
     .Build();
 

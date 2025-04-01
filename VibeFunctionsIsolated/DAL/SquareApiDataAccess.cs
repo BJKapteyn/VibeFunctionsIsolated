@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL;
 
@@ -27,7 +28,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         string buyNowLink = "";
         string getItemEndpoint = $"https://connect.squareup.com/v2/catalog/object/{imageId}";
 
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, getItemEndpoint);
+        HttpRequestMessage request = new(HttpMethod.Get, getItemEndpoint);
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
@@ -37,11 +38,10 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         {
             using (JsonDocument jsonBody = JsonDocument.Parse(jsonResponseBody))
             {
-                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+                List<SquareItemRawData> squareItems = [];
                 JsonElement root = jsonBody.RootElement;
-                JsonElement squareObject;
 
-                bool bodyHasObject = root.TryGetProperty("object", out squareObject);
+                bool bodyHasObject = root.TryGetProperty("object", out JsonElement squareObject);
 
                 if (bodyHasObject)
                 {
@@ -61,38 +61,35 @@ public class SquareApiDataAccess : ISquareApiDataAccess
     public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
     {
         string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
+        HttpRequestMessage request = new(HttpMethod.Post, getItemEndpoint);
 
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
-        GetItemByIdRequestInfo requestInfo = new GetItemByIdRequestInfo(catalogInfo.Id);
+        GetItemByIdRequestInfo requestInfo = new(catalogInfo.Id);
 
-        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
+        request.Content = new StringContent(JsonSerializer.Serialize(requestInfo));
 
         string responseJsonString = await GetJsonStringResponse(request);
          
-        if (responseJsonString != "")
+        if (responseJsonString == "")
         {
-            return new List<SquareItemRawData>();
-
+            return [];
         }
+
         using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
         {
-            List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+            List<SquareItemRawData> squareItems = [];
             JsonElement root = jsonBody.RootElement;
-            JsonElement items;
-            bool hasItemsProperty = root.TryGetProperty("items", out items);
+            bool hasItemsProperty = root.TryGetProperty("items", out JsonElement items);
 
             if (hasItemsProperty)
             {
                 foreach (JsonElement item in items.EnumerateArray())
                 {
-                    JsonElement itemData = new ();
-                    item.TryGetProperty("item_data", out itemData);
+                    item.TryGetProperty("item_data", out JsonElement itemData);
 
-                    JsonElement id = new ();
-                    item.TryGetProperty("id", out id);
+                    item.TryGetProperty("id", out JsonElement id);
 
                     string itemId = id.GetString() ?? "";
 
@@ -108,7 +105,6 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             return squareItems;
         }
-
     }
 
     public async Task<string> GetJsonStringResponse(HttpRequestMessage request)
@@ -122,18 +118,19 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
             {
-                StringBuilder stringbui = new StringBuilder();
-                stringbui.AppendLine(response.ReasonPhrase ?? "");
-                stringbui.AppendLine(request.Content?.ToString() ?? "");
-                throw new HttpRequestException(stringbui.ToString(), null, response.StatusCode);
+                StringBuilder stringBuild = new();
+                stringBuild.AppendLine(response.ReasonPhrase ?? "");
+                stringBuild.AppendLine(request.Content?.ToString() ?? "");
+                throw new HttpRequestException(stringBuild.ToString(), null, response.StatusCode);
             }
 
             responseBodyStr = await response.Content.ReadAsStringAsync();
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             string message = ex.Message;
-            logger.LogError("{message}", message);
+            string className = nameof(SquareApiDataAccess);
+            logger.LogError("{className} had an http error with message: {message}", className, message);
 
             responseBodyStr = "";
         }

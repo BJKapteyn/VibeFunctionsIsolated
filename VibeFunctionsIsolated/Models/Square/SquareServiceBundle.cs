@@ -1,6 +1,4 @@
-﻿using VibeFunctionsIsolated.Models;
-
-namespace VibeFunctionsIsolated.Models
+﻿namespace VibeFunctionsIsolated.Models.Square
 {
     public class SquareServiceBundle(SquareCategory category, IEnumerable<SquareItem> squareItems)
     {

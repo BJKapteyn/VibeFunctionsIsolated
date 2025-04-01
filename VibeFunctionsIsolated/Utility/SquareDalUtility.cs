@@ -1,39 +1,25 @@
-﻿using Square.Models;
-using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
-using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Interfaces;
+using VibeFunctionsIsolated.Models.Square;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.Utility;
 
 public class SquareDalUtility : ISquareUtility
 {
+    private readonly ILogger<SquareDalUtility> logger;
     private readonly ISquareSdkDataAccess squareSdkDal;
     private readonly ISquareApiDataAccess squareApiDal;
-    public SquareDalUtility(ISquareSdkDataAccess squareDAL, ISquareApiDataAccess squareApiDal) 
-    {
-        this.squareSdkDal = squareDAL;
-        this.squareApiDal = squareApiDal;
-    }
 
-    public async Task<T?> DeserializeStream<T>(Stream body)
+    public SquareDalUtility(ILogger<SquareDalUtility> logger, ISquareSdkDataAccess squareSdkDal, ISquareApiDataAccess squareApiDal) 
     {
-        T? deserializedJson;
-        try
-        {
-            using (StreamReader reader = new(body))
-            {
-                string streamText = await reader.ReadToEndAsync();
-                deserializedJson = JsonSerializer.Deserialize<T>(streamText);
-            };
-        }
-        catch
-        {
-            deserializedJson = default;
-        }
-        return deserializedJson;
+        this.logger = logger;
+        this.squareSdkDal = squareSdkDal;
+        this.squareApiDal = squareApiDal;
     }
 
     public IEnumerable<SquareItem> MapSquareProductItems(SearchCatalogObjectsResponse response, string type)
@@ -63,7 +49,7 @@ public class SquareDalUtility : ISquareUtility
         }
         else
         {
-            mappedSquareItems = Array.Empty<SquareItem>();
+            mappedSquareItems = [];
         }
 
         return mappedSquareItems;
@@ -88,9 +74,11 @@ public class SquareDalUtility : ISquareUtility
             string imageId = responseItem.ItemData.ImageIds == null ? "" : responseItem.ItemData.ImageIds[0];
             Task<string>[] getPropertiesTasks = new Task<string>[2];
 
+            // Add a delay to prevent rate limiting
             Thread.Sleep(50);
             getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
             getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLink(responseItem.Id) : new Task<string>(() => "");
+
             if (getPropertiesTasks[1].Status == TaskStatus.Created)
                 getPropertiesTasks[1].Start();
 
@@ -145,25 +133,46 @@ public class SquareDalUtility : ISquareUtility
         return catalogItem;
     }
 
+    public async Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembers()
+    {
+        IEnumerable<TeamMemberBookingProfile> teamMembers = await squareSdkDal.GetAllTeamMembers();
+
+        if (teamMembers.Any())
+        {
+            IEnumerable<SquareTeamMember> squareTeamMembers = teamMembers
+                .Where(teamMember => teamMember.IsBookable == true)
+                .Select(teamMember =>
+            {
+                SquareTeamMember mappedTeamMember = new (teamMember.TeamMemberId,
+                    teamMember.DisplayName, 
+                    teamMember.Description, 
+                    teamMember.ProfileImageUrl);
+
+                return mappedTeamMember;
+            });
+
+            return squareTeamMembers;
+        }
+
+        return [];
+    }
+
     /// <summary>
     /// Search for the image url in the response, it isn't in the same spot for all item types
     /// </summary>
     /// <param name="response">Catolog API response object</param>
     /// <returns>Image URL if found, empty string if not</returns>
-    private string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
+    private static string findImageUrlFromCatalogObjectResponse(RetrieveCatalogObjectResponse response)
     {
         // Check main object
         string? imageUrl = response?.MObject?.ImageData?.Url;
 
-        if (imageUrl == null)
-        {
-            // Check the related objects
-            imageUrl = response?.RelatedObjects
-                           ?.Where(x => x.ImageData != null)
-                           ?.FirstOrDefault()
-                           ?.ImageData
-                           ?.Url;
-        }
+        // Check the related objects
+        imageUrl ??= response?.RelatedObjects
+                        ?.Where(x => x.ImageData != null)
+                        ?.FirstOrDefault()
+                        ?.ImageData
+                        ?.Url;
 
         return imageUrl ?? "";
     }

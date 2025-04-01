@@ -4,7 +4,7 @@ using Square.Authentication;
 using Square.Exceptions;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 using static VibeFunctionsIsolated.Enums.SquareEnums;
 
 namespace VibeFunctionsIsolated.DAL;
@@ -23,6 +23,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         this.logger = logger;
         squareClient = InitializeClient();
     }
+
     public static SquareClient InitializeClient()
     {
         BearerAuthModel bearerAuth = new BearerAuthModel.Builder(System.Environment.GetEnvironmentVariable("SquareProduction")).Build();
@@ -100,6 +101,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return response;
     }
+
     public async Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryInfo)
     {
         List<string> objectTypes =
@@ -108,21 +110,21 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         ];
 
         CatalogQueryExact exactQuery = new CatalogQueryExact.Builder(attributeName: "parent_category", attributeValue: categoryInfo.Id)
-        .Build();
+            .Build();
 
         var searchQuery = new CatalogQuery.Builder()
-          .ExactQuery(exactQuery)
-          .Build();
+            .ExactQuery(exactQuery)
+            .Build();
 
 
         SearchCatalogObjectsRequest requestBody = new SearchCatalogObjectsRequest.Builder()
-          .ObjectTypes(objectTypes)
-          .Query(searchQuery)
-          .Build();
+            .ObjectTypes(objectTypes)
+            .Query(searchQuery)
+            .Build();
 
         SearchCatalogObjectsResponse? response = await SearchCatalogObjects(requestBody);
 
-        if (response?.Errors != null)
+        if (response?.Errors is not null)
         {
             logger.LogError($"{nameof(SearchCategoryObjectsByParentId)} returned null");
         }
@@ -148,9 +150,9 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         return response;
     }
 
-    public async Task<string> GetImageURL(string? imageId)
+    public async Task<string> GetImageURL(string? itemId)
     {
-        if (imageId == null || imageId == "")
+        if (itemId == null || itemId == "")
             return "";
 
         string imageUrl;
@@ -158,7 +160,7 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         try
         {
-            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: imageId);
+            item = await squareClient.CatalogApi.RetrieveCatalogObjectAsync(objectId: itemId);
         }
         catch (Exception ex)
         {
@@ -170,5 +172,19 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         imageUrl = item?.MObject?.ImageData?.Url ?? "";
 
         return imageUrl;
+    }
+
+    public async Task<IEnumerable<TeamMemberBookingProfile>> GetAllTeamMembers()
+    {
+        ListTeamMemberBookingProfilesResponse response = await squareClient.BookingsApi.ListTeamMemberBookingProfilesAsync();
+
+        if(response.Errors.Any())
+        {
+            logger.LogError("API response threw errors: {message}", response.Errors.ToString());
+
+            return [];
+        }
+
+        return response.TeamMemberBookingProfiles;
     }
 }
