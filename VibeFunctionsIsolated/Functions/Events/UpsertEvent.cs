@@ -31,8 +31,6 @@ namespace VibeFunctionsIsolated.Functions.Events
 
             CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertItemAsync(calendarEvent, calendarEvent.EventId);
 
-
-
             return new OkObjectResult(upsertedEvent);
         }
     }

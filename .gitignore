@@ -262,3 +262,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/VibeFunctionsIsolated/Properties/PublishProfiles/TheVibeFunctions - Zip Deploy1.pubxml
+/VibeFunctionsIsolated/Properties/serviceDependencies.TheVibeFunctions - Zip Deploy1.json
+/VibeFunctionsIsolated/Properties/ServiceDependencies/TheVibeFunctions - Zip Deploy1/profile.arm.json
+/VibeFunctionsIsolated/Properties/ServiceDependencies/TheVibeFunctions - Zip Deploy1/storage1.arm.json
