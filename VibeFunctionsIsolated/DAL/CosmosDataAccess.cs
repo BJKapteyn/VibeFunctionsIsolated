@@ -16,9 +16,9 @@ public class CosmosDataAccess : ICosmosDataAccess
     public CosmosDataAccess(ILogger<CosmosDataAccess> logger)
     {
         this.logger = logger;
-        string? cosmosKey = System.Environment.GetEnvironmentVariable("CosmosDBKey");
-        string? cosmosEndpoint = System.Environment.GetEnvironmentVariable("CosmosDBEndpoint");
-        string? comsosDBId = System.Environment.GetEnvironmentVariable("CosmosDBId");
+        string? cosmosKey = Environment.GetEnvironmentVariable("CosmosDBKey");
+        string? cosmosEndpoint = Environment.GetEnvironmentVariable("CosmosDBEndpoint");
+        string? comsosDBId = Environment.GetEnvironmentVariable("CosmosDBId");
         
 
         if (string.IsNullOrEmpty(cosmosKey) || string.IsNullOrEmpty(cosmosEndpoint) || string.IsNullOrEmpty(comsosDBId))

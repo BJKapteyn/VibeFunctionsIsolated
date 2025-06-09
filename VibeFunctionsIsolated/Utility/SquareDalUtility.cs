@@ -74,7 +74,7 @@ public class SquareDalUtility : ISquareUtility
 
             Thread.Sleep(50);
             getPropertiesTasks[0] = squareSdkDal.GetImageURL(imageId);
-            getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLink(responseItem.Id) : new Task<string>(() => "");
+            getPropertiesTasks[1] = needsBuyNowLinks ? squareApiDal.GetBuyNowLinkAsync(responseItem.Id) : new Task<string>(() => "");
             if (getPropertiesTasks[1].Status == TaskStatus.Created)
                 getPropertiesTasks[1].Start();
 

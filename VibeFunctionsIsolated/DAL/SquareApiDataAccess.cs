@@ -23,7 +23,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         client = new HttpClient();
     }
 
-    public async Task<string> GetBuyNowLink(string imageId)
+    public async Task<string> GetBuyNowLinkAsync(string imageId)
     {
         string buyNowLink = "";
         string getItemEndpoint = $"https://connect.squareup.com/v2/catalog/object/{imageId}";

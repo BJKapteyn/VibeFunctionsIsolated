@@ -34,7 +34,7 @@ public class GetBuyNowLinkByItemId
             return new BadRequestResult();
         }
 
-        string response = await squareApiDal.GetBuyNowLink(categoryInfo.Id);
+        string response = await squareApiDal.GetBuyNowLinkAsync(categoryInfo.Id);
 
         if (response.Length <= 0)
         {
