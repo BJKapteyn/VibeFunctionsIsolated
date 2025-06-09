@@ -15,11 +15,12 @@ namespace VibeFunctionsIsolated.Utility
         public CosmosUtility(ICosmosDataAccess cosmosDataAccess)
         {
             this.cosmosDataAccess = cosmosDataAccess;
+            cosmosDataAccess.ChangeContainerName("Events");
         }
 
         public async Task<IEnumerable<CalendarEvent>> MapAllCalendarEventsFromResponse()
         {
-            const string query = "SELECT * FROM c WHERE c.type = 'CalendarEvent'";
+            const string query = "SELECT * FROM c";
             IEnumerable<CalendarEvent> calendarEvents = await cosmosDataAccess.GetItemsAsync<CalendarEvent>(query);
 
             return calendarEvents;

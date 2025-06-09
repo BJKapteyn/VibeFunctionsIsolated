@@ -28,8 +28,8 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         string buyNowLink = "";
         string getItemEndpoint = $"https://connect.squareup.com/v2/catalog/object/{imageId}";
 
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, getItemEndpoint);
-        request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
+        HttpRequestMessage request = new(HttpMethod.Get, getItemEndpoint);
+        request.Headers.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
         string jsonResponseBody = await GetJsonStringResponse(request);
@@ -38,7 +38,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         {
             using (JsonDocument jsonBody = JsonDocument.Parse(jsonResponseBody))
             {
-                List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+                List<SquareItemRawData> squareItems = [];
                 JsonElement root = jsonBody.RootElement;
                 JsonElement squareObject;
 
@@ -59,15 +59,15 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         return buyNowLink;
     }
 
-    public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo)
+    public async Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawDataAsync(CatalogInformation catalogInfo)
     {
         string getItemEndpoint = "https://connect.squareup.com/v2/catalog/search-catalog-items";
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, getItemEndpoint);
+        HttpRequestMessage request = new(HttpMethod.Post, getItemEndpoint);
 
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
-        GetItemByIdRequestInfo requestInfo = new GetItemByIdRequestInfo(catalogInfo.Id);
+        GetItemByIdRequestInfo requestInfo = new(catalogInfo.Id);
 
         request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
@@ -75,13 +75,13 @@ public class SquareApiDataAccess : ISquareApiDataAccess
          
         if (responseJsonString != "")
         {
-            return new List<SquareItemRawData>();
+            return [];
 
         }
 
         using (JsonDocument jsonBody = JsonDocument.Parse(responseJsonString))
         {
-            List<SquareItemRawData> squareItems = new List<SquareItemRawData>();
+            List<SquareItemRawData> squareItems = [];
             JsonElement root = jsonBody.RootElement;
             JsonElement items;
             bool hasItemsProperty = root.TryGetProperty("items", out items);
@@ -90,10 +90,10 @@ public class SquareApiDataAccess : ISquareApiDataAccess
             {
                 foreach (JsonElement item in items.EnumerateArray())
                 {
-                    JsonElement itemData = new ();
+                    JsonElement itemData = new();
                     item.TryGetProperty("item_data", out itemData);
 
-                    JsonElement id = new ();
+                    JsonElement id = new();
                     item.TryGetProperty("id", out id);
 
                     string itemId = id.GetString() ?? "";
@@ -123,7 +123,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
             if (response.StatusCode.Equals(HttpStatusCode.OK) == false)
             {
-                StringBuilder stringBuild = new StringBuilder();
+                StringBuilder stringBuild = new();
                 stringBuild.AppendLine(response.ReasonPhrase ?? "");
                 stringBuild.AppendLine(request.Content?.ToString() ?? "");
                 throw new HttpRequestException(stringBuild.ToString(), null, response.StatusCode);
