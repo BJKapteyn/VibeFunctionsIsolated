@@ -19,7 +19,10 @@ namespace VibeFunctionsIsolated.Utility
 
         public async Task<IEnumerable<CalendarEvent>> MapAllCalendarEventsFromResponse()
         {
+            const string query = "SELECT * FROM c WHERE c.type = 'CalendarEvent'";
+            IEnumerable<CalendarEvent> calendarEvents = await cosmosDataAccess.GetItemsAsync<CalendarEvent>(query);
 
+            return calendarEvents;
         }
     }
 }
