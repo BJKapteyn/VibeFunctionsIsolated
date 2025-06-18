@@ -1,19 +1,33 @@
 ﻿using System.Text.Json.Serialization;
+using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
 
 [JsonSerializable(typeof(CalendarEvent))]
-public class CalendarEvent(string eventId, string name, string? description, DateTime startDate, DateTime? endDate)
+public class CalendarEvent : ICosmosItem
 {
-    public string? id = null;
-    [JsonPropertyName("eventId")]
-    public string EventId { get; set; } = eventId;
-    [JsonPropertyName("eventName")]
-    public string EventName { get; set; } = name;
-    [JsonPropertyName("eventDescription")]
-    public string? EventDescription { get; set; } = description;
-    [JsonPropertyName("startDate")]
-    public DateTime StartDate { get; set; } = startDate;
-    [JsonPropertyName("endDate")]
-    public DateTime? EndDate { get; set; } = endDate;
+    public CalendarEvent(
+       string id,
+       string eventId,
+       string eventName,
+       string? eventDescription,
+       DateTime startDate,
+       DateTime? endDate)
+    {
+        this.id = id ?? Guid.NewGuid().ToString();
+        EventId = eventId;
+        EventName = eventName;
+        EventDescription = eventDescription;
+        StartDate = startDate;
+        EndDate = endDate;
+        PartitionKey = startDate.ToString();
+    }
+
+    public string id { get; set; }
+    public string PartitionKey { get; set; }
+    public string EventId { get; set; }
+    public string EventName { get; set; }
+    public string? EventDescription { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }

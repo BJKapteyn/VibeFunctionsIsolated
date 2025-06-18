@@ -67,7 +67,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         request.Headers.Add("Authorization", $"Bearer {System.Environment.GetEnvironmentVariable("SquareProduction")}");
         request.Headers.Add("Accept", "application/json");
 
-        GetItemByIdRequestInfo requestInfo = new(catalogInfo.Id);
+        GetItemByIdRequestProps requestInfo = new(catalogInfo.Id);
 
         request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
 
