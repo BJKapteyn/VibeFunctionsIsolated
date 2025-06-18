@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.DAL;
 
@@ -39,7 +38,7 @@ public class CosmosDataAccess : ICosmosDataAccess
         container = cosmosClient.GetContainer(container.Database.Id, containerName);
     }
 
-    public async Task<IEnumerable<T>> GetItemsAsync<T>(string query, DateTime startDate)
+    public async Task<IEnumerable<T>> GetItemsAsync<T>(string query)
     {
         List<T> items = [];
         QueryDefinition queryDefinition = new(query);
@@ -54,11 +53,11 @@ public class CosmosDataAccess : ICosmosDataAccess
         return items;
     }
 
-    public async Task<T?> GetItemAsync<T>(string id)
+    public async Task<IVibeCosmosItem?> GetItemAsync<IVibeCosmosItem>(string id)
     {
         try
         {
-            ItemResponse<T> response = await container.ReadItemAsync<T>(id, new PartitionKey(id));
+            ItemResponse<IVibeCosmosItem> response = await container.ReadItemAsync<IVibeCosmosItem>(id, new PartitionKey(id));
 
             return response.Resource;
         }
@@ -70,17 +69,16 @@ public class CosmosDataAccess : ICosmosDataAccess
         return default;
     }
 
-    public async Task<bool> UpsertItemAsync<ICosmosItem>(ICosmosItem item, string? updatedItemId = null)
+    public async Task<IVibeCosmosItem> UpsertItemAsyncCommand<IVibeCosmosItem>(IVibeCosmosItem item, string? updatedItemId = null)
     {
-        ItemResponse<T> response = await container.UpsertItemAsync(item);
-        bool didUpsert = true;
+
+        ItemResponse<IVibeCosmosItem> response = await container.UpsertItemAsync<IVibeCosmosItem>(item, item.PartitionKey);
 
         if (response.StatusCode != System.Net.HttpStatusCode.OK || response.StatusCode != System.Net.HttpStatusCode.Created)
         {
             Type? upsertType = item?.GetType();
             logger.LogError("Error updating item with {updateItemId} and type {upsertType} in CosmosDB", updatedItemId, upsertType);
 
-            didUpsert = false;
         }
 
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -92,7 +90,7 @@ public class CosmosDataAccess : ICosmosDataAccess
             logger.LogInformation("Item with {updateItemId} created in CosmosDB", updatedItemId);
         }
 
-        return didUpsert;
+        return response.Resource;
     }
 
     public async Task<T> DeleteItemAsync<T>(string id)
@@ -101,4 +99,5 @@ public class CosmosDataAccess : ICosmosDataAccess
 
         return item;
     }
+
 }

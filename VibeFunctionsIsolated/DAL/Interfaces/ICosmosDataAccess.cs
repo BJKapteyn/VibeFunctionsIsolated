@@ -19,14 +19,14 @@ public interface ICosmosDataAccess
     /// <returns></returns>
     Task<T> DeleteItemAsync<T>(string id);
     Task<T?> GetItemAsync<T>(string id);
-    Task<IEnumerable<T>> GetItemsAsync<T>(string query);
+    Task<IEnumerable<VibeFunctionsIsolated>> GetItemsAsync<VibeFunctionsIsolated>(string query);
 
     /// <summary>
     /// Insert an item into the container
     /// </summary>
-    /// <typeparam name="T">Type of model to be inserted</typeparam>
+    /// <typeparam name="ICosmosModel">Type of cosmos item to be inserted</typeparam>
     /// <param name="id">Id of item to be updated if it already exists</param>
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
-    Task<T> UpsertItemAsync<T>(T item, string? id = null);
+    Task<IVibeCosmosItem> UpsertItemAsyncCommand<IVibeCosmosItem>(IVibeCosmosItem item, string? updatedItemId = null);
 }

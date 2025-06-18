@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.Azure.Cosmos;
+using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
 
 [JsonSerializable(typeof(CalendarEvent))]
-public class CalendarEvent : ICosmosItem
+public class CalendarEvent : IVibeCosmosItem
 {
     public CalendarEvent(
        string id,
@@ -20,11 +21,11 @@ public class CalendarEvent : ICosmosItem
         EventDescription = eventDescription;
         StartDate = startDate;
         EndDate = endDate;
-        PartitionKey = startDate.ToString();
+        PartitionKey = new PartitionKey(startDate.ToString());
     }
 
     public string id { get; set; }
-    public string PartitionKey { get; set; }
+    public PartitionKey PartitionKey { get; set; }
     public string EventId { get; set; }
     public string EventName { get; set; }
     public string? EventDescription { get; set; }
