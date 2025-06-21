@@ -5,7 +5,7 @@ using VibeFunctionsIsolated.Models.Interfaces;
 namespace VibeFunctionsIsolated.Models.Cosmos;
 
 [JsonSerializable(typeof(CalendarEvent))]
-public class CalendarEvent : IVibeCosmosItem
+public class CalendarEvent : ICosmosItem
 {
     public CalendarEvent(
        string id,

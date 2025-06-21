@@ -1,4 +1,6 @@
-﻿namespace VibeFunctionsIsolated.DAL.Interfaces;
+﻿using VibeFunctionsIsolated.Models.Interfaces;
+
+namespace VibeFunctionsIsolated.DAL.Interfaces;
 
 /// <summary>
 /// Interface for CosmosDB data access
@@ -17,9 +19,9 @@ public interface ICosmosDataAccess
     /// <typeparam name="T">Type of item to delete from the container</typeparam>
     /// <param name="id">Id of item to delete</param>
     /// <returns></returns>
-    Task<T> DeleteItemAsync<T>(string id);
-    Task<T?> GetItemAsync<T>(string id);
-    Task<IEnumerable<VibeFunctionsIsolated>> GetItemsAsync<VibeFunctionsIsolated>(string query);
+    Task<ICosmosItem> DeleteItemAsync<ICosmosItem>(string id);
+    Task<ICosmosItem> GetItemAsync(string id);
+    Task<IEnumerable<ICosmosItem>> GetItemsAsync(string query);
 
     /// <summary>
     /// Insert an item into the container
@@ -28,5 +30,5 @@ public interface ICosmosDataAccess
     /// <param name="id">Id of item to be updated if it already exists</param>
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
-    Task<IVibeCosmosItem> UpsertItemAsyncCommand<IVibeCosmosItem>(IVibeCosmosItem item, string? updatedItemId = null);
+    Task<ICosmosItem> UpsertItemAsyncCommand(ICosmosItem item, string? updatedItemId = null);
 }
