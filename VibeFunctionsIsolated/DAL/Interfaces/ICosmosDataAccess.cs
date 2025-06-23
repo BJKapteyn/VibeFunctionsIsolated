@@ -1,4 +1,5 @@
-﻿using VibeFunctionsIsolated.Models.Interfaces;
+﻿using Microsoft.Azure.Cosmos;
+using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.DAL.Interfaces;
 
@@ -20,8 +21,22 @@ public interface ICosmosDataAccess
     /// <param name="id">Id of item to delete</param>
     /// <returns></returns>
     Task<ICosmosItem> DeleteItemAsync<ICosmosItem>(string id);
-    Task<ICosmosItem> GetItemAsync(string id);
-    Task<IEnumerable<ICosmosItem>> GetItemsAsync(string query);
+
+    /// <summary>
+    /// Get an item from the container by id and partition key
+    /// </summary>
+    /// <param name="id">Guid for item to retrieve</param>
+    /// <param name="partitionKey">Partition Key for the item to be retrieved</param>
+    /// <returns></returns>
+    Task<ICosmosItem> GetItemAsync(string id, PartitionKey partitionKey);
+
+    /// <summary>
+    /// Get all Items from the container using a query
+    /// </summary>
+    /// <typeparam name="ICosmosItem"></typeparam>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    Task<IEnumerable<ICosmosItem>> GetAllItemsAsync<ICosmosItem>(string query);
 
     /// <summary>
     /// Insert an item into the container
@@ -30,5 +45,5 @@ public interface ICosmosDataAccess
     /// <param name="id">Id of item to be updated if it already exists</param>
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
-    Task<ICosmosItem> UpsertItemAsyncCommand(ICosmosItem item, string? updatedItemId = null);
+    Task<ItemResponse<TCosmosItem>> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem item, string? updatedItemId = null) where TCosmosItem : ICosmosItem;
 }

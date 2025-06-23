@@ -30,6 +30,7 @@ public class CosmosDataAccess : ICosmosDataAccess
             throw new ArgumentNullException(cosmosKey, errorMessage);
         }
 
+        // needs to be changed to a singleton
         cosmosClient = new CosmosClient(cosmosEndpoint, cosmosKey);
         container = cosmosClient.GetContainer(comsosDBId, "Events");
     }
@@ -39,12 +40,13 @@ public class CosmosDataAccess : ICosmosDataAccess
         container = cosmosClient.GetContainer(container.Database.Id, containerName);
     }
 
-    public async Task<IEnumerable<ICosmosItem>> GetItemsAsync(string query)
+    public async Task<IEnumerable<ICosmosItem>> GetAllItemsAsync<ICosmosItem>(string query)
     {
         List<ICosmosItem> items = [];
         QueryDefinition queryDefinition = new(query);
         cosmosClient.GetContainer(container.Database.Id, container.Id);
         FeedIterator<ICosmosItem> feedIterator = container.GetItemQueryIterator<ICosmosItem>(queryDefinition);
+
         while (feedIterator.HasMoreResults)
         {
             FeedResponse<ICosmosItem> response = await feedIterator.ReadNextAsync();
@@ -54,74 +56,27 @@ public class CosmosDataAccess : ICosmosDataAccess
         return items;
     }
 
-    public async Task<ICosmosItem> GetItemAsync(string id)
+    public async Task<ICosmosItem> GetItemAsync(string id, PartitionKey partitionKey)
     {
-        ItemResponse<ICosmosItem> response = await container.ReadItemAsync<ICosmosItem>(id, new PartitionKey(id));
-        //try
-        //{
+        ItemResponse<ICosmosItem> response = await container.ReadItemAsync<ICosmosItem>(id, partitionKey);
+        
 
-        //    return response.Resource;
-        //}
-        //catch (CosmosException ex)
-        //{
-        //    logger.LogError(ex, "Error getting item from CosmosDB");
-        //}
 
         return response.Resource;
     }
 
-    public async Task<ICosmosItem> UpsertItemAsyncCommand(ICosmosItem cosmosItem, string? updatedItemId = null)
+    public async Task<ItemResponse<TCosmosItem>> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? updatedItemId = null) where TCosmosItem : ICosmosItem
     {
-        ItemResponse<ICosmosItem> response = await container.UpsertItemAsync(cosmosItem, cosmosItem.PartitionKey);
+        ItemResponse<TCosmosItem> response;
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        using (cosmosClient)
         {
-            logger.LogInformation("Item with {updateItemId} updated in CosmosDB", updatedItemId);
-            // Additional logic for update success can go here
-        }
-        else if (response.StatusCode == System.Net.HttpStatusCode.Created)
-        {
-            logger.LogInformation("Item with {updateItemId} created in CosmosDB", updatedItemId);
-            // Additional logic for create success can go here
-        }
-        else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            logger.LogWarning("Item with {updateItemId} not found in CosmosDB", updatedItemId);
-            // Handle not found case
-        }
-        else
-        {
-            Type? upsertType = cosmosItem?.GetType();
-            logger.LogError("Error updating item with {updateItemId} and type {upsertType} in CosmosDB. StatusCode: {statusCode}", updatedItemId, upsertType, response.StatusCode);
-            // Handle other error cases
+            response = await container.UpsertItemAsync(cosmosItem);
         }
 
-        return response.Resource;
+
+        return response;
     }
-
-    //public async Task<IVibeCosmosItem> UpsertItemAsyncCommand<IVibeCosmosItem>(IVibeCosmosItem item, string? updatedItemId = null)
-    //{
-
-    //    ItemResponse<IVibeCosmosItem> response = await container.UpsertItemAsync<IVibeCosmosItem>(item, item.PartitionKey);
-
-    //    if (response.StatusCode != System.Net.HttpStatusCode.OK || response.StatusCode != System.Net.HttpStatusCode.Created)
-    //    {
-    //        Type? upsertType = item?.GetType();
-    //        logger.LogError("Error updating item with {updateItemId} and type {upsertType} in CosmosDB", updatedItemId, upsertType);
-
-    //    }
-
-    //    if (response.StatusCode == System.Net.HttpStatusCode.OK)
-    //    {
-    //        logger.LogInformation("Item with {updateItemId} updated in CosmosDB", updatedItemId);
-    //    }
-    //    else if (response.StatusCode == System.Net.HttpStatusCode.Created)
-    //    {
-    //        logger.LogInformation("Item with {updateItemId} created in CosmosDB", updatedItemId);
-    //    }
-
-    //    return response.Resource;
-    //}
 
     public async Task<T> DeleteItemAsync<T>(string id)
     {

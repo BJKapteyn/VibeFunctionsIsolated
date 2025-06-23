@@ -11,9 +11,9 @@ public class GetAllEvents
 {
     private readonly ILogger<GetAllEvents> logger;
 
-    private readonly ICosmosUtility cosmosUtility;
+    private readonly ICosmosCalendarEventUtility cosmosUtility;
 
-    public GetAllEvents(ILogger<GetAllEvents> logger, ICosmosUtility cosmosUtility)
+    public GetAllEvents(ILogger<GetAllEvents> logger, ICosmosCalendarEventUtility cosmosUtility)
     {
         this.logger = logger;
         this.cosmosUtility = cosmosUtility;

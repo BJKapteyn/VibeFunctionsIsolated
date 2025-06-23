@@ -3,7 +3,7 @@ using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Square
 {
-    [JsonSerializable(typeof(SquareItemRawData))]
+    //[JsonSerializable(typeof(SquareItemRawData))]
     public class SquareItemRawData : ISquareCatalogItem
     {
         [JsonPropertyName("id")]

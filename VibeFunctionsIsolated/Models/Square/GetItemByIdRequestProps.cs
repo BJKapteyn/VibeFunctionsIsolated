@@ -2,12 +2,12 @@
 
 namespace VibeFunctionsIsolated.Models.Square
 {
-    [JsonSerializable(typeof(GetItemByIdRequestProps))]
+    //[JsonSerializable(typeof(GetItemByIdRequestProps))]
     public class GetItemByIdRequestProps
     {
         public GetItemByIdRequestProps(string categoryId)
         {
-            CategoryIds = new List<string> { categoryId };
+            CategoryIds = [categoryId];
         }
 
         [JsonPropertyName("category_ids")]

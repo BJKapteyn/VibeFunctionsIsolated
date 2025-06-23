@@ -19,7 +19,7 @@ var host = new HostBuilder()
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
         services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
         services.AddScoped<IApplicationUtility, ApplicationUtility>();
-        services.AddScoped<ICosmosUtility, CosmosUtility>();
+        services.AddScoped<ICosmosCalendarEventUtility, CosmosCalendarEventUtility>();
     })
     .Build();
 

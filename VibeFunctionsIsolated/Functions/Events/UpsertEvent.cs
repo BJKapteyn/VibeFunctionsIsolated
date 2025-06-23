@@ -29,9 +29,9 @@ namespace VibeFunctionsIsolated.Functions.Events
                 return new BadRequestObjectResult("Invalid request body");
             }
 
-            CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertItemAsyncCommand(calendarEvent, calendarEvent.EventId);
+            CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.EventId);
 
-            return new OkObjectResult(upsertedEvent);
+            return new OkResult();
         }
     }
 }

@@ -4,7 +4,7 @@ using VibeFunctionsIsolated.Models.Cosmos;
 
 namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
 {
-    public interface ICosmosUtility
+    public interface ICosmosCalendarEventUtility
     {
         /// <summary>
         /// Maps all calendar events from the Cosmos DB response to an  of CalendarEvent objects.
