@@ -1,4 +1,5 @@
-﻿using VibeFunctionsIsolated.Models.Cosmos;
+﻿using Microsoft.AspNetCore.Mvc;
+using VibeFunctionsIsolated.Models.Cosmos;
 
 namespace VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
@@ -15,5 +16,6 @@ public interface ICosmosCalendarEventUtility
     /// </summary>
     /// <param name="calendarEvent">Event to upsert</param>
     /// <returns>Calendar event it upserted</returns>
-    Task<CalendarEvent?> UpsertCalendarEvent(CalendarEvent calendarEvent);
+    Task<IActionResult> UpsertCalendarEvent(CalendarEvent calendarEvent);
+
 }

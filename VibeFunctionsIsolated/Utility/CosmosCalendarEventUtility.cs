@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
-using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility
@@ -27,7 +27,7 @@ namespace VibeFunctionsIsolated.Utility
             return calendarEvents;
         }
 
-        public async Task<CalendarEvent?> UpsertCalendarEvent(CalendarEvent calendarEvent)
+        public async Task<IActionResult> UpsertCalendarEvent(CalendarEvent calendarEvent)
         {
             if (calendarEvent == null)
             {
@@ -38,23 +38,33 @@ namespace VibeFunctionsIsolated.Utility
 
             if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                logger.LogInformation("Item with {updateItemId} updated in CosmosDB", upsertResponse);
+                logger.LogInformation("Item with id {0} updated in CosmosDB", calendarEvent.id);
+                
+                return new OkResult();
             }
             else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                logger.LogInformation("Item with {updateItemId} created in CosmosDB", upsertResponse);
-            }
-            else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                logger.LogWarning("Item with {updateItemId} not found in CosmosDB", upsertResponse);
-            }
-            else
-            {
-                Type? upsertType = upsertResponse?.Resource.GetType();
-                logger.LogError("Error updating item with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
+                logger.LogInformation("Item with id {0} created in CosmosDB", calendarEvent.id);
+
+                return new CreatedResult();
             }
 
-            return upsertResponse?.Resource;
+            Type? upsertType = upsertResponse?.Resource.GetType();
+            logger.LogError("Error updating or creating item with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
+
+            return new BadRequestResult();
         }
+
+        //private IActionResult CreateResponseCode(System.Net.HttpStatusCode statusCode, string crudMethodName)
+        //{
+           
+        //    return statusCode switch
+        //    {
+        //        System.Net.HttpStatusCode.OK => new OkObjectResult(resource),
+        //        System.Net.HttpStatusCode.Created => new CreatedResult($"/{resource}", resource),
+        //        System.Net.HttpStatusCode.NotFound => new NotFoundObjectResult(resource),
+        //        _ => new StatusCodeResult((int)statusCode)
+        //    };
+        //}
     }
 }
