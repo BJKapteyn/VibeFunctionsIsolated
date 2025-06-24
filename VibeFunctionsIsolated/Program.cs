@@ -15,11 +15,11 @@ var host = new HostBuilder()
         services.AddHttpClient();
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<ISquareUtility, SquareDalUtility>();
+        services.AddSingleton<ICosmosCalendarEventUtility, CosmosCalendarEventUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
         services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
         services.AddScoped<IApplicationUtility, ApplicationUtility>();
-        services.AddScoped<ICosmosCalendarEventUtility, CosmosCalendarEventUtility>();
     })
     .Build();
 

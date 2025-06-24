@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Events;

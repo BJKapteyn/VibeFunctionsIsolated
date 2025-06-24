@@ -8,12 +8,12 @@ namespace VibeFunctionsIsolated.Models.Cosmos;
 public class CalendarEvent : ICosmosItem
 {
     public CalendarEvent(
-       string id,
        string eventId,
        string eventName,
        string? eventDescription,
        DateTime startDate,
-       DateTime? endDate)
+       DateTime? endDate,
+       string? id)
     {
         this.id = id ?? Guid.NewGuid().ToString();
         EventId = eventId;

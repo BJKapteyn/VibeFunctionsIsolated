@@ -8,12 +8,17 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Events
 {
-    public class UpsertCalendarEvent(ILogger<UpsertCalendarEvent> logger, ICosmosDataAccess cosmosDataAccess, IApplicationUtility applicationUtility)
+    public class UpsertCalendarEvent(
+            ILogger<UpsertCalendarEvent> logger,
+            ICosmosDataAccess cosmosDataAccess,
+            IApplicationUtility applicationUtility,
+            ICosmosCalendarEventUtility cosmosCalendarEventUtility)
     {
         private readonly string containerName = "Events";
         private readonly ILogger<UpsertCalendarEvent> logger = logger;
         private readonly ICosmosDataAccess cosmosDataAccess = cosmosDataAccess;
         private readonly IApplicationUtility applicationUtility = applicationUtility;
+        private readonly ICosmosCalendarEventUtility cosmosCalendarEventUtility = cosmosCalendarEventUtility;
 
         [Function("UpsertCalendarEvent")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -29,9 +34,9 @@ namespace VibeFunctionsIsolated.Functions.Events
                 return new BadRequestObjectResult("Invalid request body");
             }
 
-            CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.EventId);
+            IActionResult result = await cosmosCalendarEventUtility.UpsertCalendarEvent(calendarEvent);
 
-            return new OkResult();
+            return result;
         }
     }
 }
