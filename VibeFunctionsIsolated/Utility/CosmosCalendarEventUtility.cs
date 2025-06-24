@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility
@@ -22,38 +24,37 @@ namespace VibeFunctionsIsolated.Utility
         {
             const string query = "SELECT * FROM c";
             IEnumerable<CalendarEvent> calendarEvents = await cosmosDataAccess.GetAllItemsAsync<CalendarEvent>(query);
-
             return calendarEvents;
         }
 
-        public async Task<CalendarEvent> UpsertCalendarEvent(CalendarEvent calendarEvent)
+        public async Task<CalendarEvent?> UpsertCalendarEvent(CalendarEvent calendarEvent)
         {
             if (calendarEvent == null)
             {
                 throw new ArgumentNullException(nameof(CalendarEvent), "Calendar event cannot be null");
             }
 
-            CalendarEvent upsertedEvent = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.id);
+            ItemResponse<CalendarEvent> upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.id);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                logger.LogInformation("Item with {updateItemId} updated in CosmosDB", updatedItemId);
+                logger.LogInformation("Item with {updateItemId} updated in CosmosDB", upsertResponse);
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Created)
+            else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                logger.LogInformation("Item with {updateItemId} created in CosmosDB", updatedItemId);
+                logger.LogInformation("Item with {updateItemId} created in CosmosDB", upsertResponse);
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                logger.LogWarning("Item with {updateItemId} not found in CosmosDB", updatedItemId);
+                logger.LogWarning("Item with {updateItemId} not found in CosmosDB", upsertResponse);
             }
             else
             {
-                Type? upsertType = cosmosItem?.GetType();
-                logger.LogError("Error updating item with {updateItemId} and type {upsertType} in CosmosDB. StatusCode: {statusCode}", updatedItemId, upsertType, response.StatusCode);
+                Type? upsertType = upsertResponse?.Resource.GetType();
+                logger.LogError("Error updating item with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
             }
 
-            return upsertedEvent;
+            return upsertResponse?.Resource;
         }
     }
 }

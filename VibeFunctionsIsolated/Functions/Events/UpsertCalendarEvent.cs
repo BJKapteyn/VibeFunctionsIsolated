@@ -8,14 +8,14 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Events
 {
-    public class UpsertEvent(ILogger<UpsertEvent> logger, ICosmosDataAccess cosmosDataAccess, IApplicationUtility applicationUtility)
+    public class UpsertCalendarEvent(ILogger<UpsertCalendarEvent> logger, ICosmosDataAccess cosmosDataAccess, IApplicationUtility applicationUtility)
     {
         private readonly string containerName = "Events";
-        private readonly ILogger<UpsertEvent> logger = logger;
+        private readonly ILogger<UpsertCalendarEvent> logger = logger;
         private readonly ICosmosDataAccess cosmosDataAccess = cosmosDataAccess;
         private readonly IApplicationUtility applicationUtility = applicationUtility;
 
-        [Function("UpsertEvent")]
+        [Function("UpsertCalendarEvent")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
             cosmosDataAccess.ChangeContainerName(containerName);
@@ -24,7 +24,7 @@ namespace VibeFunctionsIsolated.Functions.Events
 
             if (calendarEvent == null)
             {
-                string upsertEventClass = nameof(UpsertEvent);
+                string upsertEventClass = nameof(UpsertCalendarEvent);
                 logger.LogError("{upsertEventClass}: Invalid request body", upsertEventClass);
                 return new BadRequestObjectResult("Invalid request body");
             }

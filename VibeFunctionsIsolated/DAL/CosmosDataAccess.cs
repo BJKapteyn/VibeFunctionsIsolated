@@ -60,8 +60,6 @@ public class CosmosDataAccess : ICosmosDataAccess
     {
         ItemResponse<ICosmosItem> response = await container.ReadItemAsync<ICosmosItem>(id, partitionKey);
         
-
-
         return response.Resource;
     }
 
@@ -73,7 +71,6 @@ public class CosmosDataAccess : ICosmosDataAccess
         {
             response = await container.UpsertItemAsync(cosmosItem);
         }
-
 
         return response;
     }

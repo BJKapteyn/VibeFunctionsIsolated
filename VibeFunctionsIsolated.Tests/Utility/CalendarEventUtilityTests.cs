@@ -1,10 +1,6 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Utility;
 
@@ -12,7 +8,7 @@ namespace VibeFunctionsIsolated.Tests.Utility;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]
-public class CosmosUtilityTests
+public class CalendarEventUtilityTests
 {
     private Mock<ICosmosDataAccess> cosmosDataAccessMock;
     private CosmosCalendarEventUtility cosmosUtility;
@@ -21,7 +17,8 @@ public class CosmosUtilityTests
     public void SetUp()
     {
         cosmosDataAccessMock = new Mock<ICosmosDataAccess>();
-        cosmosUtility = new CosmosUtility(cosmosDataAccessMock.Object);
+        Mock<ILogger<CosmosCalendarEventUtility>> mockLogger = new Mock<ILogger<CosmosCalendarEventUtility>>();
+        cosmosUtility = new CosmosCalendarEventUtility(cosmosDataAccessMock.Object, mockLogger.Object);
     }
 
     [Test]
