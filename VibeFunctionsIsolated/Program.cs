@@ -5,6 +5,7 @@ using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
+using Microsoft.Azure.Cosmos;
 
 
 var host = new HostBuilder()
