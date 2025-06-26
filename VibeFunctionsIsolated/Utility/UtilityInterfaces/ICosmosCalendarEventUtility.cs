@@ -16,6 +16,5 @@ public interface ICosmosCalendarEventUtility
     /// </summary>
     /// <param name="calendarEvent">Event to upsert</param>
     /// <returns>Calendar event it upserted</returns>
-    Task<IActionResult> UpsertCalendarEvent(CalendarEvent calendarEvent);
-
+    Task<bool> UpsertCalendarEvent(CalendarEvent calendarEvent);
 }

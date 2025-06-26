@@ -33,10 +33,11 @@ public interface ICosmosDataAccess
     /// <summary>
     /// Get all Items from the container using a query
     /// </summary>
-    /// <typeparam name="ICosmosItem"></typeparam>
-    /// <param name="query"></param>
-    /// <returns></returns>
-    Task<IEnumerable<ICosmosItem>> GetAllItemsAsync<ICosmosItem>(string query);
+    /// <typeparam name="TCosmosItem">Type of item to retrieve from cosmos container</typeparam>
+    /// <param name="query">Query to retrieve all items</param>
+    /// <returns>Collection of </returns>
+    Task<IEnumerable<TCosmosItem>> GetAllItemsAsync<TCosmosItem>(string query) where TCosmosItem : ICosmosItem;
+
 
     /// <summary>
     /// Insert an item into the container

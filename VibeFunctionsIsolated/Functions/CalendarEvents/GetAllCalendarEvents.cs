@@ -2,17 +2,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.Events;
 
-public class GetAllEvents
+public class GetAllCalendarEvents
 {
-    private readonly ILogger<GetAllEvents> logger;
+    private readonly ILogger<GetAllCalendarEvents> logger;
 
     private readonly ICosmosCalendarEventUtility cosmosUtility;
 
-    public GetAllEvents(ILogger<GetAllEvents> logger, ICosmosCalendarEventUtility cosmosUtility)
+    public GetAllCalendarEvents(ILogger<GetAllCalendarEvents> logger, ICosmosCalendarEventUtility cosmosUtility)
     {
         this.logger = logger;
         this.cosmosUtility = cosmosUtility;
@@ -21,6 +22,7 @@ public class GetAllEvents
     [Function("GetAllEvents")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
+        IEnumerable<CalendarEvent> calendarEvents = cosmosUtility.GetAllCalendarEvents().GetAwaiter().GetResult();
         logger.LogInformation("C# HTTP trigger function processed a request.");
         return new OkObjectResult("Welcome to Azure Functions!");
     }

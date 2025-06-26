@@ -40,16 +40,21 @@ public class CosmosDataAccess : ICosmosDataAccess
         container = cosmosClient.GetContainer(container.Database.Id, containerName);
     }
 
-    public async Task<IEnumerable<ICosmosItem>> GetAllItemsAsync<ICosmosItem>(string query)
+    public async Task<IEnumerable<TCosmosItem>> GetAllItemsAsync<TCosmosItem>(string query) where TCosmosItem : ICosmosItem
     {
-        List<ICosmosItem> items = [];
+        List<TCosmosItem> items = [];
         QueryDefinition queryDefinition = new(query);
-        cosmosClient.GetContainer(container.Database.Id, container.Id);
-        FeedIterator<ICosmosItem> feedIterator = container.GetItemQueryIterator<ICosmosItem>(queryDefinition);
+
+        using (cosmosClient)
+        {
+            cosmosClient.GetContainer(container.Database.Id, container.Id);
+        }
+
+        FeedIterator<TCosmosItem> feedIterator = container.GetItemQueryIterator<TCosmosItem>(queryDefinition);
 
         while (feedIterator.HasMoreResults)
         {
-            FeedResponse<ICosmosItem> response = await feedIterator.ReadNextAsync();
+            FeedResponse<TCosmosItem> response = await feedIterator.ReadNextAsync();
             items.AddRange(response);
         }
 
