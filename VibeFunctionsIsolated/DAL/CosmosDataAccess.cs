@@ -40,22 +40,29 @@ public class CosmosDataAccess : ICosmosDataAccess
         container = cosmosClient.GetContainer(container.Database.Id, containerName);
     }
 
-    public async Task<IEnumerable<TCosmosItem>> GetAllItemsAsync<TCosmosItem>(string query) where TCosmosItem : ICosmosItem
+    public async Task<IEnumerable<TItem>> GetAllItemsAsync<TItem>(string query) where TItem : ICosmosItem
     {
-        List<TCosmosItem> items = [];
+        List<TItem> items = [];
         QueryDefinition queryDefinition = new(query);
 
         using (cosmosClient)
         {
-            cosmosClient.GetContainer(container.Database.Id, container.Id);
+            FeedIterator<TItem> feedIterator = container.GetItemQueryIterator<TItem>(queryDefinition);
+
+            while (feedIterator.HasMoreResults)
+            {
+                FeedResponse<TItem> response = await feedIterator.ReadNextAsync();
+                items.AddRange(response);
+            }
         }
 
-        FeedIterator<TCosmosItem> feedIterator = container.GetItemQueryIterator<TCosmosItem>(queryDefinition);
-
-        while (feedIterator.HasMoreResults)
+        if(items.Count == 0)
         {
-            FeedResponse<TCosmosItem> response = await feedIterator.ReadNextAsync();
-            items.AddRange(response);
+            logger.LogWarning("No items found in container {ContainerName} for query: {Query}", container.Id, query);
+        }
+        else
+        {
+            logger.LogInformation("Retrieved {Count} items from container {ContainerName} for query: {Query}", items.Count, container.Id, query);
         }
 
         return items;

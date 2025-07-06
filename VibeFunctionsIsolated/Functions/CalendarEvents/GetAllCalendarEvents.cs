@@ -19,11 +19,18 @@ public class GetAllCalendarEvents
         this.cosmosUtility = cosmosUtility;
     }
 
-    [Function("GetAllEvents")]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    [Function("GetAllCalendarEvents")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
-        IEnumerable<CalendarEvent> calendarEvents = cosmosUtility.GetAllCalendarEvents().GetAwaiter().GetResult();
-        logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
+        IEnumerable<CalendarEvent> calendarEvents = await cosmosUtility.GetAllCalendarEvents();
+
+        if(calendarEvents.Any())
+        {
+            logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            return new OkObjectResult(calendarEvents);
+        }
+
+        return new BadRequestResult();
     }
 }
