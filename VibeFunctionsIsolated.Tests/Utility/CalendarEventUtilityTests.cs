@@ -19,7 +19,7 @@ public class CalendarEventUtilityTests
     public void SetUp()
     {
         cosmosDataAccessMock = new Mock<ICosmosDataAccess>();
-        Mock<ILogger<CosmosCalendarEventUtility>> mockLogger = new Mock<ILogger<CosmosCalendarEventUtility>>();
+        Mock<ILogger<CosmosCalendarEventUtility>> mockLogger = new();
         cosmosUtility = new CosmosCalendarEventUtility(cosmosDataAccessMock.Object, mockLogger.Object);
     }
 
@@ -34,7 +34,7 @@ public class CalendarEventUtilityTests
      
     }
 
-    public static TestCaseData[] UpsertCalendarEventTestCases()
+    private static TestCaseData[] UpsertCalendarEventTestCases()
     {
 
         return new[]

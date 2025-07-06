@@ -21,11 +21,9 @@ public class CalendarEvent : ICosmosItem
         EventDescription = eventDescription;
         StartDate = startDate;
         EndDate = endDate;
-        PartitionKey = new PartitionKey(startDate.ToString());
     }
 
     public string id { get; set; }
-    public PartitionKey PartitionKey { get; set; }
     public string EventId { get; set; }
     public string EventName { get; set; }
     public string? EventDescription { get; set; }
