@@ -30,9 +30,11 @@ public class BlogPostUtility
     {
         if (blogPost == null)
         {
-            ArgumentNullException argumentNullException = new(nameof(BlogPost), "Blog post cannot be null");
+            ArgumentNullException argumentNullException = new(nameof(blogPost), "Blog post cannot be null");
+
             throw argumentNullException;
         }
+
         bool didUpsert = false;
 
         ItemResponse<BlogPost> upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost, blogPost.id);

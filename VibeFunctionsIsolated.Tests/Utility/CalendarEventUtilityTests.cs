@@ -13,14 +13,14 @@ namespace VibeFunctionsIsolated.Tests.Utility;
 public class CalendarEventUtilityTests
 {
     private Mock<ICosmosDataAccess> cosmosDataAccessMock;
-    private CosmosCalendarEventUtility cosmosUtility;
+    private CalendarEventUtility cosmosUtility;
 
     [SetUp]
     public void SetUp()
     {
         cosmosDataAccessMock = new Mock<ICosmosDataAccess>();
-        Mock<ILogger<CosmosCalendarEventUtility>> mockLogger = new();
-        cosmosUtility = new CosmosCalendarEventUtility(cosmosDataAccessMock.Object, mockLogger.Object);
+        Mock<ILogger<CalendarEventUtility>> mockLogger = new();
+        cosmosUtility = new CalendarEventUtility(cosmosDataAccessMock.Object, mockLogger.Object);
     }
 
     [Test]

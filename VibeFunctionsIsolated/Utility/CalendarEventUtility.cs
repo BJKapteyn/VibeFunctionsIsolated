@@ -6,12 +6,12 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
 
-public class CosmosCalendarEventUtility : ICosmosCalendarEventUtility
+public class CalendarEventUtility : ICosmosCalendarEventUtility
 {
     private readonly ICosmosDataAccess cosmosDataAccess;
-    private readonly ILogger<CosmosCalendarEventUtility> logger;
+    private readonly ILogger<CalendarEventUtility> logger;
 
-    public CosmosCalendarEventUtility(ICosmosDataAccess cosmosDataAccess, ILogger<CosmosCalendarEventUtility> logger)
+    public CalendarEventUtility(ICosmosDataAccess cosmosDataAccess, ILogger<CalendarEventUtility> logger)
     {
         this.cosmosDataAccess = cosmosDataAccess;
         this.logger = logger;
@@ -31,7 +31,7 @@ public class CosmosCalendarEventUtility : ICosmosCalendarEventUtility
     {
         if (calendarEvent == null)
         {
-            throw new ArgumentNullException(nameof(CalendarEvent), "Calendar event cannot be null");
+            throw new ArgumentNullException(nameof(calendarEvent), "Calendar event cannot be null");
         }
         bool didUpsert = false;
 
@@ -39,12 +39,12 @@ public class CosmosCalendarEventUtility : ICosmosCalendarEventUtility
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            logger.LogInformation("Item with id {0} updated in CosmosDB", calendarEvent.id);
+            logger.LogInformation("Item with id {id} updated in CosmosDB", calendarEvent.id);
             didUpsert = true;
         }
         else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
         {
-            logger.LogInformation("Item with id {0} created in CosmosDB", calendarEvent.id);
+            logger.LogInformation("Item with id {id} created in CosmosDB", calendarEvent.id);
             didUpsert = true;
         } else
         {
