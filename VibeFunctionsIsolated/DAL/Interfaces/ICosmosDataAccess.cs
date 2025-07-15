@@ -47,4 +47,5 @@ public interface ICosmosDataAccess
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
     Task<ItemResponse<TCosmosItem>> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem item, string? updatedItemId = null) where TCosmosItem : ICosmosItem;
+
 }

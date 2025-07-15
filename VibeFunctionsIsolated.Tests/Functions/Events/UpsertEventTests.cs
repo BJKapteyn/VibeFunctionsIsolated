@@ -22,4 +22,5 @@ internal class UpsertEventTests
         ICosmosDataAccess = new Mock<ICosmosDataAccess>();
         appUtility = new Mock<IApplicationUtility>();
     }
+
 }
