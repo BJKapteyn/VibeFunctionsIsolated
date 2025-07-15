@@ -6,6 +6,5 @@ namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
     {
         public Task<IEnumerable<BlogPost>> GetAllBlogPosts();
         public Task<bool> UpsertBlogPost(BlogPost blogPost);
-        
     }
 }

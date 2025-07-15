@@ -26,8 +26,10 @@ public class GetAllBlogPosts
         if (blogPosts == null || !blogPosts.Any())
         {
             logger.LogInformation("No blog posts found.");
+
             return new NotFoundResult();
         }
-        return new OkResult();
+
+        return new OkObjectResult(blogPosts);
     }
 }
