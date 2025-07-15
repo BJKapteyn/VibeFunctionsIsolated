@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
@@ -7,36 +8,25 @@ namespace VibeFunctionsIsolated.Models.Cosmos;
 public class BlogPost : ICosmosItem
 {
     public BlogPost(
-    string id,
+    string? id,
     string title,
     string author,
-    DateTime date,
+    DateTime publishDate,
     string content,
     string? imageUrl = null)
     {
-        this.id = id;
+        this.id = id ?? Guid.NewGuid().ToString();
         Title = title;
         Author = author;
-        PublishDate = date;
+        PublishDate = publishDate;
         Content = content;
         ImageUrl = imageUrl;
     }
 
-    [JsonPropertyName("id")]
     public string id { get; set; }
-
-    [JsonPropertyName("title")]
     public string Title { get; set; }
-
-    [JsonPropertyName("author")]
     public string Author { get; set; }
-
-    [JsonPropertyName("date")]
-    DateTime PublishDate { get; set; }
-
-    [JsonPropertyName("content")]
+    public DateTime PublishDate { get; set; }
     public string Content { get; set; }
-
-    [JsonPropertyName("imageUrl")]
     public string? ImageUrl { get; set; }
 }

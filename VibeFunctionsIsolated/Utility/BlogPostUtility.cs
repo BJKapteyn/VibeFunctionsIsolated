@@ -2,10 +2,11 @@
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
 
-public class BlogPostUtility 
+public class BlogPostUtility : IBlogPostUtility
 {
     private readonly ICosmosDataAccess cosmosDataAccess;
     private readonly ILogger<BlogPostUtility> logger;

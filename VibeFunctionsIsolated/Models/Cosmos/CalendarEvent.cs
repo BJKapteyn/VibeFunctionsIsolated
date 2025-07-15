@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Cosmos;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;

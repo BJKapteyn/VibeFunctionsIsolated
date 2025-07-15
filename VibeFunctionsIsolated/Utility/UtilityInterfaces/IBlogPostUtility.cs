@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VibeFunctionsIsolated.Models.Cosmos;
 
 namespace VibeFunctionsIsolated.Utility.UtilityInterfaces
 {
-    internal interface IBlogPostUtility
+    public interface IBlogPostUtility
     {
+        public Task<IEnumerable<BlogPost>> GetAllBlogPosts();
+        public Task<bool> UpsertBlogPost(BlogPost blogPost);
+        
     }
 }
