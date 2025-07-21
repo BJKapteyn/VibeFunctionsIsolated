@@ -1,5 +1,5 @@
 ﻿using Square.Models;
-using VibeFunctionsIsolated.Models;
+using VibeFunctionsIsolated.Models.Square;
 namespace VibeFunctionsIsolated.DAL.Interfaces;
 
 public interface ISquareSdkDataAccess
@@ -11,7 +11,7 @@ public interface ISquareSdkDataAccess
     public Task<RetrieveCatalogObjectResponse?> GetCatalogObjectById(CatalogInformation categoryId);
 
     ///// <summary>
-    ///// Calls the square api directly to get all items (doesn't use SDK)
+    ///// Get all currently active team members
     ///// </summary>
     ///// <returns>Square Item </returns>
     //public Task<IEnumerable<SquareItemRawData>> GetSquareAPIRawData(CatalogInformation catalogInfo);

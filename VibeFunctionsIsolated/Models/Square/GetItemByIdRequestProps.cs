@@ -10,7 +10,6 @@ namespace VibeFunctionsIsolated.Models.Square
             CategoryIds = [categoryId];
         }
 
-        [JsonPropertyName("category_ids")]
-        public List<string> CategoryIds { get; set; }
-    }
+    [JsonPropertyName("category_ids")]
+    public List<string> CategoryIds { get; set; }
 }

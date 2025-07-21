@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models;
 using VibeFunctionsIsolated.Models.Square;
 
 namespace VibeFunctionsIsolated.DAL;
@@ -40,9 +40,8 @@ public class SquareApiDataAccess : ISquareApiDataAccess
             {
                 List<SquareItemRawData> squareItems = [];
                 JsonElement root = jsonBody.RootElement;
-                JsonElement squareObject;
 
-                bool bodyHasObject = root.TryGetProperty("object", out squareObject);
+                bool bodyHasObject = root.TryGetProperty("object", out JsonElement squareObject);
 
                 if (bodyHasObject)
                 {
@@ -69,11 +68,11 @@ public class SquareApiDataAccess : ISquareApiDataAccess
 
         GetItemByIdRequestProps requestInfo = new(catalogInfo.Id);
 
-        request.Content = new StringContent(JsonSerializer.Serialize(catalogInfo));
+        request.Content = new StringContent(JsonSerializer.Serialize(requestInfo));
 
         string responseJsonString = await GetJsonStringResponse(request);
          
-        if (responseJsonString != "")
+        if (responseJsonString == "")
         {
             return [];
 
@@ -83,8 +82,7 @@ public class SquareApiDataAccess : ISquareApiDataAccess
         {
             List<SquareItemRawData> squareItems = [];
             JsonElement root = jsonBody.RootElement;
-            JsonElement items;
-            bool hasItemsProperty = root.TryGetProperty("items", out items);
+            bool hasItemsProperty = root.TryGetProperty("items", out JsonElement items);
 
             if (hasItemsProperty)
             {
