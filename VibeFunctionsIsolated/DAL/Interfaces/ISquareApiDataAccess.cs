@@ -13,7 +13,7 @@ namespace VibeFunctionsIsolated.DAL.Interfaces
         /// </summary>
         /// <param name="id">item's Id</param>
         /// <returns>The item's buy now link if found, empty string if not</returns>
-        public Task<string> GetBuyNowLinkAsync(string id);
+        public Task<string> GetBuyNowLink(string id);
 
     }
 }

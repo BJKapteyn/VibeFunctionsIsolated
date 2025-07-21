@@ -9,6 +9,7 @@ public interface ISquareSdkDataAccess
     public Task<SearchCatalogObjectsResponse?> SearchCategoryObjectsByParentId(CatalogInformation categoryName);
     public Task<SearchCatalogItemsResponse?> SearchCatalogItemsByCategoryId(CatalogInformation categoryId);
     public Task<RetrieveCatalogObjectResponse?> GetCatalogObjectById(CatalogInformation categoryId);
+    public Task<IEnumerable<TeamMemberBookingProfile>> GetAllTeamMembers();
 
     ///// <summary>
     ///// Get all currently active team members
