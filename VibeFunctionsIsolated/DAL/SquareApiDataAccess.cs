@@ -88,10 +88,10 @@ public class SquareApiDataAccess : ISquareApiDataAccess
             {
                 foreach (JsonElement item in items.EnumerateArray())
                 {
-                    JsonElement itemData = new();
+                    JsonElement itemData;
                     item.TryGetProperty("item_data", out itemData);
 
-                    JsonElement id = new();
+                    JsonElement id;
                     item.TryGetProperty("id", out id);
 
                     string itemId = id.GetString() ?? "";

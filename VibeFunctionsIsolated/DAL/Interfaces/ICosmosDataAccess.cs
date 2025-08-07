@@ -17,10 +17,10 @@ public interface ICosmosDataAccess
     /// <summary>
     /// Delete an item from the container
     /// </summary>
-    /// <typeparam name="T">Type of item to delete from the container</typeparam>
+    /// <typeparam name="TCosmosItem">Type of item to delete from the container</typeparam>
     /// <param name="id">Id of item to delete</param>
     /// <returns></returns>
-    Task<ICosmosItem> DeleteItemAsync<ICosmosItem>(string id);
+    public Task<ItemResponse<TCosmosItem>> DeleteItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem;
 
     /// <summary>
     /// Get an item from the container by id and partition key
@@ -38,7 +38,6 @@ public interface ICosmosDataAccess
     /// <returns>Collection of </returns>
     Task<IEnumerable<TCosmosItem>> GetAllItemsAsync<TCosmosItem>(string query) where TCosmosItem : ICosmosItem;
 
-
     /// <summary>
     /// Insert an item into the container
     /// </summary>
@@ -47,5 +46,4 @@ public interface ICosmosDataAccess
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
     Task<ItemResponse<TCosmosItem>> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem item, string? updatedItemId = null) where TCosmosItem : ICosmosItem;
-
 }

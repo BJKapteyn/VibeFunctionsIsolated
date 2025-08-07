@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
@@ -23,6 +24,11 @@ public class BlogPostUtility : IBlogPostUtility
     {
         const string query = "SELECT * FROM c";
         IEnumerable<BlogPost> blogPosts = await cosmosDataAccess.GetAllItemsAsync<BlogPost>(query);
+
+        if (blogPosts.Count() <= 0)
+        {
+            logger.LogError("No Blog Posts Found");
+        }
 
         return blogPosts;
     }
@@ -57,5 +63,10 @@ public class BlogPostUtility : IBlogPostUtility
         }
 
         return didUpsert;
+    }
+
+    public async Task DeleteBlogPost(string id, string partitionKey)
+    {
+        ItemResponse<ICosmosItem> response =  await cosmosDataAccess.DeleteItemAsync<ICosmosItem>(id, partitionKey);
     }
 }

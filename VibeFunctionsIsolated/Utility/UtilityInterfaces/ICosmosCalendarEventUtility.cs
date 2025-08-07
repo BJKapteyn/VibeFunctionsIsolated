@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using VibeFunctionsIsolated.Models.Cosmos;
+﻿using VibeFunctionsIsolated.Models.Cosmos;
 
 namespace VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
+/// <summary>
+/// Business logic layer for calendar event crud operations
+/// </summary>
 public interface ICosmosCalendarEventUtility
 {
     /// <summary>

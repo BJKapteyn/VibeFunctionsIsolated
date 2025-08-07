@@ -88,11 +88,17 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response;
     }
 
-    public async Task<T> DeleteItemAsync<T>(string id)
+    public async Task<ItemResponse<TCosmosItem>> DeleteItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem
     {
-        ItemResponse<T> item = await container.DeleteItemAsync<T>(id, new PartitionKey(id));
+        ItemResponse<TCosmosItem> item = await container.DeleteItemAsync<TCosmosItem>(id, new PartitionKey(partitionKey));
+
+        if (item.StatusCode != HttpStatusCode.OK)
+        {
+            logger.LogError("Cosmos Item was not deleted");
+        }
+
+        logger.LogInformation("Cosmos item deleted successfully");
 
         return item;
     }
-
 }
