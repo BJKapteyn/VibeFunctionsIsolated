@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Net;
 using VibeFunctionsIsolated.DAL.Interfaces;
+using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.DAL;
@@ -76,16 +77,19 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response.Resource;
     }
 
-    public async Task<ItemResponse<TCosmosItem>> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? updatedItemId = null) where TCosmosItem : ICosmosItem
+    public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? updatedItemId = null) where TCosmosItem : ICosmosItem
     {
         ItemResponse<TCosmosItem> response;
+        CosmosResponse cosmosResponse;
 
         using (cosmosClient)
         {
             response = await container.UpsertItemAsync(cosmosItem);
         }
 
-        return response;
+        cosmosResponse = new CosmosResponse(response.StatusCode, response.Resource);
+
+        return cosmosResponse;
     }
 
     public async Task<ItemResponse<TCosmosItem>> DeleteCosmosItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem

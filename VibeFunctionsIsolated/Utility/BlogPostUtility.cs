@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
@@ -45,21 +46,21 @@ public class BlogPostUtility : IBlogPostUtility
 
         bool didUpsert = false;
 
-        ItemResponse<BlogPost> upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost, blogPost.id);
+        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost, blogPost.id);
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            logger.LogInformation("BlogPost with id {id} updated in CosmosDB", blogPost.id);
-            didUpsert = true;
-        }
-        else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
         {
             logger.LogInformation("BlogPost with id {id} created in CosmosDB", blogPost.id);
             didUpsert = true;
         }
+        else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+        {
+            logger.LogInformation("BlogPost with id {id} updated in CosmosDB", blogPost.id);
+            didUpsert = true;
+        }
         else
         {
-            Type? upsertType = upsertResponse?.Resource.GetType();
+            Type? upsertType = upsertResponse?.CosmosItem.GetType();
             logger.LogError("Error updating or creating BlogPost with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
         }
 
