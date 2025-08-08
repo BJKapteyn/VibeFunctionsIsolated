@@ -25,15 +25,8 @@ public class UpsertBlogPost
     {
         BlogPost? blogPost = null;
 
-        try
-        {
-            blogPost = await applicationUtility.DeserializeStream<BlogPost>(req.Body);
-        }
-        catch(Exception e)
-        {
-            logger.LogError("{functionName} deserialization failed with message {message}", nameof(UpsertBlogPost), e.Message);
-        }
-
+        blogPost = await applicationUtility.DeserializeStream<BlogPost>(req.Body);
+        
         if (blogPost == null)
         {
             string upsertBlogPostClass = nameof(UpsertBlogPost);

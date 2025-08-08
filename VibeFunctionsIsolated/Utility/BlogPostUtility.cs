@@ -53,7 +53,7 @@ public class BlogPostUtility : IBlogPostUtility
             logger.LogInformation("BlogPost with id {id} created in CosmosDB", blogPost.id);
             didUpsert = true;
         }
-        else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+        else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
         {
             logger.LogInformation("BlogPost with id {id} updated in CosmosDB", blogPost.id);
             didUpsert = true;
