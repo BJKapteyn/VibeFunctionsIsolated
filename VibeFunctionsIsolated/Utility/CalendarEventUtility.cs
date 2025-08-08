@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
@@ -35,7 +36,7 @@ public class CalendarEventUtility : ICosmosCalendarEventUtility
         }
         bool didUpsert = false;
 
-        ItemResponse<CalendarEvent> upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.id);
+        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.id);
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {
@@ -48,7 +49,7 @@ public class CalendarEventUtility : ICosmosCalendarEventUtility
             didUpsert = true;
         } else
         {
-            Type? upsertType = upsertResponse?.Resource.GetType();
+            Type? upsertType = upsertResponse?.CosmosItem.GetType();
             logger.LogError("Error updating or creating item with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
         }
 
