@@ -23,6 +23,7 @@ public class BlogPostUtility : IBlogPostUtility
     public async Task<IEnumerable<BlogPost>> GetAllBlogPosts()
     {
         const string query = "SELECT * FROM c";
+
         IEnumerable<BlogPost> blogPosts = await cosmosDataAccess.GetAllItemsAsync<BlogPost>(query);
 
         if (blogPosts.Count() <= 0)
