@@ -88,7 +88,7 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response;
     }
 
-    public async Task<ItemResponse<TCosmosItem>> DeleteItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem
+    public async Task<ItemResponse<TCosmosItem>> DeleteCosmosItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem
     {
         ItemResponse<TCosmosItem> item = await container.DeleteItemAsync<TCosmosItem>(id, new PartitionKey(partitionKey));
 

@@ -20,7 +20,7 @@ public interface ICosmosDataAccess
     /// <typeparam name="TCosmosItem">Type of item to delete from the container</typeparam>
     /// <param name="id">Id of item to delete</param>
     /// <returns></returns>
-    public Task<ItemResponse<TCosmosItem>> DeleteItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem;
+    public Task<ItemResponse<TCosmosItem>> DeleteCosmosItemAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem;
 
     /// <summary>
     /// Get an item from the container by id and partition key

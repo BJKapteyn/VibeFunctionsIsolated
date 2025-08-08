@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeFunctionsIsolated.Functions.BlogPosts;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.Cosmos.UtilityModels;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts

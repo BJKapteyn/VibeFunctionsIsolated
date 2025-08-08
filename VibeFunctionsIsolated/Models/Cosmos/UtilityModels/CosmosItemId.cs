@@ -1,4 +1,4 @@
-﻿namespace VibeFunctionsIsolated.Models.Cosmos;
+﻿namespace VibeFunctionsIsolated.Models.Cosmos.UtilityModels;
 
 public class CosmosItemId
 {

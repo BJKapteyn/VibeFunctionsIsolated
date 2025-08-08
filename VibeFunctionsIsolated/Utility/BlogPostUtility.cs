@@ -68,6 +68,6 @@ public class BlogPostUtility : IBlogPostUtility
 
     public async Task DeleteBlogPost(string id, string partitionKey)
     {
-        ItemResponse<ICosmosItem> response =  await cosmosDataAccess.DeleteItemAsync<ICosmosItem>(id, partitionKey);
+        ItemResponse<ICosmosItem> response =  await cosmosDataAccess.DeleteCosmosItemAsync<ICosmosItem>(id, partitionKey);
     }
 }
