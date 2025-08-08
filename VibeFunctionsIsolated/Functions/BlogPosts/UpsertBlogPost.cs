@@ -23,7 +23,16 @@ public class UpsertBlogPost
     [Function("UpsertBlogPost")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
-        BlogPost? blogPost = await applicationUtility.DeserializeStream<BlogPost>(req.Body);
+        BlogPost? blogPost = null;
+
+        try
+        {
+            blogPost = await applicationUtility.DeserializeStream<BlogPost>(req.Body);
+        }
+        catch(Exception e)
+        {
+            logger.LogError("{functionName} deserialization failed with message {message}", nameof(UpsertBlogPost), e.Message);
+        }
 
         if (blogPost == null)
         {
