@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Security.Policy;
+using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
@@ -13,6 +14,7 @@ public class CalendarEvent : ICosmosItem
        DateTime startDate,
        DateTime? endDate,
        string? eventOrganizerName,
+       string? bannerImageUrl,
        string? id)
     {
         this.id = id ?? Guid.NewGuid().ToString();
@@ -22,6 +24,7 @@ public class CalendarEvent : ICosmosItem
         StartDate = startDate;
         EndDate = endDate;
         EventOrganizerName = eventOrganizerName ?? "";
+        BannerImageUrl = bannerImageUrl ?? "";
     }
 
     public string id { get; set; }
@@ -31,4 +34,5 @@ public class CalendarEvent : ICosmosItem
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string EventOrganizerName { get; set; }
+    public string BannerImageUrl { get; set; }
 }
