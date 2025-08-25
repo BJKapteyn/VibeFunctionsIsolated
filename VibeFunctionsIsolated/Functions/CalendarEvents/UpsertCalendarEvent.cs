@@ -10,11 +10,11 @@ namespace VibeFunctionsIsolated.Functions.CalendarEvents;
 public class UpsertCalendarEvent(
         ILogger<UpsertCalendarEvent> logger,
         IApplicationUtility applicationUtility,
-        ICosmosCalendarEventUtility cosmosCalendarEventUtility)
+        ICalendarEventUtility cosmosCalendarEventUtility)
 {
     private readonly ILogger<UpsertCalendarEvent> logger = logger;
     private readonly IApplicationUtility applicationUtility = applicationUtility;
-    private readonly ICosmosCalendarEventUtility cosmosCalendarEventUtility = cosmosCalendarEventUtility;
+    private readonly ICalendarEventUtility cosmosCalendarEventUtility = cosmosCalendarEventUtility;
 
     [Function("UpsertCalendarEvent")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)

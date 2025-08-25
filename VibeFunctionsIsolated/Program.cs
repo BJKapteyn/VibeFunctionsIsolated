@@ -16,7 +16,7 @@ var host = new HostBuilder()
         services.AddHttpClient();
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<ISquareUtility, SquareDalUtility>();
-        services.AddSingleton<ICosmosCalendarEventUtility, CalendarEventUtility>();
+        services.AddSingleton<ICalendarEventUtility, CalendarEventUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
         services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();

@@ -9,11 +9,11 @@ namespace VibeFunctionsIsolated.Functions.CalendarEvents;
 public class GetCalendarEvent
 {
     private readonly ILogger<GetCalendarEvent> logger;
-    private readonly ICosmosCalendarEventUtility cosmosCalendarEventUtility;
+    private readonly ICalendarEventUtility cosmosCalendarEventUtility;
 
     public GetCalendarEvent(
         ILogger<GetCalendarEvent> logger,
-        ICosmosCalendarEventUtility cosmosCalendarEventUtility)
+        ICalendarEventUtility cosmosCalendarEventUtility)
     {
         this.logger = logger;
         this.cosmosCalendarEventUtility = cosmosCalendarEventUtility;

@@ -12,6 +12,7 @@ public class CalendarEvent : ICosmosItem
        string? eventDescription,
        DateTime startDate,
        DateTime? endDate,
+       string? eventOrganizerName,
        string? id)
     {
         this.id = id ?? Guid.NewGuid().ToString();
@@ -20,6 +21,7 @@ public class CalendarEvent : ICosmosItem
         EventDescription = eventDescription;
         StartDate = startDate;
         EndDate = endDate;
+        EventOrganizerName = eventOrganizerName ?? "";
     }
 
     public string id { get; set; }
@@ -28,4 +30,5 @@ public class CalendarEvent : ICosmosItem
     public string? EventDescription { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+    public string EventOrganizerName { get; set; }
 }

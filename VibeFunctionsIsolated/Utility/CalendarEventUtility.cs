@@ -7,7 +7,7 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
 
-public class CalendarEventUtility : ICosmosCalendarEventUtility
+public class CalendarEventUtility : ICalendarEventUtility
 {
     private readonly ICosmosDataAccess cosmosDataAccess;
     private readonly ILogger<CalendarEventUtility> logger;
