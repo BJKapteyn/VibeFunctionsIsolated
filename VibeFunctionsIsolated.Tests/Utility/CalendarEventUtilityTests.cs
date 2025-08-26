@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System.Net;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
+using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Utility;
 
 namespace VibeFunctionsIsolated.Tests.Utility;
@@ -33,28 +34,27 @@ public class CalendarEventUtilityTests
     public void UpsertCalendarEvent_StatusCodeTests(CalendarEvent calendarEvent, HttpStatusCode statusCode, bool expected)
     {
         // Arrange
-        Mock<ItemResponse<CalendarEvent>> mockItemResponse = new ();
-        mockItemResponse.Setup(x => x.StatusCode).Returns(statusCode);
+        CosmosResponse itemResponse = new (statusCode, calendarEvent);
 
-        cosmosDataAccessMock.Setup(x => x.UpsertCosmosItemAsync(calendarEvent, null).Result).Returns(mockItemResponse.Object);
+        cosmosDataAccessMock.Setup(x => x.UpsertCosmosItemAsync(It.IsAny<CalendarEvent>()).Result).Returns(itemResponse);
   
         // Act
         bool actual = cosmosUtility.UpsertCalendarEvent(calendarEvent).Result;
 
         // Assert
-        Assert.That(actual == expected);
-
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     private static IEnumerable<TestCaseData> UpsertCalendarEventTestCases()
     {
         string eventDescription = "This is a test event description.";
         string eventName = "Test Event Name";
+        string organizerName = "Test Organizer";
         DateTime startDate = DateTime.UtcNow;
         DateTime? endDate = DateTime.UtcNow.AddHours(1);
         string id = Guid.NewGuid().ToString();
 
-        CalendarEvent anyEvent = new (id, eventName, eventDescription, startDate, endDate, id);
+        CalendarEvent anyEvent = new (id, eventName, eventDescription, startDate, endDate, organizerName, "", "");
 
         yield return new TestCaseData(anyEvent, HttpStatusCode.OK, true);
         yield return new TestCaseData(anyEvent, HttpStatusCode.Created, true);

@@ -46,7 +46,7 @@ public class BlogPostUtility : IBlogPostUtility
 
         bool didUpsert = false;
 
-        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost, blogPost.id);
+        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost);
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {
@@ -67,8 +67,36 @@ public class BlogPostUtility : IBlogPostUtility
         return didUpsert;
     }
 
-    public async Task DeleteBlogPost(string id, string partitionKey)
+    public async Task<bool> DeleteBlogPost(string id, string partitionKey)
     {
-        ItemResponse<ICosmosItem> response =  await cosmosDataAccess.DeleteCosmosItemAsync<ICosmosItem>(id, partitionKey);
+        bool didDelete = false;
+
+        if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(partitionKey))
+        {
+            logger.LogError(nameof(DeleteBlogPost) + " called with invalid id or partitionKey");
+            return false;
+        }
+
+        try
+        {
+            ItemResponse<ICosmosItem> response = await cosmosDataAccess.DeleteCosmosItemAsync<ICosmosItem>(id, partitionKey);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent ||
+                response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                logger.LogInformation("BlogPost with id {id} deleted from CosmosDB", id);
+                didDelete = true;
+            }
+            else
+            {
+                logger.LogWarning("Failed to delete BlogPost with id {id}. StatusCode: {statusCode}", id, response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception occurred while deleting BlogPost with id {id}", id);
+        }
+
+        return didDelete;
     }
 }

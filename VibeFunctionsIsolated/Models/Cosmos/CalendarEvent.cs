@@ -18,7 +18,7 @@ public class CalendarEvent : ICosmosItem
        string? id)
     {
         this.id = id ?? Guid.NewGuid().ToString();
-        EventId = eventId;
+        SquareEventId = eventId;
         EventName = eventName;
         EventDescription = eventDescription;
         StartDate = startDate;
@@ -28,7 +28,7 @@ public class CalendarEvent : ICosmosItem
     }
 
     public string id { get; set; }
-    public string EventId { get; set; }
+    public string SquareEventId { get; set; }
     public string EventName { get; set; }
     public string? EventDescription { get; set; }
     public DateTime StartDate { get; set; }

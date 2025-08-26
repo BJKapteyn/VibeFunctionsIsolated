@@ -77,7 +77,7 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response.Resource;
     }
 
-    public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? updatedItemId = null) where TCosmosItem : ICosmosItem
+    public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem) where TCosmosItem : ICosmosItem
     {
         ItemResponse<TCosmosItem> response;
         CosmosResponse cosmosResponse;

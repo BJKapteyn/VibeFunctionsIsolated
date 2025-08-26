@@ -26,7 +26,7 @@ public interface ICalendarEventUtility
     /// </summary>
     /// <param name="id">Id of calendar event to delete</param>
     /// <param name="partitionKey">Partition Key for cosmos container</param>
-    /// <returns></returns>
+    /// <returns>True if Calendar Event is deleted, false if not deleted</returns>
     Task<bool> DeleteCalendarEvent(string id, string partitionKey);
 }
 

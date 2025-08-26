@@ -24,13 +24,14 @@ public class DeleteCalendarEventById
     }
 
     [Function("DeleteCalendarEventById")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         CosmosItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosItemId>(req.Body);
 
-        if (itemToDelete == null || string.IsNullOrEmpty(itemToDelete.id))
+        if (itemToDelete == null)
         {
-            return new NotFoundObjectResult("Item to delete not found");
+            logger.LogError("Incorrect format when running: " + nameof(DeleteCalendarEventById));
+            return new BadRequestObjectResult("Incorrect format");
         }
 
         await calendarEventUtility.DeleteCalendarEvent(itemToDelete.id, itemToDelete.partitionKey);
