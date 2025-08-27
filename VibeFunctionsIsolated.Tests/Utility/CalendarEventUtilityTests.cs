@@ -9,7 +9,6 @@ using NUnit.Framework;
 using System.Net;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
-using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Utility;
 
 namespace VibeFunctionsIsolated.Tests.Utility;

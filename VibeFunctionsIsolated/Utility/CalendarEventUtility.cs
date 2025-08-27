@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
-using VibeFunctionsIsolated.Models.DataAccess;
 using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 

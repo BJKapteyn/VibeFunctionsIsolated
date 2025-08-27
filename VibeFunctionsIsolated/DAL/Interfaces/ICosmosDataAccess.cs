@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
-using VibeFunctionsIsolated.Models.DataAccess;
+using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.DAL.Interfaces;

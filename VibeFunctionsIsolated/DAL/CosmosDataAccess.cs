@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Net;
 using VibeFunctionsIsolated.DAL.Interfaces;
-using VibeFunctionsIsolated.Models.DataAccess;
+using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.DAL;

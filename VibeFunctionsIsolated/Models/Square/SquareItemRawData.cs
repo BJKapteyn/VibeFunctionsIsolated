@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
+// model for deserializing Square data from direct API calls
 namespace VibeFunctionsIsolated.Models.Square
 {
     //[JsonSerializable(typeof(SquareItemRawData))]
