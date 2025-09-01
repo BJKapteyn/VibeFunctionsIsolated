@@ -187,4 +187,36 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return response.TeamMemberBookingProfiles;
     }
+
+    public async Task<UpsertCatalogObjectResponse> UpsertSquareCatalogObject(UpsertCatalogObjectRequest catalogItem)
+    {
+        UpsertCatalogObjectResponse response;
+
+        try
+        {
+            response = await squareClient.CatalogApi.UpsertCatalogObjectAsync(catalogItem);
+
+            // The Square .NET SDK does not expose HTTP status code directly on the response,
+            // but if no exception is thrown, the request was successful (HTTP 200).
+            // You can also check for errors in the response object.
+            if (response.Errors == null || !response.Errors.Any())
+            {
+                // Success (treated as HTTP 200)
+                logger.LogInformation("UpsertSquareCatalogObject: Successfully upserted catalog object with id: {id}", response.CatalogObject.Id);
+            }
+            else
+            {
+                // Not 200: errors present in response
+                logger.LogError("UpsertSquareCatalogObject: Square API returned errors: {errors}", string.Join(", ", response.Errors.Select(e => e.Detail)));
+            }
+        }
+        catch (Exception ex)
+        {
+            // Not 200: exception thrown (non-success status code)
+            logger.LogError("UpsertSquareCatalogObject: Exception occurred. Status code: {stackTrace}, Message: {message}", ex.StackTrace, ex.Message);
+            response = new UpsertCatalogObjectResponse(errors: [new Error(category: "Exception", code: "500", detail: ex.Message)]);
+        }
+
+        return response;
+    }
 }

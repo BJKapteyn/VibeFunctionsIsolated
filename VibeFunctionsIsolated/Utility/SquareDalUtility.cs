@@ -2,6 +2,7 @@
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
+using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
@@ -156,6 +157,94 @@ public class SquareDalUtility : ISquareUtility
         return [];
     }
 
+    public async Task<string?> UpsertCalendarEvent(CalendarEvent calendarEvent)
+    {
+        //// Build the item variation
+        //var itemVariation = new CatalogObject(
+        //    type: "ITEM_VARIATION",
+        //    id: "#" + Guid.NewGuid().ToString(),
+        //    itemVariationData: new CatalogItemVariation(
+        //        itemId: null,
+        //        name: "Default",
+        //        sku: null,
+        //        upc: null,
+        //        ordinal: 0,
+        //        pricingType: "FIXED_PRICING",
+        //        priceMoney: new Money(0, "USD"),
+        //        //{
+        //        //    amount = 0,
+        //        //    Currency = "USD"
+        //        //},
+        //        locationOverrides: null,
+        //        trackInventory: false,
+        //        inventoryAlertType: null,
+        //        inventoryAlertThreshold: null
+        //    )
+        //);
+
+        //// Build the item data
+        //var itemData = new CatalogItem(
+        //    name: calendarEvent.EventName,
+        //    description: calendarEvent.EventDescription ?? "",
+        //    abbreviation: null,
+        //    labelColor: null,
+        //    availableOnline: true,
+        //    availableForPickup: false,
+        //    availableElectronically: false,
+        //    categoryId: null,
+        //    taxIds: null,
+        //    modifierListInfo: null,
+        //    variations: new List<CatalogObject> { itemVariation },
+        //    productType: SquareProductType.AppointmentsService,
+        //    skipModifierScreen: false,
+        //    isTaxable: false
+        //);
+
+        //// Build the image data if present
+        //CatalogImage? imageData = null;
+        //if (!string.IsNullOrEmpty(calendarEvent.BannerImageUrl))
+        //{
+        //    imageData = new CatalogImage(url: calendarEvent.BannerImageUrl);            
+        //}
+
+        //// Build the main catalog object
+        //var catalogObjectToUpsert = new CatalogObject(
+        //    type: "ITEM",
+        //    id: "#" + Guid.NewGuid().ToString(),
+        //    itemData: itemData,
+        //    imageData: imageData
+        //);
+
+        // Build the upsert request
+        CatalogObject catalogObjectToUpsert = buildCatalogObject(calendarEvent);
+        string idempotencyKey = Guid.NewGuid().ToString();
+        var upsertRequest = new UpsertCatalogObjectRequest(idempotencyKey, catalogObjectToUpsert);
+
+        string? upsertCatalogObjectId = await UpsertCatalogObject(upsertRequest, nameof(UpsertCalendarEvent));
+
+
+        return upsertCatalogObjectId;
+    }
+
+    private async Task<string?> UpsertCatalogObject(UpsertCatalogObjectRequest upsertRequest, string? nameOfMethodCall = null)
+    {
+        string? upsertId = null;
+        UpsertCatalogObjectResponse upsertResponse = await squareSdkDal.UpsertSquareCatalogObject(upsertRequest);
+
+        if (upsertResponse.Errors.Count > 0)
+        {
+            string methodCall = nameOfMethodCall ?? nameof(UpsertCatalogObject);
+            logger.LogError("{methodCall}: Failed to upsert catalog object to Square", methodCall);
+        }
+        else
+        {
+            logger.LogInformation("Upserted catalog object to Square with id: {id}", upsertResponse.CatalogObject.Id);
+            upsertId = upsertResponse.CatalogObject.Id;
+        }
+
+        return upsertId;
+    }
+
     /// <summary>
     /// Search for the image url in the response, it isn't in the same spot for all item types
     /// </summary>
@@ -174,5 +263,47 @@ public class SquareDalUtility : ISquareUtility
                         ?.Url;
 
         return imageUrl ?? "";
+    }
+
+    private static CatalogObject buildCatalogObject(CalendarEvent calendarEvent)
+    {
+        // Build the item variation
+        var itemVariation = new CatalogObject(
+            type: "ITEM_VARIATION",
+            id: "#variation",
+            itemVariationData: new CatalogItemVariation(
+                itemId: calendarEvent.SquareEventId,
+                name: "Default",
+                ordinal: 0,
+                pricingType: "FIXED_PRICING",
+                priceMoney: new Money((long) calendarEvent.PriceInUSD, "USD")
+            )
+        );
+        // Build the item data
+        var itemData = new CatalogItem(
+            name: calendarEvent.EventName,
+            description: calendarEvent.EventDescription ?? "",
+            availableOnline: true,
+            availableForPickup: false,
+            availableElectronically: true,
+            categoryId: null,
+            variations: new List<CatalogObject> { itemVariation },
+            productType: SquareProductType.AppointmentsService,
+            skipModifierScreen: false,
+            isTaxable: false
+        );
+        // Build the image data if present
+        //CatalogImage? imageData = null;
+        //if (!string.IsNullOrEmpty(calendarEvent.BannerImageUrl))
+        //{
+        //    imageData = new CatalogImage(url: calendarEvent.BannerImageUrl);
+        //}
+        // Build the main catalog object
+        var catalogObject = new CatalogObject(
+            type: "ITEM",
+            id: calendarEvent.SquareEventId,
+            itemData: itemData
+        );
+        return catalogObject;
     }
 }

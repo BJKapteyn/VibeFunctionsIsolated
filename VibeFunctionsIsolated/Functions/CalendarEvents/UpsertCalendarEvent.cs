@@ -10,11 +10,13 @@ namespace VibeFunctionsIsolated.Functions.CalendarEvents;
 public class UpsertCalendarEvent(
         ILogger<UpsertCalendarEvent> logger,
         IApplicationUtility applicationUtility,
-        ICalendarEventUtility cosmosCalendarEventUtility)
+        ICalendarEventUtility cosmosCalendarEventUtility,
+        ISquareUtility squareUtility) 
 {
     private readonly ILogger<UpsertCalendarEvent> logger = logger;
     private readonly IApplicationUtility applicationUtility = applicationUtility;
     private readonly ICalendarEventUtility cosmosCalendarEventUtility = cosmosCalendarEventUtility;
+    private readonly ISquareUtility squareUtility = squareUtility;
 
     [Function("UpsertCalendarEvent")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -29,12 +31,25 @@ public class UpsertCalendarEvent(
             return new BadRequestObjectResult("Invalid request body");
         }
 
-        bool didUpsert = await cosmosCalendarEventUtility.UpsertCalendarEvent(calendarEvent);
+        string? squareUpsertId = await squareUtility.UpsertCalendarEvent(calendarEvent);
 
-        if (didUpsert)
+        if (squareUpsertId != null)
         {
-            return new OkResult();
+
+            if(calendarEvent.SquareEventId != squareUpsertId)
+                calendarEvent.SquareEventId = squareUpsertId;
+
+            bool didCosomosUpsert = await cosmosCalendarEventUtility.UpsertCalendarEvent(calendarEvent);
+
+            if (didCosomosUpsert)
+                return new OkResult();
         }
+
+
+        //if (didCosomosUpsert)
+        //{
+        //    return new OkResult();
+        //}
 
         return new BadRequestResult();
     }

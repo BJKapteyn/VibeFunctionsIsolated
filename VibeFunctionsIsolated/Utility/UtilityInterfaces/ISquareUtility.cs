@@ -1,4 +1,5 @@
 ﻿using Square.Models;
+using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Interfaces;
 using VibeFunctionsIsolated.Models.Square;
 
@@ -33,4 +34,12 @@ public interface ISquareUtility
     /// </summary>
     /// <returns>All team members and their booking information</returns>
     public Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembers();
+
+    /// <summary>
+    /// Upsert a calendar event to Square Catalog
+    /// </summary>
+    /// <param name="calendarEvent"></param>
+    /// <returns></returns>
+    public Task<string?> UpsertCalendarEvent(CalendarEvent calendarEvent);
+
 }

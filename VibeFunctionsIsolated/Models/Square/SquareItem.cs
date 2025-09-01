@@ -44,8 +44,8 @@ public class SquareItem : SquareCatalogItem, ISquareCatalogItem
             return null;
 
         const int millisecondsPerMinute = 60000;
-        HashSet<string> hashVariationNames = new();
-        List<SquareItem> variations = new();
+        HashSet<string> hashVariationNames = [];
+        List<SquareItem> variations = [];
 
         foreach (CatalogObject variation in item.ItemData.Variations)
         {

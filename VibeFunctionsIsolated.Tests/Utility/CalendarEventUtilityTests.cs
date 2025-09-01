@@ -53,7 +53,7 @@ public class CalendarEventUtilityTests
         DateTime? endDate = DateTime.UtcNow.AddHours(1);
         string id = Guid.NewGuid().ToString();
 
-        CalendarEvent anyEvent = new (id, eventName, eventDescription, startDate, endDate, organizerName, "", "");
+        CalendarEvent anyEvent = new (id, eventName, eventDescription, startDate, endDate, organizerName, "", 0, "");
 
         yield return new TestCaseData(anyEvent, HttpStatusCode.OK, true);
         yield return new TestCaseData(anyEvent, HttpStatusCode.Created, true);
