@@ -17,7 +17,7 @@ public class CalendarEventUtility : ICalendarEventUtility
         this.cosmosDataAccess = cosmosDataAccess;
         this.logger = logger;
 
-        cosmosDataAccess.ChangeContainerName("Events");
+        cosmosDataAccess.ChangeContainerName("CalendarEvent");
     }
 
     public async Task<IEnumerable<CalendarEvent>> GetAllCalendarEvents()
@@ -36,7 +36,7 @@ public class CalendarEventUtility : ICalendarEventUtility
         }
         bool didUpsert = false;
 
-        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent);
+        CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(calendarEvent, calendarEvent.EventOrganizerName);
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {

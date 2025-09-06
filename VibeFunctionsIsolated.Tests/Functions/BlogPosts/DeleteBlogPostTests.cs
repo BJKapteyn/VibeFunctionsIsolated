@@ -19,14 +19,14 @@ namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts
     [Parallelizable]
     public class DeleteBlogPostTests
     {
-        private Mock<ILogger<DeleteBlogPostById>> logger;
+        private Mock<ILogger<DeleteCalendarEventById>> logger;
         private Mock<IBlogPostUtility> blogPostUtility;
         private Mock<IApplicationUtility> appUtility;
 
         [SetUp]
         public void Setup()
         {
-            logger = new Mock<ILogger<DeleteBlogPostById>>();
+            logger = new Mock<ILogger<DeleteCalendarEventById>>();
             blogPostUtility = new Mock<IBlogPostUtility>();
             appUtility = new Mock<IApplicationUtility>();
         }
@@ -44,7 +44,7 @@ namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts
             appUtility.Setup(x => x.DeserializeStream<CosmosItemId>(It.IsAny<Stream>()).Result).Returns(deserializedRequest);
            
 
-            var deleteBlogPostById = new DeleteBlogPostById(logger.Object, blogPostUtility.Object, appUtility.Object);
+            var deleteBlogPostById = new DeleteCalendarEventById(logger.Object, blogPostUtility.Object, appUtility.Object);
 
             // Act
             IActionResult actual = await deleteBlogPostById.Run(mockRequest.Object);

@@ -7,14 +7,14 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.BlogPosts;
 
-public class DeleteBlogPostById
+public class DeleteCalendarEventById
 {
-    private readonly ILogger<DeleteBlogPostById> logger;
+    private readonly ILogger<DeleteCalendarEventById> logger;
     private readonly IBlogPostUtility blogPostUtility;
     private readonly IApplicationUtility applicationUtility;
 
-    public DeleteBlogPostById(
-        ILogger<DeleteBlogPostById> logger,
+    public DeleteCalendarEventById(
+        ILogger<DeleteCalendarEventById> logger,
         IBlogPostUtility blogPostUtility,
         IApplicationUtility applicationUtility)
     {

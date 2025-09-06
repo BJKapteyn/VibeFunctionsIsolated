@@ -33,20 +33,20 @@ public class CalendarEvent : ICosmosItem
 
     [JsonPropertyName("id")]
     public string id { get; set; }
-    [JsonPropertyName("squareEventId")]
+    [JsonPropertyName("SquareEventId")]
     public string SquareEventId { get; set; }
-    [JsonPropertyName("eventName")]
+    [JsonPropertyName("EventName")]
     public string EventName { get; set; }
-    [JsonPropertyName("eventDescription")]
+    [JsonPropertyName("EventDescription")]
     public string? EventDescription { get; set; }
-    [JsonPropertyName("startDate")]
+    [JsonPropertyName("StartDate")]
     public DateTime StartDate { get; set; }
-    [JsonPropertyName("endDate")]
+    [JsonPropertyName("EndDate")]
     public DateTime? EndDate { get; set; }
-    [JsonPropertyName("eventOrganizerName")]
+    [JsonPropertyName("EventOrganizerName")]
     public string EventOrganizerName { get; set; }
-    [JsonPropertyName("bannerImageUrl")]
+    [JsonPropertyName("BannerImageUrl")]
     public string BannerImageUrl { get; set; }
-    [JsonPropertyName("priceInUSD")]
-    public float PriceInUSD { get; set; }
+    [JsonPropertyName("PriceInUSD")]
+    public long PriceInUSD { get; set; }
 }

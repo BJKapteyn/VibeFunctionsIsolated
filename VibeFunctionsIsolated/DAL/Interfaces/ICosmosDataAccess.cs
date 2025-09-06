@@ -46,6 +46,5 @@ public interface ICosmosDataAccess
     /// <param name="id">Id of item to be updated if it already exists</param>
     /// <param name="item">Model of item to be upserted</param>
     /// <returns>Task containing the model for item inserted or updated</returns>
-    Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem item) where TCosmosItem : ICosmosItem;
-
+    Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem item, string? partitionKey = null) where TCosmosItem : ICosmosItem;
 }

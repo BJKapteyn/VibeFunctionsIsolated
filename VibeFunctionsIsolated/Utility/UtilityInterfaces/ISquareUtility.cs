@@ -23,9 +23,8 @@ public interface ISquareUtility
     /// <summary>
     /// Retrieve data points that aren't included in the catalog object
     /// </summary>
-    /// <param name="items">Items that need extra properties</param>
+    /// <param name="catalogObjects">Items that need extra properties</param>
     /// <param name="needsBuyNowLinks">If the items need buy/book now links</param>
-    /// <param name="needsImageUrls">If the items need image urls</param>   
     /// <returns>The original collection with image urls</returns>
     public Task<IEnumerable<SquareItem>> MapCatalogObjectsToLocalModel(IEnumerable<CatalogObject> catalogObjects, bool needsBuyNowLinks);
 

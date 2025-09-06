@@ -229,9 +229,10 @@ public class SquareDalUtility : ISquareUtility
     private async Task<string?> UpsertCatalogObject(UpsertCatalogObjectRequest upsertRequest, string? nameOfMethodCall = null)
     {
         string? upsertId = null;
+
         UpsertCatalogObjectResponse upsertResponse = await squareSdkDal.UpsertSquareCatalogObject(upsertRequest);
 
-        if (upsertResponse.Errors.Count > 0)
+        if (upsertResponse.Errors?.Count > 0)
         {
             string methodCall = nameOfMethodCall ?? nameof(UpsertCatalogObject);
             logger.LogError("{methodCall}: Failed to upsert catalog object to Square", methodCall);
@@ -287,23 +288,19 @@ public class SquareDalUtility : ISquareUtility
             availableForPickup: false,
             availableElectronically: true,
             categoryId: null,
-            variations: new List<CatalogObject> { itemVariation },
+            variations: [itemVariation],
             productType: SquareProductType.AppointmentsService,
             skipModifierScreen: false,
             isTaxable: false
         );
-        // Build the image data if present
-        //CatalogImage? imageData = null;
-        //if (!string.IsNullOrEmpty(calendarEvent.BannerImageUrl))
-        //{
-        //    imageData = new CatalogImage(url: calendarEvent.BannerImageUrl);
-        //}
+
         // Build the main catalog object
         var catalogObject = new CatalogObject(
             type: "ITEM",
             id: calendarEvent.SquareEventId,
             itemData: itemData
         );
+
         return catalogObject;
     }
 }

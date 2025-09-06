@@ -47,15 +47,12 @@ public class CosmosDataAccess : ICosmosDataAccess
         List<TItem> items = [];
         QueryDefinition queryDefinition = new(query);
 
-        using (cosmosClient)
-        {
-            FeedIterator<TItem> feedIterator = container.GetItemQueryIterator<TItem>(queryDefinition);
+        FeedIterator<TItem> feedIterator = container.GetItemQueryIterator<TItem>(queryDefinition);
 
-            while (feedIterator.HasMoreResults)
-            {
-                FeedResponse<TItem> response = await feedIterator.ReadNextAsync();
-                items.AddRange(response);
-            }
+        while (feedIterator.HasMoreResults)
+        {
+            FeedResponse<TItem> response = await feedIterator.ReadNextAsync();
+            items.AddRange(response);
         }
 
         if(items.Count == 0)
@@ -77,15 +74,14 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response.Resource;
     }
 
-    public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem) where TCosmosItem : ICosmosItem
+    public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? partitionKey = null) where TCosmosItem : ICosmosItem
     {
         ItemResponse<TCosmosItem> response;
         CosmosResponse cosmosResponse;
 
-        using (cosmosClient)
-        {
-            response = await container.UpsertItemAsync(cosmosItem);
-        }
+        PartitionKey? key = partitionKey != null ? new PartitionKey(partitionKey) : null;
+
+        response = await container.UpsertItemAsync(cosmosItem, key);
 
         cosmosResponse = new CosmosResponse(response.StatusCode, response.Resource);
 

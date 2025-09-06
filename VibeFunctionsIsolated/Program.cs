@@ -5,8 +5,6 @@ using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
-using Microsoft.Azure.Cosmos;
-
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
@@ -19,7 +17,7 @@ var host = new HostBuilder()
         services.AddSingleton<ICalendarEventUtility, CalendarEventUtility>();
         services.AddScoped<ISquareSdkDataAccess, SquareSdkDataAccess>();
         services.AddScoped<ISquareApiDataAccess, SquareApiDataAccess>();
-        services.AddScoped<ICosmosDataAccess, CosmosDataAccess>();
+        services.AddSingleton<ICosmosDataAccess, CosmosDataAccess>();
         services.AddScoped<IApplicationUtility, ApplicationUtility>();
         services.AddScoped<IBlogPostUtility, BlogPostUtility>();
     })
