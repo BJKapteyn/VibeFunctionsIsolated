@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using VibeFunctionsIsolated.Models.Cosmos.UtilityModels;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
-namespace VibeFunctionsIsolated.Functions.BlogPosts;
+namespace VibeFunctionsIsolated.Functions.CalendarEvents;
 
 public class DeleteCalendarEventById
 {

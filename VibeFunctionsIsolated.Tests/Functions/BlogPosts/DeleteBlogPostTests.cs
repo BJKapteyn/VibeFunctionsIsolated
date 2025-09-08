@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VibeFunctionsIsolated.Functions.BlogPosts;
+using VibeFunctionsIsolated.Functions.CalendarEvents;
 using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Cosmos.UtilityModels;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
