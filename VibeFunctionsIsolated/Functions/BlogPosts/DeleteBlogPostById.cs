@@ -7,14 +7,14 @@ using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Functions.BlogPosts;
 
-public class DeleteCalendarEventById
+public class DeleteBlogPostById
 {
-    private readonly ILogger<DeleteCalendarEventById> logger;
+    private readonly ILogger<DeleteBlogPostById> logger;
     private readonly ICalendarEventUtility calendarEventUtility;
     private readonly IApplicationUtility applicationUtility;
 
-    public DeleteCalendarEventById(
-        ILogger<DeleteCalendarEventById> logger,
+    public DeleteBlogPostById(
+        ILogger<DeleteBlogPostById> logger,
         ICalendarEventUtility calendarEventUtility,
         IApplicationUtility applicationUtility)
     {
@@ -23,14 +23,14 @@ public class DeleteCalendarEventById
         this.applicationUtility = applicationUtility;
     }
 
-    [Function("DeleteCalendarEventById")]
+    [Function("DeleteBlogPostById")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         CosmosItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosItemId>(req.Body);
 
         if (itemToDelete == null)
         {
-            logger.LogError("Incorrect format when running: " + nameof(DeleteCalendarEventById));
+            logger.LogError("Incorrect format when running: " + nameof(DeleteBlogPostById));
             return new BadRequestObjectResult("Incorrect format");
         }
 

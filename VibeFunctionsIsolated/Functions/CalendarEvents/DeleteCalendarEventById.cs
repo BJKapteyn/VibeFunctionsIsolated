@@ -23,7 +23,7 @@ public class DeleteCalendarEventById
         this.applicationUtility = applicationUtility;
     }
 
-    [Function("DeleteBlogPostById")]
+    [Function("DeleteCalendarEventById")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
         CosmosItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosItemId>(req.Body);
