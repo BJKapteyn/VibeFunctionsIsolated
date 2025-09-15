@@ -1,5 +1,4 @@
-﻿using System.Security.Policy;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
@@ -20,7 +19,7 @@ public class CalendarEvent : ICosmosItem
     {
         this.id = id ?? Guid.NewGuid().ToString();
         // If no squareEventId is provided, the placeholder value must start with # in the Square SDK
-        // and the square API will assign it an id on insert 
+        // the square API will assign it an id on insert 
         SquareEventId = squareEventId ?? "#" + Guid.NewGuid().ToString();
         EventName = eventName;
         EventDescription = eventDescription;
