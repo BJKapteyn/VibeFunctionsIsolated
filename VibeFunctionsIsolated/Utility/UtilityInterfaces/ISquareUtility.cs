@@ -35,6 +35,13 @@ public interface ISquareUtility
     public Task<IEnumerable<SquareTeamMember>> MapAllBookableTeamMembers();
 
     /// <summary>
+    /// Delete Square Event by Id
+    /// </summary>
+    /// <param name="id">Id of event in Square API</param>
+    /// <returns>true if event successfully deleted, false if not</returns>
+    public Task<bool> DeleteSquareEventById(string id);
+
+    /// <summary>
     /// Upsert a calendar event to Square Catalog
     /// </summary>
     /// <param name="calendarEvent"></param>

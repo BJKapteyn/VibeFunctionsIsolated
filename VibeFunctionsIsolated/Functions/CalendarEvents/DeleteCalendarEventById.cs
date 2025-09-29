@@ -10,32 +10,56 @@ namespace VibeFunctionsIsolated.Functions.CalendarEvents;
 public class DeleteCalendarEventById
 {
     private readonly ILogger<DeleteCalendarEventById> logger;
-    private readonly IBlogPostUtility blogPostUtility;
+    private readonly ISquareUtility squareUtility;
     private readonly IApplicationUtility applicationUtility;
+    private readonly ICalendarEventUtility calendarEventUtility;
 
     public DeleteCalendarEventById(
         ILogger<DeleteCalendarEventById> logger,
-        IBlogPostUtility blogPostUtility,
-        IApplicationUtility applicationUtility)
+        IApplicationUtility applicationUtility,
+        ISquareUtility squareUtility,
+        ICalendarEventUtility calendarEventUtility)
     {
         this.logger = logger;
-        this.blogPostUtility = blogPostUtility ;
         this.applicationUtility = applicationUtility;
+        this.calendarEventUtility = calendarEventUtility;
+        this.squareUtility = squareUtility;
     }
 
     [Function("DeleteCalendarEventById")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
-        CosmosItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosItemId>(req.Body);
+        CosmosDeleteItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosDeleteItemId>(req.Body);
      
-        if (itemToDelete == null || itemToDelete.id.Length <= 0)
+        if (itemToDelete == null || 
+            itemToDelete.id.Length <= 0 || 
+            itemToDelete.squareEventId.Length <= 0)
         {
             return new NotFoundObjectResult("Item to delete not found");
         }
 
-        await blogPostUtility.DeleteBlogPost(itemToDelete.id, itemToDelete.partitionKey);
-        logger.LogInformation("Function {}", itemToDelete.id);
+        bool didDeleteCalendarEvent = await calendarEventUtility.DeleteCalendarEvent(itemToDelete.id, itemToDelete.partitionKey);
 
-        return new OkObjectResult("Item Deleted Successfully");
+
+        if (didDeleteCalendarEvent)
+        {
+            logger.LogInformation("Calendar Event {id} deleted", itemToDelete.id);
+
+            bool didDeleteSquareEvent = await squareUtility.DeleteSquareEventById(itemToDelete.squareEventId);
+
+            if (didDeleteSquareEvent)
+            {
+                logger.LogInformation("Calendar Event {CalendarEventId} deleted", itemToDelete.id);
+
+                return new OkObjectResult("Item Deleted Successfully");
+            }
+            else
+            {
+                logger.LogError("Failed to delete Calendar Event {CalendarEventId}", itemToDelete.id);
+
+            }
+        }
+
+        return new BadRequestObjectResult("Failed to delete Calendar Event");
     }
 }

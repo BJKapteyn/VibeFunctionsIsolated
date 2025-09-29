@@ -159,63 +159,7 @@ public class SquareDalUtility : ISquareUtility
 
     public async Task<string?> UpsertCalendarEvent(CalendarEvent calendarEvent)
     {
-        //// Build the item variation
-        //var itemVariation = new CatalogObject(
-        //    type: "ITEM_VARIATION",
-        //    id: "#" + Guid.NewGuid().ToString(),
-        //    itemVariationData: new CatalogItemVariation(
-        //        itemId: null,
-        //        name: "Default",
-        //        sku: null,
-        //        upc: null,
-        //        ordinal: 0,
-        //        pricingType: "FIXED_PRICING",
-        //        priceMoney: new Money(0, "USD"),
-        //        //{
-        //        //    amount = 0,
-        //        //    Currency = "USD"
-        //        //},
-        //        locationOverrides: null,
-        //        trackInventory: false,
-        //        inventoryAlertType: null,
-        //        inventoryAlertThreshold: null
-        //    )
-        //);
-
-        //// Build the item data
-        //var itemData = new CatalogItem(
-        //    name: calendarEvent.EventName,
-        //    description: calendarEvent.EventDescription ?? "",
-        //    abbreviation: null,
-        //    labelColor: null,
-        //    availableOnline: true,
-        //    availableForPickup: false,
-        //    availableElectronically: false,
-        //    categoryId: null,
-        //    taxIds: null,
-        //    modifierListInfo: null,
-        //    variations: new List<CatalogObject> { itemVariation },
-        //    productType: SquareProductType.AppointmentsService,
-        //    skipModifierScreen: false,
-        //    isTaxable: false
-        //);
-
-        //// Build the image data if present
-        //CatalogImage? imageData = null;
-        //if (!string.IsNullOrEmpty(calendarEvent.BannerImageUrl))
-        //{
-        //    imageData = new CatalogImage(url: calendarEvent.BannerImageUrl);            
-        //}
-
-        //// Build the main catalog object
-        //var catalogObjectToUpsert = new CatalogObject(
-        //    type: "ITEM",
-        //    id: "#" + Guid.NewGuid().ToString(),
-        //    itemData: itemData,
-        //    imageData: imageData
-        //);
-
-        // Build the upsert request
+        
         CatalogObject catalogObjectToUpsert = buildCatalogObject(calendarEvent);
         string idempotencyKey = Guid.NewGuid().ToString();
         var upsertRequest = new UpsertCatalogObjectRequest(idempotencyKey, catalogObjectToUpsert);
@@ -224,6 +168,13 @@ public class SquareDalUtility : ISquareUtility
 
 
         return upsertCatalogObjectId;
+    }
+
+    public async Task<bool> DeleteSquareEventById(string eventId)
+    {
+        bool didDeleteEvent = await squareSdkDal.DeleteSquareCatalogObject(eventId);
+
+        return didDeleteEvent;
     }
 
     private async Task<string?> UpsertCatalogObject(UpsertCatalogObjectRequest upsertRequest, string? nameOfMethodCall = null)

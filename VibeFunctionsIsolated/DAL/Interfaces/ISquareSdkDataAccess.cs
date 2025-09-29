@@ -36,4 +36,12 @@ public interface ISquareSdkDataAccess
     /// <param name="upsertObjectRequest">request containing catalog item to upsert</param>
     /// <returns>true if object was upserted, false if not</returns>
     public Task<UpsertCatalogObjectResponse> UpsertSquareCatalogObject(UpsertCatalogObjectRequest upsertObjectRequest);
+
+    /// <summary>
+    /// Deletes a catalog object from the Square catalog.
+    /// </summary>
+    /// <param name="deleteObjectRequest">The request object containing the details of the catalog object to delete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a  <see
+    /// cref="DeleteCatalogObjectResponse"/> object with the details of the deletion operation.</returns>
+    public Task<bool> DeleteSquareCatalogObject(string deleteRequestObjectId);
 }

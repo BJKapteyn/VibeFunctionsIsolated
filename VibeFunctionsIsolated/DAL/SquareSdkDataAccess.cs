@@ -196,9 +196,6 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
         {
             response = await squareClient.CatalogApi.UpsertCatalogObjectAsync(catalogItem);
 
-            // The Square .NET SDK does not expose HTTP status code directly on the response,
-            // but if no exception is thrown, the request was successful (HTTP 200).
-            // You can also check for errors in the response object.
             if (response.Errors == null || !response.Errors.Any())
             {
                 // Success (treated as HTTP 200)
@@ -219,4 +216,25 @@ public class SquareSdkDataAccess : ISquareSdkDataAccess
 
         return response;
     }
+
+    public async Task<bool> DeleteSquareCatalogObject(string deleteRequestObjectId)
+    {
+        bool didDelete = false; 
+
+        DeleteCatalogObjectResponse deleteResponse =  await squareClient.CatalogApi.DeleteCatalogObjectAsync(deleteRequestObjectId);
+
+        if (deleteResponse?.Errors != null && deleteResponse.Errors.Any())
+        {
+            logger.LogError("DeleteSquareCatalogObject: Square API returned errors: {errors}", string.Join(", ", deleteResponse.Errors.Select(e => e.Detail)));
+        }
+        else if (deleteResponse != null)
+        {
+            logger.LogInformation("DeleteSquareCatalogObject: Successfully deleted catalog object with id: {id}", deleteResponse.DeletedObjectIds);
+
+            didDelete = true;
+        }
+
+        return didDelete;
+    }
+
 }

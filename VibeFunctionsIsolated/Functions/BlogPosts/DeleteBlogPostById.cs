@@ -10,16 +10,16 @@ namespace VibeFunctionsIsolated.Functions.BlogPosts;
 public class DeleteBlogPostById
 {
     private readonly ILogger<DeleteBlogPostById> logger;
-    private readonly ICalendarEventUtility calendarEventUtility;
     private readonly IApplicationUtility applicationUtility;
+    private readonly IBlogPostUtility blogPostUtility;
 
     public DeleteBlogPostById(
         ILogger<DeleteBlogPostById> logger,
-        ICalendarEventUtility calendarEventUtility,
+        IBlogPostUtility blogPostUtility,
         IApplicationUtility applicationUtility)
     {
         this.logger = logger;
-        this.calendarEventUtility = calendarEventUtility;
+        this.blogPostUtility = blogPostUtility;
         this.applicationUtility = applicationUtility;
     }
 
@@ -34,7 +34,12 @@ public class DeleteBlogPostById
             return new BadRequestObjectResult("Incorrect format");
         }
 
-        await calendarEventUtility.DeleteCalendarEvent(itemToDelete.id, itemToDelete.partitionKey);
+        bool didDeleteBlogPost = await blogPostUtility.DeleteBlogPost(itemToDelete.id, itemToDelete.partitionKey);
+
+        if(!didDeleteBlogPost)
+        {
+            return new NotFoundObjectResult("Delete Failed");
+        }
         logger.LogInformation("Function {CalendarEventId} deleted", itemToDelete.id);
 
         return new OkObjectResult("Item Deleted Successfully");
