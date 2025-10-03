@@ -13,7 +13,6 @@ public interface ICalendarEventUtility
     /// <returns>Collection of calendar events from cosmosdb</returns>
     Task<IEnumerable<CalendarEvent>> GetAllCalendarEvents();
 
-
     /// <summary>
     /// Upsert Calendar Event to Cosmos DB.
     /// </summary>

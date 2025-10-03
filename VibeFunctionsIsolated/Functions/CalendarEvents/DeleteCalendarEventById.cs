@@ -40,7 +40,6 @@ public class DeleteCalendarEventById
 
         bool didDeleteCalendarEvent = await calendarEventUtility.DeleteCalendarEvent(itemToDelete.id, itemToDelete.partitionKey);
 
-
         if (didDeleteCalendarEvent)
         {
             logger.LogInformation("Calendar Event {id} deleted", itemToDelete.id);
@@ -56,7 +55,6 @@ public class DeleteCalendarEventById
             else
             {
                 logger.LogError("Failed to delete Calendar Event {CalendarEventId}", itemToDelete.id);
-
             }
         }
 

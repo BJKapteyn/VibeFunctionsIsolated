@@ -2,6 +2,7 @@
 
 namespace VibeFunctionsIsolated.Models.Cosmos.UtilityModels;
 
+[JsonSerializable(typeof(CosmosDeleteItemId))]
 public class CosmosDeleteItemId : CosmosItemId
 {
     [JsonConstructor]
@@ -13,6 +14,7 @@ public class CosmosDeleteItemId : CosmosItemId
     /// <summary>
     /// Id of Square event to be deleted
     /// </summary>
+    [JsonPropertyName("squareEventId")]
     public string squareEventId { get; set; }
 
 }
