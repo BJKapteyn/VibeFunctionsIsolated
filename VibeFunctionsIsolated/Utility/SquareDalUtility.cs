@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
 using Square.Models;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Enums;
@@ -157,17 +158,15 @@ public class SquareDalUtility : ISquareUtility
         return [];
     }
 
-    public async Task<string?> UpsertCalendarEvent(CalendarEvent calendarEvent)
+    public async Task<CatalogItemIds?> UpsertCalendarEvent(CalendarEvent calendarEvent)
     {
-        
         CatalogObject catalogObjectToUpsert = buildCatalogObject(calendarEvent);
         string idempotencyKey = Guid.NewGuid().ToString();
         var upsertRequest = new UpsertCatalogObjectRequest(idempotencyKey, catalogObjectToUpsert);
 
-        string? upsertCatalogObjectId = await UpsertCatalogObject(upsertRequest, nameof(UpsertCalendarEvent));
+        CatalogItemIds? upsertCatalogObjectIds = await UpsertCatalogObject(upsertRequest, nameof(UpsertCalendarEvent));
 
-
-        return upsertCatalogObjectId;
+        return upsertCatalogObjectIds;
     }
 
     public async Task<bool> DeleteSquareEventById(string eventId)
@@ -177,9 +176,9 @@ public class SquareDalUtility : ISquareUtility
         return didDeleteEvent;
     }
 
-    private async Task<string?> UpsertCatalogObject(UpsertCatalogObjectRequest upsertRequest, string? nameOfMethodCall = null)
+    private async Task<CatalogItemIds?> UpsertCatalogObject(UpsertCatalogObjectRequest upsertRequest, string? nameOfMethodCall = null)
     {
-        string? upsertId = null;
+        CatalogItemIds? upsertIds = null;
 
         UpsertCatalogObjectResponse upsertResponse = await squareSdkDal.UpsertSquareCatalogObject(upsertRequest);
 
@@ -191,10 +190,14 @@ public class SquareDalUtility : ISquareUtility
         else
         {
             logger.LogInformation("Upserted catalog object to Square with id: {id}", upsertResponse.CatalogObject.Id);
-            upsertId = upsertResponse.CatalogObject.Id;
+            upsertIds = new CatalogItemIds
+            {
+                ItemId = upsertResponse.CatalogObject.Id,
+                VariationIds = upsertResponse.CatalogObject.ItemData.Variations?.Select(variation => variation.Id).ToList() ?? new List<string>()
+            };
         }
 
-        return upsertId;
+        return upsertIds;
     }
 
     /// <summary>
@@ -219,16 +222,22 @@ public class SquareDalUtility : ISquareUtility
 
     private static CatalogObject buildCatalogObject(CalendarEvent calendarEvent)
     {
+        long squareAPIVersion = 1759610876353;
+        DateTime endDate = calendarEvent.EndDate ?? calendarEvent.StartDate.AddHours(1);
+        int eventDurationInMinutes = (int)(endDate - calendarEvent.StartDate).TotalMinutes;
         // Build the item variation
         var itemVariation = new CatalogObject(
             type: "ITEM_VARIATION",
-            id: "#variation",
+            id: calendarEvent.SquareVariationId ?? "#variation",
+            version: squareAPIVersion,
+            itemData: null,
             itemVariationData: new CatalogItemVariation(
                 itemId: calendarEvent.SquareEventId,
                 name: "Default",
                 ordinal: 0,
                 pricingType: "FIXED_PRICING",
-                priceMoney: new Money((long) calendarEvent.PriceInUSD, "USD")
+                serviceDuration: eventDurationInMinutes,
+                priceMoney: new Money((long)calendarEvent.PriceInUSD, "USD")
             )
         );
         // Build the item data
@@ -249,7 +258,8 @@ public class SquareDalUtility : ISquareUtility
         var catalogObject = new CatalogObject(
             type: "ITEM",
             id: calendarEvent.SquareEventId,
-            itemData: itemData
+            itemData: itemData,
+            version: squareAPIVersion
         );
 
         return catalogObject;

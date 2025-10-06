@@ -4,10 +4,11 @@ using VibeFunctionsIsolated.Models.Interfaces;
 namespace VibeFunctionsIsolated.Models.Cosmos;
 
 [JsonSerializable(typeof(CalendarEvent))]
-public class CalendarEvent : ICosmosItem
+public class  CalendarEvent : ICosmosItem
 {
     public CalendarEvent(
        string? squareEventId,
+       string? squareVariationId,
        string eventName,
        string? eventDescription,
        DateTime startDate,
@@ -21,6 +22,7 @@ public class CalendarEvent : ICosmosItem
         // If no squareEventId is provided, the placeholder value must start with # in the Square SDK
         // the square API will assign it an id on insert 
         SquareEventId = squareEventId ?? "#" + Guid.NewGuid().ToString();
+        SquareVariationId = squareVariationId ?? "#" + Guid.NewGuid().ToString();
         EventName = eventName;
         EventDescription = eventDescription;
         StartDate = startDate;
@@ -34,6 +36,8 @@ public class CalendarEvent : ICosmosItem
     public string id { get; set; }
     [JsonPropertyName("SquareEventId")]
     public string SquareEventId { get; set; }
+    [JsonPropertyName("SquareVariationId")]
+    public string SquareVariationId { get; set; }
     [JsonPropertyName("EventName")]
     public string EventName { get; set; }
     [JsonPropertyName("EventDescription")]

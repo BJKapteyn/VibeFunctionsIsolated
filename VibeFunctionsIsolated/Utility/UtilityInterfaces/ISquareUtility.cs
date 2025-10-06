@@ -45,7 +45,6 @@ public interface ISquareUtility
     /// Upsert a calendar event to Square Catalog
     /// </summary>
     /// <param name="calendarEvent"></param>
-    /// <returns></returns>
-    public Task<string?> UpsertCalendarEvent(CalendarEvent calendarEvent);
-
+    /// <returns>Catalog Item Ids if response is good, null if not</returns>
+    public Task<CatalogItemIds?> UpsertCalendarEvent(CalendarEvent calendarEvent);
 }
