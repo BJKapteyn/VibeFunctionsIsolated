@@ -222,7 +222,7 @@ public class SquareDalUtility : ISquareUtility
 
     private static CatalogObject buildCatalogObject(CalendarEvent calendarEvent)
     {
-        long squareAPIVersion = 1759610876353;
+        long squareAPIVersion = 1759871319778;
         DateTime endDate = calendarEvent.EndDate ?? calendarEvent.StartDate.AddHours(1);
         int eventDurationInMinutes = (int)(endDate - calendarEvent.StartDate).TotalMinutes;
         // Build the item variation
