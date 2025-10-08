@@ -41,7 +41,7 @@ public class UpsertCalendarEvent(
             if (calendarEvent.SquareEventId != squareUpsertIds.ItemId && squareUpsertIds.VariationIds.Any())
             {
                 calendarEvent.SquareEventId = squareUpsertIds.ItemId;
-                calendarEvent.SquareVariationId = squareUpsertIds.VariationIds.First(); // The First variation contains extra data not in the item itself
+                calendarEvent.SquareVariationId = squareUpsertIds.VariationIds.First(); 
                 calendarEvent.SquareEventVersion = squareUpsertIds.DatabaseVersion;
             }
 
