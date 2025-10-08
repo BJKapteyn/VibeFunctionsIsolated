@@ -193,7 +193,8 @@ public class SquareDalUtility : ISquareUtility
             upsertIds = new CatalogItemIds
             {
                 ItemId = upsertResponse.CatalogObject.Id,
-                VariationIds = upsertResponse.CatalogObject.ItemData.Variations?.Select(variation => variation.Id).ToList() ?? new List<string>()
+                VariationIds = upsertResponse.CatalogObject.ItemData.Variations?.Select(variation => variation.Id).ToList() ?? new List<string>(),
+                DatabaseVersion = upsertResponse.CatalogObject.Version ?? 0
             };
         }
 
@@ -222,14 +223,13 @@ public class SquareDalUtility : ISquareUtility
 
     private static CatalogObject buildCatalogObject(CalendarEvent calendarEvent)
     {
-        long squareAPIVersion = 1759871319778;
         DateTime endDate = calendarEvent.EndDate ?? calendarEvent.StartDate.AddHours(1);
         int eventDurationInMinutes = (int)(endDate - calendarEvent.StartDate).TotalMinutes;
         // Build the item variation
         var itemVariation = new CatalogObject(
             type: "ITEM_VARIATION",
             id: calendarEvent.SquareVariationId ?? "#variation",
-            version: squareAPIVersion,
+            version: calendarEvent.SquareEventVersion,
             itemData: null,
             itemVariationData: new CatalogItemVariation(
                 itemId: calendarEvent.SquareEventId,
@@ -259,7 +259,7 @@ public class SquareDalUtility : ISquareUtility
             type: "ITEM",
             id: calendarEvent.SquareEventId,
             itemData: itemData,
-            version: squareAPIVersion
+            version: calendarEvent.SquareEventVersion
         );
 
         return catalogObject;

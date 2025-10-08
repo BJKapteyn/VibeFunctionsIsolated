@@ -42,6 +42,7 @@ public class UpsertCalendarEvent(
             {
                 calendarEvent.SquareEventId = squareUpsertIds.ItemId;
                 calendarEvent.SquareVariationId = squareUpsertIds.VariationIds.First(); // The First variation contains extra data not in the item itself
+                calendarEvent.SquareEventVersion = squareUpsertIds.DatabaseVersion;
             }
 
             bool didCosomosUpsert = await cosmosCalendarEventUtility.UpsertCalendarEvent(calendarEvent);

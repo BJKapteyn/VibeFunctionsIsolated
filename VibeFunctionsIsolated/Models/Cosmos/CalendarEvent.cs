@@ -9,6 +9,7 @@ public class  CalendarEvent : ICosmosItem
     public CalendarEvent(
        string? squareEventId,
        string? squareVariationId,
+       long squareEventVersion,
        string eventName,
        string? eventDescription,
        DateTime startDate,
@@ -23,6 +24,7 @@ public class  CalendarEvent : ICosmosItem
         // the square API will assign it an id on insert 
         SquareEventId = squareEventId ?? "#" + Guid.NewGuid().ToString();
         SquareVariationId = squareVariationId ?? "#" + Guid.NewGuid().ToString();
+        SquareEventVersion = squareEventVersion;
         EventName = eventName;
         EventDescription = eventDescription;
         StartDate = startDate;
@@ -38,6 +40,8 @@ public class  CalendarEvent : ICosmosItem
     public string SquareEventId { get; set; }
     [JsonPropertyName("SquareVariationId")]
     public string SquareVariationId { get; set; }
+    [JsonPropertyName("SquareEventVersion")]
+    public long SquareEventVersion { get; set; }
     [JsonPropertyName("EventName")]
     public string EventName { get; set; }
     [JsonPropertyName("EventDescription")]
