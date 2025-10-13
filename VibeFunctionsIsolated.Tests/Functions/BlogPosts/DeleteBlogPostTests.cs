@@ -20,14 +20,14 @@ namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts
     [Parallelizable]
     public class DeleteBlogPostTests
     {
-        private Mock<ILogger<DeleteCalendarEventById>> logger;
+        private Mock<ILogger<DeleteBlogPostById>> logger;
         private Mock<IBlogPostUtility> blogPostUtility;
         private Mock<IApplicationUtility> appUtility;
 
         [SetUp]
         public void Setup()
         {
-            logger = new Mock<ILogger<DeleteCalendarEventById>>();
+            logger = new Mock<ILogger<DeleteBlogPostById>>();
             blogPostUtility = new Mock<IBlogPostUtility>();
             appUtility = new Mock<IApplicationUtility>();
         }
@@ -37,15 +37,16 @@ namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts
         [TestCaseSource(nameof(DeleteBlogPostTestCases))]
         public async Task DeleteBlogPostById_CorrectResponseTest(
             CosmosItemId deserializedRequest,
+            bool didDelete,
             IActionResult expected)
         {
             // Arrange
             var mockRequest = new Mock<HttpRequest>();
             // Simulate request body containing the blog post id
             appUtility.Setup(x => x.DeserializeStream<CosmosItemId>(It.IsAny<Stream>()).Result).Returns(deserializedRequest);
-           
+            blogPostUtility.Setup(utility => utility.DeleteBlogPost(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(didDelete);
 
-            var deleteBlogPostById = new DeleteCalendarEventById(logger.Object, blogPostUtility.Object, appUtility.Object);
+            var deleteBlogPostById = new DeleteBlogPostById(logger.Object, blogPostUtility.Object, appUtility.Object);
 
             // Act
             IActionResult actual = await deleteBlogPostById.Run(mockRequest.Object);
@@ -60,14 +61,14 @@ namespace VibeFunctionsIsolated.Tests.Functions.BlogPosts
             CosmosItemId? validCosmosItemId = new("id123", "partitionKey");
             CosmosItemId? invalidCosmosItemId = new("", "partitionKey");
             CosmosItemId? nullCosmosItemId = null;
+            bool didDelete = true;
+            bool didNOTDelete = false;
             var okResult = new OkObjectResult(new object());
             var notFoundResult = new NotFoundObjectResult(new object());
 
-            // Blog post found and deleted
-            yield return new TestCaseData(validCosmosItemId, okResult);
-            // Blog post not found
-            yield return new TestCaseData(invalidCosmosItemId, notFoundResult);
-            yield return new TestCaseData(nullCosmosItemId, notFoundResult);
+            yield return new TestCaseData(validCosmosItemId, didDelete, okResult);
+            yield return new TestCaseData(invalidCosmosItemId, didNOTDelete, notFoundResult);
+            yield return new TestCaseData(nullCosmosItemId, didNOTDelete, notFoundResult);
         }
     }
 }

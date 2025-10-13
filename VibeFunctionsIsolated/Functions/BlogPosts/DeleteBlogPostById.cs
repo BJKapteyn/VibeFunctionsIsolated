@@ -28,17 +28,17 @@ public class DeleteBlogPostById
     {
         CosmosItemId? itemToDelete = await applicationUtility.DeserializeStream<CosmosItemId>(req.Body);
 
-        if (itemToDelete == null)
+        if (itemToDelete == null || string.IsNullOrEmpty(itemToDelete.id) || string.IsNullOrEmpty(itemToDelete.partitionKey))
         {
             logger.LogError("Incorrect format when running: " + nameof(DeleteBlogPostById));
-            return new BadRequestObjectResult("Incorrect format");
+            return new NotFoundObjectResult("Invalid request body");
         }
 
         bool didDeleteBlogPost = await blogPostUtility.DeleteBlogPost(itemToDelete.id, itemToDelete.partitionKey);
 
         if(!didDeleteBlogPost)
         {
-            return new NotFoundObjectResult("Delete Failed");
+            return new BadRequestObjectResult("Blog Post not deleted");
         }
         logger.LogInformation("Function {CalendarEventId} deleted", itemToDelete.id);
 
