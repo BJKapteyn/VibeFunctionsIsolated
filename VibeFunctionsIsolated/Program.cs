@@ -5,6 +5,8 @@ using VibeFunctionsIsolated.Utility;
 using VibeFunctionsIsolated.DAL;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
+using Microsoft.Extensions.Azure;
+using Azure.Identity;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
@@ -20,6 +22,10 @@ var host = new HostBuilder()
         services.AddSingleton<ICosmosDataAccess, CosmosDataAccess>();
         services.AddScoped<IApplicationUtility, ApplicationUtility>();
         services.AddScoped<IBlogPostUtility, BlogPostUtility>();
+        services.AddAzureClients(builder =>
+        {
+            builder.AddBlobServiceClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"));
+        });
     })
     .Build();
 
