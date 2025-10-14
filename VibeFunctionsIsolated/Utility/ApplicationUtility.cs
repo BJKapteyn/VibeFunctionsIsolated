@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Utility.UtilityInterfaces;
 
 namespace VibeFunctionsIsolated.Utility;
@@ -8,9 +9,18 @@ namespace VibeFunctionsIsolated.Utility;
 /// General inner application utility methods
 /// </summary>
 /// <param name="logger">Logger for information and errors</param>
-public class ApplicationUtility(ILogger<ApplicationUtility> logger) : IApplicationUtility
+public class ApplicationUtility : IApplicationUtility
 {
-    private readonly ILogger<ApplicationUtility> logger = logger;
+    private readonly ILogger<ApplicationUtility> logger;
+    private readonly IBlobStorageDataAccess blobStorageDataAccess;
+
+    public ApplicationUtility(
+        ILogger<ApplicationUtility> logger,
+        IBlobStorageDataAccess blobStorageDataAccess)
+    {
+        this.logger = logger;
+        this.blobStorageDataAccess = blobStorageDataAccess;
+    }
 
     public async Task<T?> DeserializeStream<T>(Stream body)
     {
@@ -30,5 +40,11 @@ public class ApplicationUtility(ILogger<ApplicationUtility> logger) : IApplicati
         }
 
         return deserializedJson;
+    }
+
+    public async Task<string> UploadImage(Stream imageStream)
+    {
+        // Forward the stream to blob storage and return the URL
+        return await blobStorageDataAccess.UploadBlob(imageStream);
     }
 }

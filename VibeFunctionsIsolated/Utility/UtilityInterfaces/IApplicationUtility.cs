@@ -12,4 +12,11 @@ public interface IApplicationUtility
     /// <param name="body">Body of the response as a stream</param>
     /// <returns>Deserialized object</returns>
     public Task<T?> DeserializeStream<T>(Stream body);
+
+    /// <summary>
+    /// Uploads an image from a stream.
+    /// </summary>
+    /// <param name="imageStream">The image stream to upload.</param>
+    /// <returns>URL or identifier for the uploaded image.</returns>
+    public Task<string> UploadImage(Stream imageStream);
 }

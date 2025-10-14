@@ -22,9 +22,12 @@ var host = new HostBuilder()
         services.AddSingleton<ICosmosDataAccess, CosmosDataAccess>();
         services.AddScoped<IApplicationUtility, ApplicationUtility>();
         services.AddScoped<IBlogPostUtility, BlogPostUtility>();
+        services.AddScoped<IBlobStorageDataAccess, BlobStorageDataAccess>();
         services.AddAzureClients(builder =>
         {
             builder.AddBlobServiceClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"));
+            DefaultAzureCredential credential = new DefaultAzureCredential();
+            builder.UseCredential(credential);
         });
     })
     .Build();
