@@ -21,9 +21,15 @@ public class UploadImage
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        // Example usage:
-
         string imageUrl = await applicationUtility.UploadImage(req.Body);
+
+        if(string.IsNullOrEmpty(imageUrl))
+        {
+            _logger.LogError("Image upload failed in function: " + nameof(UploadImage));
+
+            return new BadRequestResult();
+        }
+
         return new OkObjectResult(imageUrl);
     }
 }

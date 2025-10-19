@@ -44,7 +44,17 @@ public class ApplicationUtility : IApplicationUtility
 
     public async Task<string> UploadImage(Stream imageStream)
     {
-        // Forward the stream to blob storage and return the URL
-        return await blobStorageDataAccess.UploadBlob(imageStream);
+        string imageUrl = "";
+
+        try
+        {
+            imageUrl = await blobStorageDataAccess.UploadBlob(imageStream);
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Failed to upload image to blob storage");
+        }
+
+        return imageUrl;
     }
 }
