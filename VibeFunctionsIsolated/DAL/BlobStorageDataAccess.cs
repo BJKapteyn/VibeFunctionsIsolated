@@ -24,7 +24,7 @@ public class BlobStorageDataAccess : IBlobStorageDataAccess
 
         await containerClient.CreateIfNotExistsAsync();
 
-        string imageName = Guid.NewGuid().ToString();
+        string imageName = Guid.NewGuid().ToString() + ".jpg";
         BlobClient blobClient = containerClient.GetBlobClient(imageName);
 
         var headers = new BlobHttpHeaders();
