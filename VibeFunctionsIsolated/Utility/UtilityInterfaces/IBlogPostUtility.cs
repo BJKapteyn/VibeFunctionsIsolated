@@ -8,6 +8,6 @@ namespace VibeFunctionsIsolated.Utility.UtilityInterfaces;
 public interface IBlogPostUtility
 {
     public Task<IEnumerable<BlogPost>> GetAllBlogPosts();
-    public Task<bool> UpsertBlogPost(BlogPost blogPost);
+    public Task<BlogPost?> UpsertBlogPost(BlogPost blogPost);
     public Task<bool> DeleteBlogPost(string id, string partitionKey);
 }

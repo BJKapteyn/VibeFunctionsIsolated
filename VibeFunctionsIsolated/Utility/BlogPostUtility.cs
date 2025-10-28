@@ -34,7 +34,7 @@ public class BlogPostUtility : IBlogPostUtility
         return blogPosts;
     }
 
-    public async Task<bool> UpsertBlogPost(BlogPost blogPost)
+    public async Task<BlogPost?> UpsertBlogPost(BlogPost blogPost)
     {
         if (blogPost == null)
         {
@@ -43,27 +43,27 @@ public class BlogPostUtility : IBlogPostUtility
             throw argumentNullException;
         }
 
-        bool didUpsert = false;
-
         CosmosResponse upsertResponse = await cosmosDataAccess.UpsertCosmosItemAsync(blogPost);
 
         if (upsertResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {
             logger.LogInformation("BlogPost with id {id} created in CosmosDB", blogPost.id);
-            didUpsert = true;
         }
         else if (upsertResponse.StatusCode == System.Net.HttpStatusCode.Created)
         {
             logger.LogInformation("BlogPost with id {id} updated in CosmosDB", blogPost.id);
-            didUpsert = true;
         }
         else
         {
             Type? upsertType = upsertResponse?.CosmosItem.GetType();
             logger.LogError("Error updating or creating BlogPost with type {upsertType} in CosmosDB. StatusCode: {statusCode}", upsertType, upsertResponse?.StatusCode);
+            
+            return null;
         }
+        
+        blogPost.id = upsertResponse.CosmosItem.id;
 
-        return didUpsert;
+        return blogPost;
     }
 
     public async Task<bool> DeleteBlogPost(string id, string partitionKey)

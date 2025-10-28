@@ -35,13 +35,13 @@ public class UpsertBlogPost
             return new BadRequestObjectResult("Invalid request body");
         }
 
-        bool didUpsertBlogPost = await blogPostUtility.UpsertBlogPost(blogPost);
+        BlogPost? upsertedBlogPost = await blogPostUtility.UpsertBlogPost(blogPost);
 
-        if (!didUpsertBlogPost)
+        if (upsertedBlogPost == null)
         {
             return new BadRequestObjectResult("Upsert failed");
         }
 
-        return new OkObjectResult(blogPost);
+        return new OkObjectResult(upsertedBlogPost);
     }
 }
