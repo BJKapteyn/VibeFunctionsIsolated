@@ -37,17 +37,17 @@ public class UpsertCalendarEvent(
         if (squareUpsertIds != null)
         {
             // Update square info in cosmos if needed
+            calendarEvent.SquareEventVersion = squareUpsertIds.DatabaseVersion;
             if (calendarEvent.SquareEventId != squareUpsertIds.ItemId && squareUpsertIds.VariationIds.Any())
             {
                 calendarEvent.SquareEventId = squareUpsertIds.ItemId;
                 calendarEvent.SquareVariationId = squareUpsertIds.VariationIds.First(); 
-                calendarEvent.SquareEventVersion = squareUpsertIds.DatabaseVersion;
             }
 
             bool didCosomosUpsert = await cosmosCalendarEventUtility.UpsertCalendarEvent(calendarEvent);
 
             if (didCosomosUpsert)
-                return new OkObjectResult(calendarEvent.id);
+                return new OkObjectResult(calendarEvent);
         }
 
         return new BadRequestResult();

@@ -42,6 +42,6 @@ public class UpsertBlogPost
             return new BadRequestObjectResult("Upsert failed");
         }
 
-        return new OkResult();
+        return new OkObjectResult(blogPost);
     }
 }
