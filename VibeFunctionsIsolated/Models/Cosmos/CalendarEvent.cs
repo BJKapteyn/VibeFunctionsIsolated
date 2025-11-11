@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using VibeFunctionsIsolated.Enums;
 using VibeFunctionsIsolated.Models.Interfaces;
 
 namespace VibeFunctionsIsolated.Models.Cosmos;
@@ -40,6 +41,7 @@ public class  CalendarEvent : ICosmosItem
     public string SquareEventId { get; set; }
     [JsonPropertyName("SquareVariationId")]
     public string SquareVariationId { get; set; }
+    public string SquareCalendarEventCategoryId { get; set; } = SquareCategoryId.CalendarEventCategoryId;
     [JsonPropertyName("SquareEventVersion")]
     public long SquareEventVersion { get; set; }
     [JsonPropertyName("EventName")]
