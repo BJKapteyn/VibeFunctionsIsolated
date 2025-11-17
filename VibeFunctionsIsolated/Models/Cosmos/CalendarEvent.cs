@@ -18,11 +18,12 @@ public class  CalendarEvent : ICosmosItem
        string? eventOrganizerName,
        string? bannerImageUrl,
        long priceInUSD,
+       string teamMemberId,
        string? id)
     {
         this.id = id ?? Guid.NewGuid().ToString();
-        // If no squareEventId is provided, the placeholder value must start with # in the Square SDK
-        // the square API will assign it an id on insert 
+        // If no squareEventId is provided, the placeholder value must start with # in the Square API
+        // the square API will then assign it an id on insert 
         SquareEventId = squareEventId ?? "#" + Guid.NewGuid().ToString();
         SquareVariationId = squareVariationId ?? "#" + Guid.NewGuid().ToString();
         SquareEventVersion = squareEventVersion;
@@ -33,10 +34,13 @@ public class  CalendarEvent : ICosmosItem
         EventOrganizerName = eventOrganizerName ?? "";
         BannerImageUrl = bannerImageUrl ?? "";
         PriceInUSD = priceInUSD;
+        TeamMemberId = teamMemberId;
     }
 
     [JsonPropertyName("id")]
     public string id { get; set; }
+    [JsonPropertyName("TeamMemberId")]
+    public string TeamMemberId { get; set; }
     [JsonPropertyName("SquareEventId")]
     public string SquareEventId { get; set; }
     [JsonPropertyName("SquareVariationId")]

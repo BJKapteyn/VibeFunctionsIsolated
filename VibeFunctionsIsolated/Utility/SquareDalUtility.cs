@@ -245,6 +245,7 @@ public class SquareDalUtility : ISquareUtility
                 ordinal: 0,
                 pricingType: "FIXED_PRICING",
                 serviceDuration: 3600000,
+                teamMemberIds: [calendarEvent.TeamMemberId],
                 priceMoney: new Money((long)calendarEvent.PriceInUSD, "USD")
             )
         );
