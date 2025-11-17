@@ -223,31 +223,43 @@ public class SquareDalUtility : ISquareUtility
 
     private static CatalogObject buildCatalogObject(CalendarEvent calendarEvent)
     {
-        DateTime endDate = calendarEvent.EndDate ?? calendarEvent.StartDate.AddHours(1);
-        int eventDurationInMinutes = (int)(endDate - calendarEvent.StartDate).TotalMinutes;
-        // Build the item variation
+        //DateTime endDate = calendarEvent.EndDate ?? calendarEvent.StartDate.AddHours(1);
+        //int eventDurationInMinutes = (int)(endDate - calendarEvent.StartDate).TotalMinutes;
+
+        //if(eventDurationInMinutes <= 0)
+        //{
+        //    eventDurationInMinutes = 60;
+        //}
+
+        // needs to have an assigned team member
+        // Build the item variation needed for the item data
         var itemVariation = new CatalogObject(
             type: "ITEM_VARIATION",
             id: calendarEvent.SquareVariationId ?? "#variation",
             version: calendarEvent.SquareEventVersion,
             itemData: null,
             itemVariationData: new CatalogItemVariation(
+                availableForBooking: true,
                 itemId: calendarEvent.SquareEventId,
                 name: "Default",
                 ordinal: 0,
                 pricingType: "FIXED_PRICING",
-                serviceDuration: eventDurationInMinutes,
+                serviceDuration: 3600000,
                 priceMoney: new Money((long)calendarEvent.PriceInUSD, "USD")
             )
         );
+        var catelogReportingCategory = new CatalogObjectCategory(
+            id: calendarEvent.SquareCalendarEventCategoryId
+        );
         // Build the item data
         var itemData = new CatalogItem(
+            availableOnline: true,
             name: calendarEvent.EventName,
             description: calendarEvent.EventDescription ?? "",
-            availableOnline: true,
+            reportingCategory: catelogReportingCategory,
             availableForPickup: false,
             availableElectronically: true,
-            categoryId: null,
+            categoryId: calendarEvent.SquareCalendarEventCategoryId,
             variations: [itemVariation],
             productType: SquareProductType.AppointmentsService,
             skipModifierScreen: false,

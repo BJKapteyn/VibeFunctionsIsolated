@@ -41,6 +41,7 @@ public class  CalendarEvent : ICosmosItem
     public string SquareEventId { get; set; }
     [JsonPropertyName("SquareVariationId")]
     public string SquareVariationId { get; set; }
+    [JsonPropertyName("SquareCalendarEventCategoryId")]
     public string SquareCalendarEventCategoryId { get; set; } = SquareCategoryId.CalendarEventCategoryId;
     [JsonPropertyName("SquareEventVersion")]
     public long SquareEventVersion { get; set; }
