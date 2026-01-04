@@ -269,3 +269,4 @@ __pycache__/
 /VibeFunctionsIsolated/Properties/PublishProfiles/TheVibeFunctions - Zip Deploy.pubxml
 /VibeFunctionsIsolated/Properties/ServiceDependencies/TheVibeFunctions - Zip Deploy/storage1.arm.json
 /VibeFunctionsIsolated/Properties/serviceDependencies.TheVibeFunctions - Zip Deploy.json
+/VibeFunctionsIsolated/Properties/ServiceDependencies/TheVibeFunctions - Zip Deploy/profile.arm.json
