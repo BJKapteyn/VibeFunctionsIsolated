@@ -74,6 +74,14 @@ public class CosmosDataAccess : ICosmosDataAccess
         return response.Resource;
     }
 
+    public async Task<CosmosResponse> GetItemCosmosResponseAsync(string id, string partitionKey)
+    {
+        ItemResponse<ICosmosItem> response = await container.ReadItemAsync<ICosmosItem>(id, new PartitionKey(partitionKey));
+        CosmosResponse cosmosResponse = new CosmosResponse(response.StatusCode, response.Resource);
+
+        return cosmosResponse;
+    }
+
     public async Task<CosmosResponse> UpsertCosmosItemAsync<TCosmosItem>(TCosmosItem cosmosItem, string? partitionKey = null) where TCosmosItem : ICosmosItem
     {
         ItemResponse<TCosmosItem> response;

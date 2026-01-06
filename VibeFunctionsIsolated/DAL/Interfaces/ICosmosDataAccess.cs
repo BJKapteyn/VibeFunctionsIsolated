@@ -32,6 +32,14 @@ public interface ICosmosDataAccess
     Task<ICosmosItem> GetItemAsync(string id, PartitionKey partitionKey);
 
     /// <summary>
+    /// Get a cosmos response object with underlying item from the container
+    /// </summary>
+    /// <param name="id">id for item to retrieve</param>
+    /// <param name="partitionKey">Partition Key for the item to be retrieved</param>
+    /// <returns></returns>
+    Task<CosmosResponse> GetItemCosmosResponseAsync(string id, string partitionKey);
+
+    /// <summary>
     /// Get all Items from the container using a query
     /// </summary>
     /// <typeparam name="TCosmosItem">Type of item to retrieve from cosmos container</typeparam>
