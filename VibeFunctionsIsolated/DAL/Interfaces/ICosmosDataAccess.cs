@@ -37,14 +37,14 @@ public interface ICosmosDataAccess
     /// <param name="id">id for item to retrieve</param>
     /// <param name="partitionKey">Partition Key for the item to be retrieved</param>
     /// <returns></returns>
-    Task<CosmosResponse> GetItemCosmosResponseAsync(string id, string partitionKey);
+    Task<CosmosResponse> GetItemWithStatusCodeAsync<TCosmosItem>(string id, string partitionKey) where TCosmosItem : ICosmosItem;
 
     /// <summary>
     /// Get all Items from the container using a query
     /// </summary>
     /// <typeparam name="TCosmosItem">Type of item to retrieve from cosmos container</typeparam>
     /// <param name="query">Query to retrieve all items</param>
-    /// <returns>Collection of </returns>
+    /// <returns>Collection of items</returns>
     Task<IEnumerable<TCosmosItem>> GetAllItemsAsync<TCosmosItem>(string query) where TCosmosItem : ICosmosItem;
 
     /// <summary>

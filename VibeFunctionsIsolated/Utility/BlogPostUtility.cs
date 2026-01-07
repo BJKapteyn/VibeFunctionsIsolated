@@ -108,7 +108,7 @@ public class BlogPostUtility : IBlogPostUtility
 
         try
         {
-            blogPostResponse =  await cosmosDataAccess.GetItemCosmosResponseAsync(id, partitionKey);
+            blogPostResponse =  await cosmosDataAccess.GetItemWithStatusCodeAsync<BlogPost>(id, partitionKey);
 
             blogPost = blogPostResponse.CosmosItem as BlogPost;
 
