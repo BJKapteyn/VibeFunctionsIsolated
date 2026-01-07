@@ -110,19 +110,17 @@ public class BlogPostUtility : IBlogPostUtility
         {
             blogPostResponse =  await cosmosDataAccess.GetItemWithStatusCodeAsync<BlogPost>(id, partitionKey);
 
-            blogPost = blogPostResponse.CosmosItem as BlogPost;
-
             switch (blogPostResponse.StatusCode)
             {
                 case HttpStatusCode.OK:
                     blogPost = blogPostResponse.CosmosItem as BlogPost;
+
                     if (blogPost == null)
                     {
                         logger.LogError("Retrieved item for id {id} could not be cast to BlogPost. ItemType: {type}", id, blogPostResponse.CosmosItem?.GetType());
-                        break;
                     }
-
-                    logger.LogInformation("BlogPost with id {id} retrieved from CosmosDB", id);
+                    
+                    logger.LogInformation("BlogPost with id {id} retrieved successfully from CosmosDB", id);
                     break;
 
                 case HttpStatusCode.NotFound:
