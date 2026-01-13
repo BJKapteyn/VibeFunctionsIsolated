@@ -5,11 +5,11 @@ namespace VibeFunctionsIsolated.Models.Cosmos;
 
 public class CosmosResponse
 {
-    public CosmosResponse(HttpStatusCode statusCode, ICosmosItem cosmosItem)
+    public CosmosResponse(HttpStatusCode statusCode, ICosmosItem? cosmosItem)
     {
         StatusCode = statusCode;
         CosmosItem = cosmosItem;
     }
     public HttpStatusCode StatusCode { get; set; }
-    public ICosmosItem CosmosItem { get; set; }
+    public ICosmosItem? CosmosItem { get; set; }
 }
