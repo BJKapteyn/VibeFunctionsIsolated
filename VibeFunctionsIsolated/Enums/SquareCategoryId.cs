@@ -2,5 +2,5 @@
 
 public static class SquareCategoryId
 {
-    public static readonly string CalendarEventCategoryId = "NAE24FPZ2OP4UUGCEVCMOC6E";
+    public static readonly string CalendarEventCategoryId = "PAUGCKGMOXMYWJQZBXKFY2O5";
 }
