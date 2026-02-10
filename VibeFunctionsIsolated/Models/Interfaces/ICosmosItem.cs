@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.Cosmos;
-
-namespace VibeFunctionsIsolated.Models.Interfaces;
+﻿namespace VibeFunctionsIsolated.Models.Interfaces;
 
 /// <summary>
 /// Represents a Cosmos DB item with a unique identifier.

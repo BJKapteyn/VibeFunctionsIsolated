@@ -10,4 +10,5 @@ public interface IBlogPostUtility
     public Task<IEnumerable<BlogPost>> GetAllBlogPosts();
     public Task<BlogPost?> UpsertBlogPost(BlogPost blogPost);
     public Task<bool> DeleteBlogPost(string id, string partitionKey);
+    public Task<BlogPost?> GetBlogPost(string id, string partitionKey);
 }

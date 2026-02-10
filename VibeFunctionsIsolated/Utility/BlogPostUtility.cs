@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using VibeFunctionsIsolated.DAL.Interfaces;
 using VibeFunctionsIsolated.Models.Cosmos;
 using VibeFunctionsIsolated.Models.Interfaces;
@@ -97,5 +98,50 @@ public class BlogPostUtility : IBlogPostUtility
         }
 
         return didDelete;
+    }
+
+    public async Task<BlogPost?> GetBlogPost(string id, string partitionKey)
+    {
+        PartitionKey partitionKeyObject = new(partitionKey);
+        CosmosResponse blogPostResponse;
+        BlogPost? blogPost = null;
+
+        try
+        {
+            blogPostResponse =  await cosmosDataAccess.GetItemWithStatusCodeAsync<BlogPost>(id, partitionKey);
+
+            switch (blogPostResponse.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    blogPost = blogPostResponse.CosmosItem as BlogPost;
+
+                    if (blogPost == null)
+                    {
+                        logger.LogError("Retrieved item for id {id} could not be cast to BlogPost. ItemType: {type}", id, blogPostResponse.CosmosItem?.GetType());
+                    }
+                    
+                    logger.LogInformation("BlogPost with id {id} retrieved successfully from CosmosDB", id);
+                    break;
+
+                case HttpStatusCode.NotFound:
+                    logger.LogWarning("BlogPost with id {id} not found in CosmosDB. StatusCode: {statusCode}", id, blogPostResponse.StatusCode);
+                    break;
+
+                case HttpStatusCode.Unauthorized:
+                case HttpStatusCode.Forbidden:
+                    logger.LogError("Authorization error while retrieving BlogPost with id {id}. StatusCode: {statusCode}", id, blogPostResponse.StatusCode);
+                    break;
+
+                default:
+                    logger.LogError("Error retrieving BlogPost with id {id}. StatusCode: {statusCode}, ItemType: {type}", id, blogPostResponse.StatusCode, blogPostResponse.CosmosItem?.GetType());
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception occurred while retrieving BlogPost with id {id}", id);
+        }
+
+        return blogPost;
     }
 }
